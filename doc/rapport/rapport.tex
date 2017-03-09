@@ -49,17 +49,24 @@
 	
 	% Table des matières
 	\tableofcontents
+	\section*{Table des abréviations}
+		Dans l'ordre alphabétique:\\
+		\begin{itemize}
+			\item \textbf{BNF} \cite{bnf} $\rightarrow$ Backus-Naur Form
+			\item \textbf{CLI} $\rightarrow$ Command Line Interface
+			\item \textbf{EBNF} \cite{ebnf} $\rightarrow$ Extended Backus-Naur Form
+			\item \textbf{LALR} \cite{lalr} $\rightarrow$ Look-Ahead LR parser
+			\item \textbf{PP} $\rightarrow$ Platinum Parsing
+		\end{itemize}
 	\newpage
 	
 	\section{Introduction}
 		\todo{à faire à la fin}
-		
-		(dans ce document, PP = Platinum Parsing)
 	
 	\section{Études des cas d'utilisation}
 		Afin d'analyser les fonctionnalités nécessaires de PP, nous allons utiliser une approche par cas d'utilisation. La première étape de cette analyse est de définir quels seront les acteurs qui auront besoin d'utiliser notre outil:
 		\begin{itemize}
-			\item le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF \cite{ebnf}, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
+			\item le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
 			\item le \textbf{développeur} de compilateur veut pouvoir se baser sur une grammaire EBNF pour construire facilement les règles de production. Il souhaite également avoir le contrôle sur la sortie produite, cela à l'aide d'un langage riche
 			\item le \textbf{mainteneur} du compilateur veut pouvoir apporter des modifications/améliorations au sans devoir revoir tout le processus depuis le début
 			\item l'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle
@@ -197,10 +204,19 @@
 			\begingroup
 				\renewcommand{\section}[2]{}
 				\begin{thebibliography}{9}
-						
-					\bibitem{ebnf} EBNF, Extended Backus-Naur form,\\ 
-						\url{https://en.wikipedia.org/wiki/Extended\_Backus\%E2\%80\%93Naur_form}
 					
+					\bibitem{bnf} BNF, Backus-Naur form,\\
+						\url{https://en.wikipedia.org/wiki/Backus\%E2\%80\%93Naur_form}\\
+						
+					\bibitem{ebnf} EBNF, Extended Backus-Naur form, used to express a context-free grammar,\\ 
+						\url{https://en.wikipedia.org/wiki/Extended\_Backus\%E2\%80\%93Naur_form}\\
+					
+					\bibitem{goldparser} GOLD Parsing System, GOLD is a free parsing system that you can use to develop your own programming languages, scripting languages and interpreters,\\
+						\url{http://www.goldparser.org/}\\
+						
+					\bibitem{lalr} LALR, Look-Ahead LR parser,\\
+						\url{https://en.wikipedia.org/wiki/LALR_parser}
+						
 				\end{thebibliography}
 			\endgroup
 	
