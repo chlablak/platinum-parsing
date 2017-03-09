@@ -1,0 +1,37 @@
+@startuml
+
+left to right direction
+skinparam packageStyle rectangle
+
+:conceptor: as AC
+:developper: as AD
+:maintainer: as AM
+:user: as AU
+
+AD <|- AM
+
+rectangle "Platinum Parsing" {
+  (define EBNF grammar) as U10
+  (verify EBNF grammar) as U20
+  (use existing EBNF grammar) as U30
+  (define production rules) as U40
+  (define output) as U50
+  (define options) as U55
+  (compile an executable) as U60
+  (update rules and output) as U70
+  (use the executable) as U80
+  (apply options) as U90
+  
+  AC -- U10
+  AC -- U20
+  AD -- U40
+  U40 .> U30 : extends
+  AD -- U50
+  U50 .> U55 : extends
+  AD -- U60
+  U70 -- AM
+  U80 -- AU
+  U80 .> U90 : extends
+}
+
+@enduml

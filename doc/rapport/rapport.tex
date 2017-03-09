@@ -1,0 +1,207 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=2.00cm, right=2.00cm, top=2.00cm, bottom=2.00cm]{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\pagestyle{fancy}
+
+% Entêtes et pieds de page
+\lhead{TB: Platinum Parsing}
+\chead{}
+\rhead{HEIG-VD}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+
+% Commands
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+
+\begin{document}
+	
+	% Page de titre
+	\title{Platinum Parsing\\
+		Travail de Bachelor}
+	\author{Patrick Champion\\
+		Prof. François Birling}
+	\date{Printemps 2017\\
+		HEIG-VD}
+	\maketitle
+	\vspace{6cm}
+	\begin{figure}[H]
+		\centering
+		\todo{inclure logo ici}
+	\end{figure}
+	\thispagestyle{empty}
+	\newpage
+	
+	% Page vide
+	$ $ 
+	\thispagestyle{empty}
+	\newpage
+	
+	% Table des matières
+	\tableofcontents
+	\newpage
+	
+	\section{Introduction}
+		\todo{à faire à la fin}
+		
+		(dans ce document, PP = Platinum Parsing)
+	
+	\section{Études des cas d'utilisation}
+		Afin d'analyser les fonctionnalités nécessaires de PP, nous allons utiliser une approche par cas d'utilisation. La première étape de cette analyse est de définir quels seront les acteurs qui auront besoin d'utiliser notre outil:
+		\begin{itemize}
+			\item le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF \cite{ebnf}, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
+			\item le \textbf{développeur} de compilateur veut pouvoir se baser sur une grammaire EBNF pour construire facilement les règles de production. Il souhaite également avoir le contrôle sur la sortie produite, cela à l'aide d'un langage riche
+			\item le \textbf{mainteneur} du compilateur veut pouvoir apporter des modifications/améliorations au sans devoir revoir tout le processus depuis le début
+			\item l'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle
+		\end{itemize}
+		
+		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.5\textwidth]{../diagrams/use-case/use-case}
+			\caption{Diagramme des cas d'utilisation}
+		\end{figure}
+	
+		\subsection{Cahier des charges}
+			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section les fonctionnalités utilisant \textit{doit} sont obligatoires, celles utilisant \textit{devrait} sont optionnelles.
+			
+			\todo{faire CC}
+		
+	\section{Technologies}
+	
+		\subsection{Choix du langage}
+			Un choix crucial dans ce projet est le choix du langage de programmation que nous allons utiliser pour implémenter notre solution. Plusieurs langages ont été choisis en début de projet pour être comparés:
+			\begin{itemize}
+				\item C\# 
+				\item F\#
+				\item Haskell\\
+			\end{itemize}
+			
+			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les différents critères seront pondérés en fonction de leur importance dans ce projet, chaque langage obtiendra une note pour les critères (de 0 à 3) et c'est la moyenne finale qui nous donnera une bonne information du potentiel de chaque langage:
+			\begin{figure}[H]
+				\centering
+				\begin{tabular}{|c|l|c|c|}
+					\hline
+					\textbf{No} & \textbf{Critère} & \textbf{Poids}\\
+					\hline
+					\multicolumn{3}{|c|}{\textit{Critères fonctionnels}}\\
+					\hline
+					1.1 & Possibilités du paradigme & 3\\
+					1.2 & Bibliothèque(s) utile(s) & 3\\
+					1.3 & Quantité de code nécessaire & 2\\
+					1.4 & Portabilité & 2\\
+					\hline
+					\multicolumn{3}{|c|}{\textit{Critères de développement}}\\
+					\hline
+					2.1 & Communauté active & 3\\
+					2.2 & Ressources en ligne & 3\\
+					2.3 & Outils de développement & 1\\
+					\hline
+					\multicolumn{3}{|c|}{\textit{Critères de performances}}\\
+					\hline
+					3.1 & Vitesse d'exécution & 3\\
+					3.2 & Mémoire utilisée & 2\\
+					\hline
+				\end{tabular}
+				\caption{Critères pour le choix du langage}
+			\end{figure}
+			
+			Les détails des critères testés se trouvent dans l'annexe \ref{subsec:criteres-testes-pour-le-choix-du-langage}:
+			\begin{figure}[H]
+				\centering
+				\begin{tabular}{|c|c|c|c|}
+					\hline
+					\textbf{No} & \textbf{C\#} & \textbf{F\#} & \textbf{Haskell}\\
+					\hline
+					- & - & - & -\\
+					\hline
+				\end{tabular}
+				\caption{Notes des langages pour les différents critères}
+			\end{figure}
+			
+			Les notes finales sont:
+			\begin{enumerate}
+				\item 
+				\item 
+				\item .\\
+			\end{enumerate}
+			
+			Le choix est donc... \todo{faire choix}
+			
+		\subsection{Cadre de développement}
+		
+	\section{Architecture du projet}
+	
+		\subsection{Décomposition en sous-projets}
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-parts} 
+				\caption{Sous-projets de PP}
+			\end{figure}
+			
+			\todo{expliquer schéma}
+	
+		\subsection{Processus de transformation}
+			PP est un outil qui peut se décomposer en plusieurs étapes successives (un \textit{pipeline}), chacune prenant des données en entrée et fournissant d'autres données en sortie pour la prochaine étape du processus. Dans cette section nous allons expliciter quelles sont ces étapes ainsi que les données intermédiaires:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.9\textwidth]{../diagrams/pipeline/pipeline} 
+				\caption{Pipeline de transformation}
+			\end{figure}
+			
+			\todo{expliquer schéma}
+			
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.9\textwidth]{../diagrams/pipeline/pipeline-output} 
+				\caption{Sorties possibles de l'exécutable final}
+			\end{figure}
+			
+			\todo{expliquer schéma}
+		
+	\section{Conclusion}
+		\todo{à faire à la fin}
+	
+	\section{Annexes}
+	
+		\subsection{Énoncé original}
+			Pour faciliter l'écriture de compilateurs, ce travail de diplôme vise à réaliser un outil complet avec un environnement de développement intégré, permettant :
+			\begin{itemize}
+				\item d'éditer une grammaire selon une syntaxe de type BNF
+				\item d'analyser automatiquement cette BNF, de détecter les erreurs de syntaxe, incohérences et conflits de règles.
+				\item de générer dans n'importe quel langage de programmation cible, sur la base d'un template textuel fourni par l'utilisateur, les tables pour le lexer et le parser LALR.\\
+			\end{itemize}
+			
+			Ce travail de diplôme vise à développer un outil capable de remplacer "Gold Parsing System", un outil libre intéressant, mais malheureusement fortement pénalisé par des bugs récurrents. L'IDE sera réalisé sous la forme d'un plugin du logiciel oStudio d'Objectis, avec les technologies très en vogue C\# et WPF. Le générateur de compilateurs sera mis en ligne sur Internet en libre accès, permettant à la communauté Internet de bénéficier gratuitement de cette technologie. 
+			
+		\subsection{Table des figures}
+			\begingroup
+				\renewcommand{\section}[2]{}
+				\listoffigures
+			\endgroup
+			
+		\subsection{Critères testés pour le choix du langage}
+		\label{subsec:criteres-testes-pour-le-choix-du-langage}
+	
+		\subsection{Références}
+			\begingroup
+				\renewcommand{\section}[2]{}
+				\begin{thebibliography}{9}
+						
+					\bibitem{ebnf} EBNF, Extended Backus-Naur form,\\ 
+						\url{https://en.wikipedia.org/wiki/Extended\_Backus\%E2\%80\%93Naur_form}
+					
+				\end{thebibliography}
+			\endgroup
+	
+\end{document}\grid

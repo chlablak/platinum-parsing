@@ -1,0 +1,10 @@
+# LaTeX
+**/*.aux
+**/*.lof
+**/*.log
+**/*.out
+**/*.synctex.gz
+**/*.toc
+
+# OpenOffice
+**/.~lock*
