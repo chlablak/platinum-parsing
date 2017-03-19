@@ -24,6 +24,9 @@
 % Commands
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 
+% No subsubsection in tableofcontent
+\setcounter{tocdepth}{2}
+
 \begin{document}
 	
 	% Page de titre
@@ -49,12 +52,15 @@
 	
 	% Table des matières
 	\tableofcontents
+	\newpage
+	
 	\section*{Table des abréviations}
 		Dans l'ordre alphabétique:\\
 		\begin{itemize}
 			\item \textbf{BNF} \cite{bnf} $\rightarrow$ Backus-Naur Form
 			\item \textbf{CLI} $\rightarrow$ Command Line Interface
 			\item \textbf{EBNF} \cite{ebnf} $\rightarrow$ Extended Backus-Naur Form
+			\item \textbf{GOLD} \cite{goldparser} $\rightarrow$ GOLD Parser System
 			\item \textbf{LALR} \cite{lalr} $\rightarrow$ Look-Ahead LR parser
 			\item \textbf{PP} $\rightarrow$ Platinum Parsing
 		\end{itemize}
@@ -64,6 +70,8 @@
 		\todo{à faire à la fin}
 	
 	\section{Études des cas d'utilisation}
+	\label{sec:etudes-des-cas-d-utilisation}
+	
 		Afin d'analyser les fonctionnalités nécessaires de PP, nous allons utiliser une approche par cas d'utilisation. La première étape de cette analyse est de définir quels seront les acteurs qui auront besoin d'utiliser notre outil:
 		\begin{itemize}
 			\item le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
@@ -75,15 +83,215 @@
 		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.5\textwidth]{../diagrams/use-case/use-case}
+			\todo{revoir les use-cases}%\includegraphics[width=0.5\textwidth]{../diagrams/use-case/use-case}
 			\caption{Diagramme des cas d'utilisation}
 		\end{figure}
-	
-		\subsection{Cahier des charges}
-			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section les fonctionnalités utilisant \textit{doit} sont obligatoires, celles utilisant \textit{devrait} sont optionnelles.
-			
-			\todo{faire CC}
 		
+		\subsection{Cahier des charges}
+			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section les fonctionnalités utilisant \textit{doit} sont obligatoires, celles utilisant \textit{devrait} sont optionnelles:
+			
+			\begin{enumerate}
+				\item La conception de Platinum Parsing:
+				\begin{itemize}
+					\item \textbf{doit} amener à un outil capable de remplacer \textit{Gold Parsing System}
+					\item \textbf{doit} évaluer et sélectionner les briques technologiques à utiliser pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage
+					\item devrait être pensée pour avoir une approche générique du problème de la compilation
+					\item devrait fournir une documentation complète de la solution
+				\end{itemize}
+				
+				\item Le module d'analyse de grammaire EBNF:
+				\begin{itemize}
+					\item \textbf{doit} lire et comprendre une grammaire selon la syntaxe EBNF
+					\item \textbf{doit} analyser la validité d'une grammaire définie
+					\item \textbf{doit} aider à la correction des erreurs de grammaire
+					\item \textbf{doit} permettre de tester une grammaire pour la reconnaissance d'un texte en entrée 
+				\end{itemize}
+				
+				\item Le module de génération de tables LALR:
+				\begin{itemize}
+					\item \textbf{doit} générer les tables selon une grammaire EBNF donnée
+					\item \textbf{doit} être capable de traduire les tables selon un modèle fourni par l'utilisateur
+					\item devrait fournir une documentation pour l'utilisation des tables générées
+				\end{itemize}
+				
+				\item L'environnement de développement:
+				\begin{itemize}
+					\item devrait soit être un IDE dédié ou un plugin pour un environnement existant
+					\item devrait intégrer l'ensemble des fonctionnalités de Platinum Parsing pour en faciliter l'usage
+				\end{itemize}
+				
+				\item La solution finale:
+				\begin{itemize}
+					\item \textbf{doit} fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC
+				\end{itemize}
+			\end{enumerate}
+
+	\section{Architecture du projet}
+		Dans cette section, nous allons poser l'architecture de PP. C'est-à-dire l'organisation générale des différentes fonctionnalités requises, ainsi que leur utilisation dans des cas réels.
+	
+		\subsection{GOLD Parser System \cite{goldparser}}
+			Pour commencer, nous allons voir comment fonctionne GOLD Parser. le but de ce projet étant de remplacer GOLD, il s'agit d'un bon point de départ. En effet nous souhaitons proposer la même chose et, éventuellement, aller plus loin encore.\\
+			
+			Voici le schéma tel qu'expliqué sur le site de GOLD:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-gold-parser}
+				\caption{Fonctionnement de GOLD Parser System}
+			\end{figure}
+			
+			L'utilisation de GOLD se décompose en 2 étapes distinctes:
+			\begin{enumerate}
+				\item le développeur écrit la grammaire de son langage et utilise le \textit{Builder} pour générer une grammaire compilée (.cgt), constituée principalement des tables (LALR, ...) du langage en question. À partir de là, le \textit{Builder} n'est plus nécessaire
+				\item le développeur implémente un \textit{Engine} (dans n'importe quel langage) qui s'occupe de charger la grammaire compilée et d'effectuer le \textit{parsing} des fichiers sources 
+			\end{enumerate}
+			
+			Une des forces de GOLD est que de nombreuses personnes ont fournies une implémentation d'\textit{Engine} dans des langages de programmation différents. Ces \textit{Engine} étaient donc prêts a être utilisés, cela implique que le format du fichier .cgt doit être normalisé.\\
+			
+			Le désavantage de cette approche est qu'il n'est pas possible de réaliser toute la chaîne en une seule fois.
+		
+		\subsection{Décomposition en sous-projets}
+			Avant de passer à la section suivante, qui explique comment PP sera organisé, nous allons rapidement définir à un niveau plus large quelles seront les différentes parties de PP:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth,trim={3cm 3cm 3cm 3cm},clip]{../diagrams/pipeline/pipeline-parts}
+				\caption{Sous-projets de PP}
+			\end{figure}
+			
+			Si nous partons du plus interne au plus externe, nous avons:
+			\begin{itemize}
+				\item le \textbf{framework}, qui n'est rien d'autre qu'un cadre de développement pour la création de compilateur. On peut le voir comme une collection de briques pré-créées extensible 
+				\item le \textbf{CLI}, pour \textbf{C}ommand \textbf{L}ine \textbf{I}nterface, qui aide à l'utilisation du framework et qui propose d'autres outils spécifiques
+				\item l'\textbf{IDE} (ou plugin pour un IDE existant), qui utilise principalement le CLI et qui connaît le framework pour offrir une meilleure expérience de développement\\
+			\end{itemize}
+			
+			Ces explications sont encore assez abstraites et méritent d'être approfondies, cela sera fait dans les prochaines sections. Cependant nous préférons les introduire dès maintenant pour simplifier la lecture et la compréhension.
+		
+		\subsection{Organisation de Platinum Parsing}
+			PP est un outil qui peut se décomposer en plusieurs étapes successives (un \textit{pipeline}), chacune prenant des données en entrée et fournissant d'autres données en sortie pour la prochaine étape du processus. Dans cette section nous allons expliciter quelles sont ces étapes ainsi que les données intermédiaires.\\
+			
+			Premièrement, définissons ce que nous avons besoin au niveau du framework. Nous voulons pouvoir transformer des fichiers sources en quelque chose d'autre:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-output} 
+				\caption{Sorties possibles d'un exécutable créé avec PP}
+			\end{figure}
+			
+			Nous voyons que ce \textit{quelque chose d'autre} peut prendre plusieurs formes: une interprétation directement, des fichiers transpilés, ou encore d'autres choses (ici en exemple des tables).\\
+			
+			Comment allons-nous créer cet exécutable? Ce prochain schéma va nous montrer cela, avec les acteurs des cas d'utilisation pour plus de clareté (voir section~\ref{sec:etudes-des-cas-d-utilisation}):
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline} 
+				\caption{Utilisation de PP pour créer un exécutable}
+			\end{figure}
+			
+			On voit ici apparaître le framework ainsi que le CLI, comment cela fonctionne:
+			\begin{enumerate}
+				\item le concepteur crée sa grammaire EBNF
+				\item le développeur utilise une fonctionnalité du CLI pour transformer la grammaire EBNF dans une grammaire compréhensible par le framework, les \textit{Rules}
+				\item le développeur utilise les briques du framework et/ou crée ses propres briques
+				\begin{itemize}
+					\item c'est typiquement ici que la sortie sera décidée (interprétation, transpilation, etc.)
+				\end{itemize}
+				\item le développeur utilise le CLI pour créer l'exécutable final
+				\item l'utilisateur utilise l'exécutable final\\
+			\end{enumerate}
+			
+			Si l'on met les deux schémas précédents ensemble, nous obtenons:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-full} 
+				\caption{Fonctionnement de PP}
+			\end{figure}
+			
+			Ce schéma fait le parallèle entre GOLD et PP. Là où GOLD s'arrête à la transformation d'une grammaire en tables, PP est plus général et permet de transformer depuis n'importe quelle langage (définissable par les \textit{rules}) vers n'importe quelle sortie.\\
+			
+			Cependant les fonctionnalités de GOLD sont également intéressantes, et celles-ci peuvent être implémentées à l'aide de notre framework. Nous allons voir cela dans la section suivante.
+			
+		\subsection{Séparation des fonctionnalités framework/CLI}
+			Pour séparer les fonctionnalités prévues entre le framework et le CLI, nous allons nous baser sur plusieurs exemples d'utilisation possible de PP. L'un de ces exemples suivra l'approche de GOLD, afin de prouver que PP est capable de faire la même chose si le développeur le souhaite.\\
+			
+			Nous avons déjà vu une séparation grâce aux précédents schémas, le reste est vu dans les cas ci-dessous:
+			\begin{itemize}
+				\item le \textbf{framework}:
+				\begin{itemize}
+					\item fourni un pipeline de développement pour tout le processus
+					\item fourni un ou des \textit{builder}/\textit{engine} pré-définis
+					\item fourni la gestion des options en ligne de commande
+					\item est extensible pour permettre le changement de son comportement
+				\end{itemize}
+				\item le \textbf{CLI}:
+				\begin{itemize}
+					\item fourni des outils pour gérer les fichiers ainsi que l'arborescence dans un projet utilisant le framework
+					\item exécute la chaîne de compilation complète du framework
+					\item fourni des outils relatifs à l'élaboration d'une grammaire EBNF:
+					\begin{itemize}
+						\item transformation en \textit{Rules} compréhensibles par le framework
+						\item vérification de la grammaire (cohérence, conflit, etc.)
+						\item vérification de la grammaire en se basant sur des fichiers sources de ladite grammaire 
+					\end{itemize}
+					\item fourni un outil pour transformer une EBNF directement en tables (comme GOLD)
+				\end{itemize}
+			\end{itemize}
+			
+			\subsubsection{Cas 1: interprétation du langage Lua}
+				Avant de commencer ce cas d'utilisation, expliquons rapidement le fonctionnement interne du framework:
+				\begin{figure}[H]
+					\centering
+					\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-framework} 
+					\caption{Fonctionnement interne du framework (général)}
+				\end{figure}
+				
+				On y retrouve les éléments des schémas précédents:
+				\begin{enumerate}
+					\item on définit notre grammaire, ce sont les \textit{Rules}
+					\item le \textit{Builder}, à l'image de celui de GOLD, créer les tables (LALR, ...) en se basant sur les \textit{Rules}
+					\item ces tables sont envoyés à l'\textit{Engine}, ainsi que les fichiers sources à traiter selon ces tables
+					\item l'\textit{Engine} génère une sortie\\
+				\end{enumerate}
+				
+				Le framework fourni un squelette pour que le développeur puisse faire ce qu'il veut dans l'\textit{Engine} sans avoir à se soucier de certain détails (le \textit{parser} typiquement).\\
+				
+				Si l'on revient sur notre cas:
+				\begin{enumerate}
+					\item on définit la grammaire Lua
+					\item on implémente un \textit{Engine} pour interpréter Lua\\
+				\end{enumerate}
+				
+				Et c'est tout! On compile et on peut utiliser notre exécutable.
+			
+			\subsubsection{Cas 2: transformation d'une grammaire EBNF en grammaire BNF}
+				Ce cas ressemble beaucoup au cas précédent:
+				\begin{enumerate}
+					\item on définit la grammaire EBNF
+					\item on implémente un \textit{Engine} pour transformer en BNF
+				\end{enumerate}
+			
+			\subsubsection{Cas 3: transformation d'une grammaire EBNF en tables}
+				Ce cas est plus intéressant, en effet il s'agit de la fonctionnalité principale de GOLD. Si nous reprenons le schéma précédent pour l'adapter à ce cas:
+				\begin{figure}[H]
+					\centering
+					\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-framework-gold} 
+					\caption{Utilisation du framework pour recréer le \textit{Builder} de GOLD}
+				\end{figure}
+				
+				\begin{enumerate}
+					\item on définit la grammaire EBNF
+					\item on implémente un \textit{Engine} qui sérialise les tables dans un fichier (.cgt pour faire la comparaison avec GOLD)\\
+				\end{enumerate}
+				
+				Ce cas étant une fonctionnalité nécessaire au projet, nous pouvons l'inclure au CLI.
+			
+			\subsubsection{Cas 4: transformation d'une grammaire EBNF en tables, puis implémentation d'un \textit{engine} en Python}
+				Ce cas est une utilisation typique de GOLD, voyons comment cela est fait avec PP:
+				\begin{enumerate}
+					\item on définit notre grammaire en EBNF
+					\item on utilise le CLI pour créer les tables correspondantes (voir cas 3)
+					\item on implémente un \textit{Engine} en Python qui utilise les tables\\
+				\end{enumerate}
+				
+				On voit ici que le framework est très général, ainsi les fonctionnalités de GOLD plus spécifiques doivent être implémentées à part (à l'aide du framework) et être intégrées au CLI.
+
 	\section{Technologies}
 	
 		\subsection{Choix du langage}
@@ -94,88 +302,40 @@
 				\item Haskell\\
 			\end{itemize}
 			
-			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les différents critères seront pondérés en fonction de leur importance dans ce projet, chaque langage obtiendra une note pour les critères (de 0 à 3) et c'est la moyenne finale qui nous donnera une bonne information du potentiel de chaque langage:
+			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les différents critères seront séparés en deux groupes: un groupe de critères essentiels pour le projet, et un groupe de critères moins important mais permettant de comparer les langages tout de même. Les critères essentiels sont éliminatifs, c'est-à-dire qu'un langage qui ne répondrait pas à l'un de ces critères est d'emblée supprimé: 
 			\begin{figure}[H]
 				\centering
-				\begin{tabular}{|c|l|c|c|}
+				\begin{tabular}{|c|l|c|c|c|}
 					\hline
-					\textbf{No} & \textbf{Critère} & \textbf{Poids}\\
+					\textbf{No} & \textbf{Critère} & \textbf{C\#} & \textbf{F\#} & \textbf{Haskell}\\
 					\hline
-					\multicolumn{3}{|c|}{\textit{Critères fonctionnels}}\\
+					\multicolumn{5}{|c|}{\textit{Critères fondamentaux}}\\
 					\hline
-					1.1 & Possibilités du paradigme & 3\\
-					1.2 & Bibliothèque(s) utile(s) & 3\\
-					1.3 & Quantité de code nécessaire & 2\\
-					1.4 & Portabilité & 2\\
+					1.1 & Le langage a une communauté active et des ressources sur internet & - & - & -\\
+					1.2 & Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing} & - & - & -\\
+					1.3 & L'implémentation d'un parser de test simple ne demande pas trop de travail & - & - & -\\
 					\hline
-					\multicolumn{3}{|c|}{\textit{Critères de développement}}\\
+					\multicolumn{5}{|c|}{\textit{Critères de comparaison}}\\
 					\hline
-					2.1 & Communauté active & 3\\
-					2.2 & Ressources en ligne & 3\\
-					2.3 & Outils de développement & 1\\
-					\hline
-					\multicolumn{3}{|c|}{\textit{Critères de performances}}\\
-					\hline
-					3.1 & Vitesse d'exécution & 3\\
-					3.2 & Mémoire utilisée & 2\\
+					2.1 & Vitesse d'exécution du parser de test & - & - & -\\
+					2.2 & Quantité et qualité du code nécessaire pour le parser de test & - & - & -\\
+					\hline\hline
+					\multicolumn{2}{|c|}{\textbf{Total}} & - & - & -\\
 					\hline
 				\end{tabular}
-				\caption{Critères pour le choix du langage}
+				\caption{Critères pour le choix du langage et résultats}
 			\end{figure}
 			
-			Les détails des critères testés se trouvent dans l'annexe \ref{subsec:criteres-testes-pour-le-choix-du-langage}:
-			\begin{figure}[H]
-				\centering
-				\begin{tabular}{|c|c|c|c|}
-					\hline
-					\textbf{No} & \textbf{C\#} & \textbf{F\#} & \textbf{Haskell}\\
-					\hline
-					- & - & - & -\\
-					\hline
-				\end{tabular}
-				\caption{Notes des langages pour les différents critères}
-			\end{figure}
-			
-			Les notes finales sont:
-			\begin{enumerate}
-				\item 
-				\item 
-				\item .\\
-			\end{enumerate}
+			Les détails des critères testés se trouvent dans l'annexe \ref{subsec:criteres-testes-pour-le-choix-du-langage}.\\
 			
 			Le choix est donc... \todo{faire choix}
 			
 		\subsection{Cadre de développement}
-		
-	\section{Architecture du projet}
-	
-		\subsection{Décomposition en sous-projets}
-			\begin{figure}[H]
-				\centering
-				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-parts} 
-				\caption{Sous-projets de PP}
-			\end{figure}
+			\todo{git, ...}
 			
-			\todo{expliquer schéma}
-	
-		\subsection{Processus de transformation}
-			PP est un outil qui peut se décomposer en plusieurs étapes successives (un \textit{pipeline}), chacune prenant des données en entrée et fournissant d'autres données en sortie pour la prochaine étape du processus. Dans cette section nous allons expliciter quelles sont ces étapes ainsi que les données intermédiaires:
-			\begin{figure}[H]
-				\centering
-				\includegraphics[width=0.9\textwidth]{../diagrams/pipeline/pipeline} 
-				\caption{Pipeline de transformation}
-			\end{figure}
-			
-			\todo{expliquer schéma}
-			
-			\begin{figure}[H]
-				\centering
-				\includegraphics[width=0.9\textwidth]{../diagrams/pipeline/pipeline-output} 
-				\caption{Sorties possibles de l'exécutable final}
-			\end{figure}
-			
-			\todo{expliquer schéma}
-		
+	\section{Conception}
+		\todo{attendre de savoir le langage}
+
 	\section{Conclusion}
 		\todo{à faire à la fin}
 	
@@ -191,6 +351,19 @@
 			
 			Ce travail de diplôme vise à développer un outil capable de remplacer "Gold Parsing System", un outil libre intéressant, mais malheureusement fortement pénalisé par des bugs récurrents. L'IDE sera réalisé sous la forme d'un plugin du logiciel oStudio d'Objectis, avec les technologies très en vogue C\# et WPF. Le générateur de compilateurs sera mis en ligne sur Internet en libre accès, permettant à la communauté Internet de bénéficier gratuitement de cette technologie. 
 			
+		\subsection{Cahier des charges original}
+			Les objectifs du travail sont :
+			\begin{itemize}
+				\item Analyser et formaliser la liste des fonctionnalités répondant aux besoins des différents types d'utilisateurs dans un cahier des charges fonctionnel.
+				\item Concevoir l'architecture de la solution.
+				\item Évaluer et sélectionner les briques technologiques à utiliser pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage.
+				\item Développer le module d'analyse BNF, capable de lire une grammaire selon la syntaxe EBNF, d'analyser la validité de la grammaire définie, d'aider la correction des erreurs et de tester la grammaire pour la reconnaissance d'un texte d'entrée.
+				\item Développer un module de génération des tables LALR et capable de les traduire dans un code source selon des modèles fournis par l'utilisateur, ce qui permet de cibler différents langages.
+				\item Intégrer l'ensemble dans un environnement de développement à sélectionner pour en faciliter l'usage.
+				\item Réaliser une démonstration finale de la solution développée en développant un lexer et un parser pour langage ISO CNC en C\#.
+				\item Fournir une documentation de conception et un rapport final du travail réalisé.
+			\end{itemize}
+			
 		\subsection{Table des figures}
 			\begingroup
 				\renewcommand{\section}[2]{}
@@ -199,6 +372,19 @@
 			
 		\subsection{Critères testés pour le choix du langage}
 		\label{subsec:criteres-testes-pour-le-choix-du-langage}
+			Cette section contient les détails des différents critères.
+		
+			\subsubsection{1.1 - Le langage a une communauté active et des ressources sur internet}
+			
+			\subsubsection{1.2 - Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing}}
+			
+			\subsubsection{1.3 - L'implémentation d'un parser de test simple ne demande pas trop de travail}
+				\todo{ebnf simple}
+			
+			\subsubsection{2.1 - Vitesse d'exécution du parser de test}
+			
+			\subsubsection{2.2 - Quantité et qualité du code nécessaire pour le parser de test}
+			
 	
 		\subsection{Références}
 			\begingroup
