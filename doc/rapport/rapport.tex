@@ -10,6 +10,7 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{listings,lstautogobble}
 
 \pagestyle{fancy}
 
@@ -26,6 +27,13 @@
 
 % No subsubsection in tableofcontent
 \setcounter{tocdepth}{2}
+
+\lstset{
+	frame=single,
+	numbers=left,
+	tabsize=2,
+	autogobble=true
+}
 
 \begin{document}
 	
@@ -57,12 +65,14 @@
 	\section*{Table des abréviations}
 		Dans l'ordre alphabétique:\\
 		\begin{itemize}
+			\item \textbf{AST} \cite{ast} $\rightarrow$ Abstract Syntax Tree
 			\item \textbf{BNF} \cite{bnf} $\rightarrow$ Backus-Naur Form
 			\item \textbf{CLI} $\rightarrow$ Command Line Interface
 			\item \textbf{EBNF} \cite{ebnf} $\rightarrow$ Extended Backus-Naur Form
 			\item \textbf{GOLD} \cite{goldparser} $\rightarrow$ GOLD Parser System
 			\item \textbf{LALR} \cite{lalr} $\rightarrow$ Look-Ahead LR parser
 			\item \textbf{PP} $\rightarrow$ Platinum Parsing
+			\item \textbf{TB} $\rightarrow$ Travail de Bachelor
 		\end{itemize}
 	\newpage
 	
@@ -302,7 +312,7 @@
 				\item Haskell\\
 			\end{itemize}
 			
-			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les différents critères seront séparés en deux groupes: un groupe de critères essentiels pour le projet, et un groupe de critères moins important mais permettant de comparer les langages tout de même. Les critères essentiels sont éliminatifs, c'est-à-dire qu'un langage qui ne répondrait pas à l'un de ces critères est d'emblée supprimé: 
+			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les critères fondamentaux sont éliminatifs, c'est-à-dire qu'un langage qui ne répondrait pas à l'un de ces critères est d'emblée supprimé: 
 			\begin{figure}[H]
 				\centering
 				\begin{tabular}{|c|l|c|c|c|}
@@ -311,16 +321,11 @@
 					\hline
 					\multicolumn{5}{|c|}{\textit{Critères fondamentaux}}\\
 					\hline
-					1.1 & Le langage a une communauté active et des ressources sur internet & - & - & -\\
-					1.2 & Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing} & - & - & -\\
-					1.3 & L'implémentation d'un parser de test simple ne demande pas trop de travail & - & - & -\\
-					\hline
-					\multicolumn{5}{|c|}{\textit{Critères de comparaison}}\\
-					\hline
-					2.1 & Vitesse d'exécution du parser de test & - & - & -\\
-					2.2 & Quantité et qualité du code nécessaire pour le parser de test & - & - & -\\
+					1 & Le langage a une communauté active et des ressources sur internet & - & - & Oui\\
+					2 & Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing} & - & - & Oui\\
+					3 & L'implémentation d'un parser de test simple est aisée & - & - & Oui\\
 					\hline\hline
-					\multicolumn{2}{|c|}{\textbf{Total}} & - & - & -\\
+					\multicolumn{2}{|c|}{\textbf{Total}} & - & - & Oui\\
 					\hline
 				\end{tabular}
 				\caption{Critères pour le choix du langage et résultats}
@@ -374,16 +379,43 @@
 		\label{subsec:criteres-testes-pour-le-choix-du-langage}
 			Cette section contient les détails des différents critères.
 		
-			\subsubsection{1.1 - Le langage a une communauté active et des ressources sur internet}
+			\subsubsection{1 - Le langage a une communauté active et des ressources sur internet}
 			
-			\subsubsection{1.2 - Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing}}
+			Concernant Haskell, le lien suivant contient tous les pointeurs utiles en ressources: \url{https://www.haskell.org/documentation}. Pour ce qui est de la communauté, les questions et réponses sont quotidiennes sur \textit{stack overflow} ainsi que sur \textit{reddit}. Il y a également un wiki communautaire.
 			
-			\subsubsection{1.3 - L'implémentation d'un parser de test simple ne demande pas trop de travail}
-				\todo{ebnf simple}
+			\subsubsection{2 - Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing}}
 			
-			\subsubsection{2.1 - Vitesse d'exécution du parser de test}
+			Concernant Haskell, le lien suivant liste différentes bibliothèques présente pour ce langage: \url{https://wiki.haskell.org/Applications_and_libraries}. Plusieurs outils ou bibliothèques pour le parsing existent et sont listés ici: \url{https://wiki.haskell.org/Applications_and_libraries/Compiler_tools}. De plus ce langage est la base de plusieurs compilateurs, voir: \url{https://wiki.haskell.org/Applications_and_libraries/Compilers_and_interpreters}\\
 			
-			\subsubsection{2.2 - Quantité et qualité du code nécessaire pour le parser de test}
+			\todo{C\#, F\#}
+			
+			\subsubsection{3 - L'implémentation d'un parser de test simple est aisée}
+				Comme nous devrons implémenter la grammaire EBNF dans le cadre de ce TB, nous allons créer pour ce test un parser pour une grammaire EBNF simplifiée. Puis nous allons tester ce parser sur le fichier suivant:
+				\begin{verbatim}
+					grammar=identifier;
+					identifier=letter,<letter>,digit;
+					letter='a'|'b'|'c';
+					digit='1'|'2'|'3';
+					<test>='un test',<test>;
+					<a2>=<a>,<b>|<b>;
+				\end{verbatim}
+				
+				Pour simplification, nous avons uniquement:
+				\begin{itemize}
+					\item la définition de règle avec \texttt{=} : \texttt{<rule>=<expr>;}
+					\item la concaténation avec \texttt{,} : \texttt{<a>,<b>}
+					\item le choix avec \texttt{|} : \texttt{<a>|<b>}
+					\item les terminaux entourés par des guillemets simples: \texttt{'a'}
+					\item les non-terminaux entourés par \texttt{<>} ou pas
+					\item pas de gestion des espaces, tabulations, ...
+					\item pas de gestion de la priorité des opérateurs, ni des parenthèses\\
+				\end{itemize}
+				
+				Le parser doit pouvoir sortir l'AST correspondant.\\
+				
+				Nous allons commencer par l'implémentation en Haskell, celle-ci se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait 46 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 170ms.\\
+				
+				\todo{C\#, F\#}
 			
 	
 		\subsection{Références}

@@ -11,3 +11,6 @@
 
 # OpenOffice
 **/.~lock*
+
+# Haskell
+**/.stack-work

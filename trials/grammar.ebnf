@@ -1,0 +1,6 @@
+grammar=identifier;
+identifier=letter,<letter>,digit;
+letter='a'|'b'|'c';
+digit='1'|'2'|'3';
+<test>='un test',<test>;
+<a2>=<a>,<b>|<b>;
