@@ -2,10 +2,12 @@
 
 ## Now
 - [x] cahier des charges
-- [ ] use case (on arrive, on fait, on part)
+- [x] use case (on arrive, on fait, on part)
 - [x] revoir critère (impl. ebnf simple)
-- [ ] mettre à jour planif
+- [x] mettre à jour planif
 - [x] impl. test en haskell
+- [x] CC += AST
+- [x] plantuml plugin atom
 
 ## Then
 - [ ] revoir schéma (formalisme)

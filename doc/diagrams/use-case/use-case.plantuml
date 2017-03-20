@@ -1,0 +1,48 @@
+@startuml
+
+left to right direction
+skinparam packageStyle rectangle
+
+:conceptor: as AC
+:developper: as AD
+:maintainer: as AM
+:user: as AU
+
+rectangle "Platinum Parsing" {
+  (write a grammar) as U10
+  (correct grammar error) as U20
+  (analyse grammar validity) as U30
+  (check grammar with a text) as U40
+
+  (generate tables) as U50
+  (translate tables according to a template) as U60
+
+  (define production rules) as U70
+  (generate production rules from grammar) as U80
+  (define parsing process) as U85
+
+  (implement a parser) as U90
+  (write a template) as U105
+
+  (use the compiler) as U110
+  (apply compilation options) as U120
+
+  AC -- U10
+  U10 .> U20 : extends
+  U20 ..> U30 : include
+  U10 ..> U40 : extends
+
+  AD -- U70
+  U70 ..> U80 : extends
+  AD -- U85
+
+  U50 <.. U90 : include
+  U50 .> U60 : extends
+  U105 -- AM
+  U90 -- AM
+
+  U110 -- AU
+  U120 <.. U110 : extends
+}
+
+@enduml

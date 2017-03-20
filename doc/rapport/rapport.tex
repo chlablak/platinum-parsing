@@ -86,14 +86,14 @@
 		\begin{itemize}
 			\item le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
 			\item le \textbf{développeur} de compilateur veut pouvoir se baser sur une grammaire EBNF pour construire facilement les règles de production. Il souhaite également avoir le contrôle sur la sortie produite, cela à l'aide d'un langage riche
-			\item le \textbf{mainteneur} du compilateur veut pouvoir apporter des modifications/améliorations au sans devoir revoir tout le processus depuis le début
+			\item le \textbf{mainteneur} du compilateur veut pouvoir implémenter un parser en se basant sur des tables pré-générées, cela dans n'importe quel langage
 			\item l'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle
 		\end{itemize}
 		
 		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
 		\begin{figure}[H]
 			\centering
-			\todo{revoir les use-cases}%\includegraphics[width=0.5\textwidth]{../diagrams/use-case/use-case}
+			\includegraphics[width=\textwidth]{../diagrams/use-case/use-case}
 			\caption{Diagramme des cas d'utilisation}
 		\end{figure}
 		
@@ -122,6 +122,11 @@
 					\item \textbf{doit} générer les tables selon une grammaire EBNF donnée
 					\item \textbf{doit} être capable de traduire les tables selon un modèle fourni par l'utilisateur
 					\item devrait fournir une documentation pour l'utilisation des tables générées
+				\end{itemize}
+				
+				\item L'arbre abstrait syntaxique:
+				\begin{itemize}
+					\item \textbf{doit} permettre d'attacher un \textit{callback} à ses noeuds
 				\end{itemize}
 				
 				\item L'environnement de développement:
@@ -336,7 +341,7 @@
 			Le choix est donc... \todo{faire choix}
 			
 		\subsection{Cadre de développement}
-			\todo{git, ...}
+			\todo{git, latex, atom?, ...}
 			
 	\section{Conception}
 		\todo{attendre de savoir le langage}
