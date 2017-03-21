@@ -22,7 +22,7 @@ data TStatement =
       deriving (Show)
 
 rule :: P.Parsec String st TExpression
-rule = TRule <$> P.try (P.char '<' *> ruleDef <* P.char '>' <|> ruleDef)
+rule = TRule <$> (P.try (P.char '<' *> ruleDef <* P.char '>') <|> ruleDef)
   where
     ruleDef = (:) <$> P.letter <*> P.many alpha
     alpha = P.letter <|> P.digit

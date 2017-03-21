@@ -2,7 +2,7 @@ module Main where
 
 import Lib
 import qualified EBNF as E
-import Text.Parsec as P
+import qualified Text.Parsec as P
 import System.Directory
 import Data.Either
 import System.Clock
