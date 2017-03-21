@@ -14,3 +14,8 @@
 
 # Haskell
 **/.stack-work
+
+# C#
+**/.vs
+**/bin
+**/obj
