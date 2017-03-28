@@ -11,6 +11,7 @@
 \usepackage{fancyhdr}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{listings,lstautogobble}
+\usepackage{longtable}
 
 \pagestyle{fancy}
 
@@ -100,46 +101,40 @@
 		\subsection{Cahier des charges}
 			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section les fonctionnalités utilisant \textit{doit} sont obligatoires, celles utilisant \textit{devrait} sont optionnelles:
 			
-			\begin{enumerate}
-				\item La conception de Platinum Parsing:
-				\begin{itemize}
-					\item \textbf{doit} amener à un outil capable de remplacer \textit{Gold Parsing System}
-					\item \textbf{doit} évaluer et sélectionner les briques technologiques à utiliser pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage
-					\item devrait être pensée pour avoir une approche générique du problème de la compilation
-					\item devrait fournir une documentation complète de la solution
-				\end{itemize}
-				
-				\item Le module d'analyse de grammaire EBNF:
-				\begin{itemize}
-					\item \textbf{doit} lire et comprendre une grammaire selon la syntaxe EBNF
-					\item \textbf{doit} analyser la validité d'une grammaire définie
-					\item \textbf{doit} aider à la correction des erreurs de grammaire
-					\item \textbf{doit} permettre de tester une grammaire pour la reconnaissance d'un texte en entrée 
-				\end{itemize}
-				
-				\item Le module de génération de tables LALR:
-				\begin{itemize}
-					\item \textbf{doit} générer les tables selon une grammaire EBNF donnée
-					\item \textbf{doit} être capable de traduire les tables selon un modèle fourni par l'utilisateur
-					\item devrait fournir une documentation pour l'utilisation des tables générées
-				\end{itemize}
-				
-				\item L'arbre abstrait syntaxique:
-				\begin{itemize}
-					\item \textbf{doit} permettre d'attacher un \textit{callback} à ses noeuds
-				\end{itemize}
-				
-				\item L'environnement de développement:
-				\begin{itemize}
-					\item devrait soit être un IDE dédié ou un plugin pour un environnement existant
-					\item devrait intégrer l'ensemble des fonctionnalités de Platinum Parsing pour en faciliter l'usage
-				\end{itemize}
-				
-				\item La solution finale:
-				\begin{itemize}
-					\item \textbf{doit} fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC
-				\end{itemize}
-			\end{enumerate}
+			\begin{figure}[H]
+				\centering
+				\begin{longtable}{p{0.05\textwidth}p{0.8\textwidth}|p{0.05\textwidth}}
+					\# & & Status\\
+					\hline\hline
+					&&\\
+					& Platinum Parsing: & \\
+					10.10 & \textbf{doit} être un outil fournissant des fonctionnalités similaires à \textit{Gold Parsing System} & \\
+					10.20 & \textbf{doit} être développé à l'aide de briques technologiques efficaces pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage & \\
+					10.30 & devrait être pensée pour avoir une approche générique du problème de la compilation & \\
+					10.40 & devrait fournir une documentation complète de la solution & \\
+					&&\\
+					& Le module d'analyse de grammaire EBNF: & \\
+					20.10 & \textbf{doit} lire et comprendre une grammaire selon la syntaxe EBNF & \\
+					20.20 & \textbf{doit} analyser la validité d'une grammaire définie & \\
+					20.30 & \textbf{doit} aider à la correction des erreurs de grammaire & \\
+					20.40 & \textbf{doit} permettre de tester une grammaire pour la reconnaissance d'un texte en entrée & \\
+					&&\\
+					& Le module de génération de tables LALR: & \\
+					30.10 & \textbf{doit} générer les tables selon une grammaire EBNF donnée & \\
+					30.20 & \textbf{doit} être capable de traduire les tables selon un modèle fourni par l'utilisateur & \\
+					30.30 & devrait fournir une documentation pour l'utilisation des tables générées & \\
+					&&\\
+					& L'arbre abstrait syntaxique: & \\
+					40.10 & \textbf{doit} permettre d'attacher un \textit{callback} à ses noeuds & \\
+					&&\\
+					& L'environnement de développement: & \\
+					50.10 & devrait soit être un IDE dédié ou un plugin pour un environnement existant & \\
+					50.20 & devrait intégrer l'ensemble des fonctionnalités de Platinum Parsing pour en faciliter l'usage & \\
+					&&\\
+					& La solution finale: & \\
+					60.10 & \textbf{doit} fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC & \\
+				\end{longtable}
+			\end{figure}
 
 	\section{Architecture du projet}
 		Dans cette section, nous allons poser l'architecture de PP. C'est-à-dire l'organisation générale des différentes fonctionnalités requises, ainsi que leur utilisation dans des cas réels.
@@ -326,11 +321,11 @@
 					\hline
 					\multicolumn{5}{|c|}{\textit{Critères fondamentaux}}\\
 					\hline
-					1 & Le langage a une communauté active et des ressources sur internet & - & - & Oui\\
-					2 & Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing} & - & - & Oui\\
-					3 & L'implémentation d'un parser de test simple est aisée & - & - & Oui\\
+					1 & Le langage a une communauté active et des ressources sur internet & Oui & Non & Oui\\
+					2 & Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing} & Oui & Oui & Oui\\
+					3 & L'implémentation d'un parser de test simple est aisée & Oui & Oui & Oui\\
 					\hline\hline
-					\multicolumn{2}{|c|}{\textbf{Total}} & - & - & Oui\\
+					\multicolumn{2}{|c|}{\textbf{Total}} & Oui & Non & Oui\\
 					\hline
 				\end{tabular}
 				\caption{Critères pour le choix du langage et résultats}
@@ -338,7 +333,11 @@
 			
 			Les détails des critères testés se trouvent dans l'annexe \ref{subsec:criteres-testes-pour-le-choix-du-langage}.\\
 			
-			Le choix est donc... \todo{faire choix}
+			F\# se retrouve d'office éliminé pour cause d'une communauté trop peu active, ce qui n'est pas une bonne chose pour un projet. Cela nous laisse à choisir entre C\# et Haskell. Concernant les bibliothèques de \textit{parsing}, Irony pour C\# et Parsec pour Haskell, celles-ci offrent des possibilités similaires et sont simples à prendre en main, néanmoins Parsec possède des ressources (tutos, articles) plus complètes que Irony. À propos des paradigmes, multiple pour C\# et fonctionnel pur pour Haskell, ceux-ci apportent des approches différentes du problèmes. Cependant aucun est incapable de résoudre les problèmes liés à ce projet.\\
+			
+			Une différence entre l'implémentation du parser simplifié en C\# et en Haskell est la manipulation de l'AST. En effet en C\# les types des noeuds sont des \texttt{string}, le parcours est donc fait au \textit{runtime} à base de conditions \textit{if-else}. Haskell quant à lui permet de définir les types des noeuds de manière statique, ainsi le parcours de l'arbre se base sur du \textit{pattern matching}, ce qui amène à du code plus clair, plus court et plus sûr.
+			
+			\todo{choisir}
 			
 		\subsection{Cadre de développement}
 			\todo{git, latex, atom?, ...}
@@ -382,46 +381,56 @@
 			
 		\subsection{Critères testés pour le choix du langage}
 		\label{subsec:criteres-testes-pour-le-choix-du-langage}
-			Cette section contient les détails des différents critères.
+			Cette section contient les détails des différents critères pour chaque langage testé. Pour rappel ces critères sont:
+			\begin{enumerate}
+				\item Le langage a une communauté active et des ressources sur internet
+				\item Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing}
+				\item L'implémentation d'un parser de test simple est aisée\\
+			\end{enumerate}
+			
+			Concernant le 3ème critère, comme nous devrons implémenter la grammaire EBNF dans le cadre de ce TB, nous allons créer pour ce test un parser pour une grammaire EBNF simplifiée. Puis nous allons tester ce parser sur le fichier suivant:
+			\begin{verbatim}
+				grammar=identifier;
+				identifier=letter,<letter>,digit;
+				letter='a'|'b'|'c';
+				digit='1'|'2'|'3';
+				<test>='un test',<test>;
+				<a2>=<a>,<b>|<b>;
+			\end{verbatim}
+			
+			Pour simplification, nous avons uniquement:
+			\begin{itemize}
+				\item la définition de règle avec \texttt{=} : \texttt{<rule>=<expr>;}
+				\item la concaténation avec \texttt{,} : \texttt{<a>,<b>}
+				\item le choix avec \texttt{|} : \texttt{<a>|<b>}
+				\item les terminaux entourés par des guillemets simples: \texttt{'a'}
+				\item les non-terminaux entourés par \texttt{<>} ou pas
+				\item pas de gestion des espaces, tabulations, ...
+				\item pas de gestion de la priorité des opérateurs, ni des parenthèses\\
+			\end{itemize}
+			
+			Le parser doit pouvoir sortir l'AST correspondant.
+					
+			\subsubsection{Langage Haskell}
+				Concernant Haskell, le lien suivant contient tous les pointeurs utiles en ressources: \url{https://www.haskell.org/documentation}. Pour ce qui est de la communauté, les questions et réponses sont quotidiennes sur \textit{stack overflow} ainsi que sur \textit{reddit}. Il y a également un wiki communautaire.\\
+				
+				Le lien suivant liste différentes bibliothèques présente pour ce langage: \url{https://wiki.haskell.org/Applications_and_libraries}. Plusieurs outils ou bibliothèques pour le parsing existent et sont listés ici: \url{https://wiki.haskell.org/Applications_and_libraries/Compiler_tools}. De plus ce langage est la base de plusieurs compilateurs, voir: \url{https://wiki.haskell.org/Applications_and_libraries/Compilers_and_interpreters}\\
+				
+				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait moins de 50 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 140ms. Notons qu'il y a de nombreuses ressources concernant Parsec.
 		
-			\subsubsection{1 - Le langage a une communauté active et des ressources sur internet}
-			
-			Concernant Haskell, le lien suivant contient tous les pointeurs utiles en ressources: \url{https://www.haskell.org/documentation}. Pour ce qui est de la communauté, les questions et réponses sont quotidiennes sur \textit{stack overflow} ainsi que sur \textit{reddit}. Il y a également un wiki communautaire.
-			
-			\subsubsection{2 - Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing}}
-			
-			Concernant Haskell, le lien suivant liste différentes bibliothèques présente pour ce langage: \url{https://wiki.haskell.org/Applications_and_libraries}. Plusieurs outils ou bibliothèques pour le parsing existent et sont listés ici: \url{https://wiki.haskell.org/Applications_and_libraries/Compiler_tools}. De plus ce langage est la base de plusieurs compilateurs, voir: \url{https://wiki.haskell.org/Applications_and_libraries/Compilers_and_interpreters}\\
-			
-			\todo{C\#, F\#}
-			
-			\subsubsection{3 - L'implémentation d'un parser de test simple est aisée}
-				Comme nous devrons implémenter la grammaire EBNF dans le cadre de ce TB, nous allons créer pour ce test un parser pour une grammaire EBNF simplifiée. Puis nous allons tester ce parser sur le fichier suivant:
-				\begin{verbatim}
-					grammar=identifier;
-					identifier=letter,<letter>,digit;
-					letter='a'|'b'|'c';
-					digit='1'|'2'|'3';
-					<test>='un test',<test>;
-					<a2>=<a>,<b>|<b>;
-				\end{verbatim}
+			\subsubsection{Langage C\#}
+				C\# est un langage développé par Microsoft avec la base de .NET derrière. Les ressources sur Internet ne manquent pas et la communauté est bonne.\\
 				
-				Pour simplification, nous avons uniquement:
-				\begin{itemize}
-					\item la définition de règle avec \texttt{=} : \texttt{<rule>=<expr>;}
-					\item la concaténation avec \texttt{,} : \texttt{<a>,<b>}
-					\item le choix avec \texttt{|} : \texttt{<a>|<b>}
-					\item les terminaux entourés par des guillemets simples: \texttt{'a'}
-					\item les non-terminaux entourés par \texttt{<>} ou pas
-					\item pas de gestion des espaces, tabulations, ...
-					\item pas de gestion de la priorité des opérateurs, ni des parenthèses\\
-				\end{itemize}
+				La bibliothèque Irony \cite{irony} permet de construire un parser très simplement. En effet Irony utilise la surcharge des opérateurs pour avoir une syntaxe proche de celle de l'EBNF, ce qui est très pratique.\\
 				
-				Le parser doit pouvoir sortir l'AST correspondant.\\
-				
-				Nous allons commencer par l'implémentation en Haskell, celle-ci se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait 46 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 170ms.\\
-				
-				\todo{C\#, F\#}
+				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/csharp-simple-ebnf}. La taille du module EBNF fait moins de 50 lignes, et est très simple à comprendre. Notons tout de même que Irony possède assez peu de ressources sur Internet.
 			
+			\subsubsection{Langage F\#}
+				F\# possède plusieurs tutoriaux sur Internet et bénéficie de .NET derrière: \url{http://fsharp.org/learn.html}. Cependant les questions sur \textit{stack overflow} ne sont pas courante, et celles-ci ne reçoivent pas forcément des réponses. \\
+				
+				La bibliothèque FParsec \cite{fparsec} a une API équivalente à Parsec de Haskell. Il y a plusieurs tutoriaux et la documentation est claire.\\
+				
+				L'implémentation se trouve dans le dossier \texttt{./trials/fsharp-simple-ebnf}. Celle-ci est naturellement proche de celle en Haskell, cependant F\# oblige de définir une fonction avant qu'elle ne soit utilisée, et construire des règles récursives est plus compliqué. La taille du module EBNF fait également moins de 50 lignes.
 	
 		\subsection{Références}
 			\begingroup
