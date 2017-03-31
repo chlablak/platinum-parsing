@@ -1,5 +1,6 @@
 # Misc
 **/*.pdf
+exemples/
 
 # LaTeX
 **/*.aux
@@ -8,6 +9,8 @@
 **/*.out
 **/*.synctex.gz
 **/*.toc
+**/*.lol
+**/_minted*
 
 # OpenOffice
 **/.~lock*

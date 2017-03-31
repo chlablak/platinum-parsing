@@ -10,8 +10,8 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
-\usepackage{listings,lstautogobble}
 \usepackage{longtable}
+\usepackage{minted}
 
 \pagestyle{fancy}
 
@@ -29,11 +29,13 @@
 % No subsubsection in tableofcontent
 \setcounter{tocdepth}{2}
 
-\lstset{
-	frame=single,
-	numbers=left,
-	tabsize=2,
-	autogobble=true
+% source code listing
+\definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
+\setminted{
+	autogobble,
+	linenos,
+	bgcolor=mintedbg,
+	tabsize=2
 }
 
 \begin{document}
@@ -335,9 +337,23 @@
 			
 			F\# se retrouve d'office éliminé pour cause d'une communauté trop peu active, ce qui n'est pas une bonne chose pour un projet. Cela nous laisse à choisir entre C\# et Haskell. Concernant les bibliothèques de \textit{parsing}, Irony pour C\# et Parsec pour Haskell, celles-ci offrent des possibilités similaires et sont simples à prendre en main, néanmoins Parsec possède des ressources (tutos, articles) plus complètes que Irony. À propos des paradigmes, multiple pour C\# et fonctionnel pur pour Haskell, ceux-ci apportent des approches différentes du problèmes. Cependant aucun est incapable de résoudre les problèmes liés à ce projet.\\
 			
-			Une différence entre l'implémentation du parser simplifié en C\# et en Haskell est la manipulation de l'AST. En effet en C\# les types des noeuds sont des \texttt{string}, le parcours est donc fait au \textit{runtime} à base de conditions \textit{if-else}. Haskell quant à lui permet de définir les types des noeuds de manière statique, ainsi le parcours de l'arbre se base sur du \textit{pattern matching}, ce qui amène à du code plus clair, plus court et plus sûr.
+			Une différence entre l'implémentation du parser simplifié en C\# et en Haskell est la manipulation de l'AST. En effet en C\# les types des noeuds sont des \texttt{string}, le parcours est donc fait au \textit{runtime} à base de conditions \textit{if-else}. Haskell quant à lui permet de définir les types des noeuds de manière statique, ainsi le parcours de l'arbre se base sur du \textit{pattern matching}, ce qui amène à du code plus clair, plus court et plus sûr.\\
 			
-			\todo{choisir}
+			Nous choisissons donc \textbf{Haskell} pour le développement de ce projet pour ses avantages suivants:
+			\begin{itemize}
+				\item Bonne communauté
+				\item Beaucoup de ressources
+				\item Bibliothèque Parsec efficace
+				\item AST statique\\
+			\end{itemize}
+			
+			Haskell possède également d'autres avantages et il est utilisé par de nombreuses entreprises pour certains projets, notamment il est populaire pour le lexing/parsing. Voici quelques liens de départ pour en savoir plus:
+			\begin{itemize}
+				\item \url{https://wiki.haskell.org/Introduction}
+				\item \url{https://wiki.haskell.org/Haskell_in_industry}\\
+			\end{itemize}
+			
+			Cela sera également l'occasion de concevoir et développer un projet complet à l'aide d'un langage fonctionnel pur, chose que nous n'avons pas eu la possibilité de faire lors du cursus.
 			
 		\subsection{Cadre de développement}
 			\todo{git, latex, atom?, ...}
@@ -379,6 +395,12 @@
 				\listoffigures
 			\endgroup
 			
+		\subsection{Table des listings}
+			\begingroup
+				\renewcommand{\section}[2]{}
+				\listoflistings
+			\endgroup
+			
 		\subsection{Critères testés pour le choix du langage}
 		\label{subsec:criteres-testes-pour-le-choix-du-langage}
 			Cette section contient les détails des différents critères pour chaque langage testé. Pour rappel ces critères sont:
@@ -417,6 +439,58 @@
 				Le lien suivant liste différentes bibliothèques présente pour ce langage: \url{https://wiki.haskell.org/Applications_and_libraries}. Plusieurs outils ou bibliothèques pour le parsing existent et sont listés ici: \url{https://wiki.haskell.org/Applications_and_libraries/Compiler_tools}. De plus ce langage est la base de plusieurs compilateurs, voir: \url{https://wiki.haskell.org/Applications_and_libraries/Compilers_and_interpreters}\\
 				
 				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait moins de 50 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 140ms. Notons qu'il y a de nombreuses ressources concernant Parsec.
+				
+				\begin{listing}[H]
+					\begin{minted}{haskell}
+						module EBNF
+							( TStatement(..)
+							, statements
+							) where
+						
+						import Text.Parsec as P
+						
+						data TOperator =
+								TConcatenation
+							| TAlternation
+								deriving (Show)
+						
+						data TExpression =
+								TTerminal String
+							| TRule String
+							| TBinary TExpression TOperator TExpression
+								deriving (Show)
+						
+						data TStatement =
+								TDefinition TExpression TExpression
+							| TStatements [TStatement]
+								deriving (Show)
+						
+						rule :: P.Parsec String st TExpression
+						rule = TRule <$> (P.try (P.char '<' *> ruleDef <* P.char '>') <|> ruleDef)
+							where
+								ruleDef = (:) <$> P.letter <*> P.many alpha
+								alpha = P.letter <|> P.digit
+						
+						operator :: P.Parsec String st TOperator
+						operator = choose <$> P.oneOf ",|"
+							where
+								choose ',' = TConcatenation
+								choose '|' = TAlternation
+						
+						expression :: P.Parsec String st TExpression
+						expression = P.try binaryOp <|> part
+							where
+							binaryOp = TBinary <$> part <*> operator <*> expression
+							part = TTerminal <$> (P.char '\'' *> P.many1 (P.noneOf "\'") <* P.char '\'')
+								<|> rule
+						
+						statements :: P.Parsec String st TStatement
+						statements = TStatements <$> P.many1 definition
+							where
+								definition = TDefinition <$> (rule <* P.char '=') <*> (expression <* P.char ';')
+					\end{minted}
+					\caption{Utilisation de Parsec avec Haskell}
+				\end{listing}
 		
 			\subsubsection{Langage C\#}
 				C\# est un langage développé par Microsoft avec la base de .NET derrière. Les ressources sur Internet ne manquent pas et la communauté est bonne.\\
@@ -424,6 +498,56 @@
 				La bibliothèque Irony \cite{irony} permet de construire un parser très simplement. En effet Irony utilise la surcharge des opérateurs pour avoir une syntaxe proche de celle de l'EBNF, ce qui est très pratique.\\
 				
 				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/csharp-simple-ebnf}. La taille du module EBNF fait moins de 50 lignes, et est très simple à comprendre. Notons tout de même que Irony possède assez peu de ressources sur Internet.
+				
+				\begin{listing}[H]
+					\begin{minted}{csharp}
+						using Irony.Parsing;
+						
+						namespace csharp_simple_ebnf
+						{
+							class EBNF : Grammar
+							{
+								public EBNF() : base(false)
+								{
+									// Terminals
+									IdentifierTerminal TIdentifier = new IdentifierTerminal("identifier");
+									StringLiteral TTerminal = new StringLiteral("terminal", "\'");
+									KeyTerm TConcatenation = ToTerm(",", "concatenation");
+									KeyTerm TAlternation = ToTerm("|", "alternation");
+									
+									// Non terminals
+									NonTerminal TOperator = new NonTerminal("operator");
+									NonTerminal TExpression = new NonTerminal("expression");
+									NonTerminal TRule = new NonTerminal("rule");
+									NonTerminal TBinary = new NonTerminal("binary");
+									NonTerminal TStatement = new NonTerminal("statement");
+									NonTerminal TDefinition = new NonTerminal("definition");
+									NonTerminal TStatements = new NonTerminal("statements");
+									
+									// Rules definition
+									TOperator.Rule = TConcatenation | TAlternation;
+									TExpression.Rule = TTerminal | TRule | TBinary;
+									TRule.Rule = ToTerm("<") + TIdentifier + ">" | TIdentifier;
+									TBinary.Rule = TExpression + TOperator + TExpression;
+									TStatement.Rule = TDefinition;
+									TDefinition.Rule = TRule + "=" + TExpression + ";";
+									TStatements.Rule = MakePlusRule(TStatements, TStatement);
+									
+									// Operators precedence and associativity
+									RegisterOperators(1, TAlternation);
+									RegisterOperators(2, TConcatenation);
+									
+									// Clean tree
+									MarkPunctuation("<", ">", "=", ";");
+									
+									// Entry rule
+									this.Root = TStatements;
+								}
+							}
+						}
+					\end{minted}
+					\caption{Utilisation de Irony avec C\#}
+				\end{listing}
 			
 			\subsubsection{Langage F\#}
 				F\# possède plusieurs tutoriaux sur Internet et bénéficie de .NET derrière: \url{http://fsharp.org/learn.html}. Cependant les questions sur \textit{stack overflow} ne sont pas courante, et celles-ci ne reçoivent pas forcément des réponses. \\
@@ -431,6 +555,52 @@
 				La bibliothèque FParsec \cite{fparsec} a une API équivalente à Parsec de Haskell. Il y a plusieurs tutoriaux et la documentation est claire.\\
 				
 				L'implémentation se trouve dans le dossier \texttt{./trials/fsharp-simple-ebnf}. Celle-ci est naturellement proche de celle en Haskell, cependant F\# oblige de définir une fonction avant qu'elle ne soit utilisée, et construire des règles récursives est plus compliqué. La taille du module EBNF fait également moins de 50 lignes.
+				
+				\begin{listing}[H]
+					\begin{minted}{fsharp}
+						module EBNF
+						
+						open FParsec
+						
+						type TOperator = 
+								TConcatenation 
+							| TAlternation 
+						
+						type TExpression = 
+								TTerminal of string 
+							| TRule of string 
+							| TBinary of TExpression * TOperator * TExpression 
+						
+						type TStatement = 
+								TDefinition of TExpression * TExpression 
+							| TStatements of TStatement list 
+						
+						let rule: Parser<TExpression, unit> = 
+							let alpha = letter <|> digit 
+							let ruleDef = many1Chars2 letter alpha
+							((pchar '<' >>. ruleDef .>> pchar '>') <|> ruleDef) |>> TRule
+						
+						let operator: Parser<TOperator, unit> = 
+							let choose c =
+								match c with
+								| ',' -> TConcatenation 
+								| '|' -> TAlternation
+							anyOf ",|" |>> choose 
+						
+						let expression, expressionRef = createParserForwardedToRef<TExpression, unit> ()
+						
+						let statements: Parser<TStatement, unit> = 
+							let definition = pipe2 (rule .>> pchar '=') (expression .>> pchar ';') (fun a b -> TDefinition (a, b))
+							many1 definition |>> TStatements
+						
+						expressionRef := 
+							let terminal = (pchar '\'' >>. many1Chars (noneOf "'") .>> pchar '\'') |>> TTerminal
+							let part = terminal <|> rule
+							let binaryOp = pipe3 part operator expression (fun a b c -> TBinary (a, b, c)) 
+							attempt binaryOp <|> part 
+					\end{minted}
+					\caption{Utilisation de FParsec avec F\#}
+				\end{listing}
 	
 		\subsection{Références}
 			\begingroup
