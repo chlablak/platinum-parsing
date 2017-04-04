@@ -35,7 +35,8 @@
 	autogobble,
 	linenos,
 	bgcolor=mintedbg,
-	tabsize=2
+	tabsize=2,
+	breaklines
 }
 
 \begin{document}
@@ -106,7 +107,7 @@
 			\begin{figure}[H]
 				\centering
 				\begin{longtable}{p{0.05\textwidth}p{0.8\textwidth}|p{0.05\textwidth}}
-					\# & & Status\\
+					\# & & Statut\\
 					\hline\hline
 					&&\\
 					& Platinum Parsing: & \\
@@ -139,6 +140,7 @@
 			\end{figure}
 
 	\section{Architecture du projet}
+	\label{sec:architecture-du-projet}
 		Dans cette section, nous allons poser l'architecture de PP. C'est-à-dire l'organisation générale des différentes fonctionnalités requises, ainsi que leur utilisation dans des cas réels.
 	
 		\subsection{GOLD Parser System \cite{goldparser}}
@@ -306,6 +308,9 @@
 
 	\section{Technologies}
 	
+		\subsection{État de l'art}
+			\todo{\url{https://en.wikipedia.org/wiki/Comparison_of_parser_generators}}
+	
 		\subsection{Choix du langage}
 			Un choix crucial dans ce projet est le choix du langage de programmation que nous allons utiliser pour implémenter notre solution. Plusieurs langages ont été choisis en début de projet pour être comparés:
 			\begin{itemize}
@@ -347,7 +352,7 @@
 				\item AST statique\\
 			\end{itemize}
 			
-			Haskell possède également d'autres avantages et il est utilisé par de nombreuses entreprises pour certains projets, notamment il est populaire pour le lexing/parsing. Voici quelques liens de départ pour en savoir plus:
+			Haskell possède également d'autres avantages et il est utilisé par de nombreuses entreprises pour certains projets, notamment il est populaire pour le \textit{lexing/parsing}. Voici quelques liens de départ pour en savoir plus:
 			\begin{itemize}
 				\item \url{https://wiki.haskell.org/Introduction}
 				\item \url{https://wiki.haskell.org/Haskell_in_industry}\\
@@ -356,10 +361,64 @@
 			Cela sera également l'occasion de concevoir et développer un projet complet à l'aide d'un langage fonctionnel pur, chose que nous n'avons pas eu la possibilité de faire lors du cursus.
 			
 		\subsection{Cadre de développement}
-			\todo{git, latex, atom?, ...}
+			La gestion de ce projet utilise plusieurs outils pour sa réalisation, voici une liste pour référence:
+			\begin{itemize}
+				\item Git \cite{git} : Gestionnaire de version
+				\subitem Github \cite{github} : Serveur Git (\url{https://github.com/chlablak/platinum-parsing})
+				\item LaTeX \cite{latex} : Rédaction du rapport
+				\item Haskell \cite{haskell} : Langage de développement
+				\subitem Stack \cite{stack} : Gestionnaire de projet Haskell
+				\subitem Cabal \cite{cabal} : Système de \textit{package} pour les projets Haskell
+				\item Atom \cite{atom} : Éditeur de texte\\
+			\end{itemize}
 			
-	\section{Conception}
-		\todo{attendre de savoir le langage}
+			Le langage choisi étant Haskell, nous allons nous baser sur ces \textit{guidelines} pour le développement:\\ \url{https://wiki.haskell.org/Programming_guidelines}
+		
+	\section{Planification des tâches}
+		Dans la section~\ref{sec:architecture-du-projet} \textit{architecture du projet} nous avons poser la forme générale de Platinum Parsing, cependant cette approche reste très générale et nous devons à présent la réduire pour répondre efficacement aux objectifs principaux du projet. Cette section cherche à organiser le développement dans ce sens. Évidemment, une fois ces objectifs remplis, la suite logique est d'aller vers l'architecture générale.\\
+		
+		Rappelons donc les objectifs principaux:
+		\begin{itemize}
+			\item lire et comprendre une grammaire selon la syntaxe EBNF
+			\item analyser la validité d'une grammaire définie
+			\item aider à la correction des erreurs de grammaire
+			\item permettre de tester la grammaire pour la reconnaissance d'un texte en entrée
+			\item générer les tables selon une grammaire EBNF donnée
+			\item être capable de traduire les tables selon un modèle fourni par l'utilisateur
+			\item permettre d'attacher un \textit{callback} aux noeuds de l'AST
+			\item fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC\\
+		\end{itemize}
+		
+		À partir de cette liste, nous pouvons organiser le développement en phases successives:
+		\begin{enumerate}
+			\item Choix et définition de la grammaire non-contextuelle $\rightarrow$ voir section~\ref{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
+			\subitem + Définition de l'AST pour la grammaire choisie 
+			\item Création d'un parser pour la grammaire
+			\subitem + Donnant en sortie l'AST correspondant
+			\item Génération de la table LALR à partir de l'AST
+			\subitem + Test avec une grammaire simple
+			\item Définition de la grammaire du langage ISO CNC
+			\subitem + Écriture d'un petit programme en ISO CNC
+			\item Test d'une grammaire à partir d'un texte en entrée
+			\subitem + Analyse de la validité de la grammaire
+			\subitem + Aide à la correction des erreurs de grammaire 
+			\subitem + Test avec des grammaires ambiguës simples
+			\item Génération des tables dans un langage cible selon un modèle
+			\item Utilisation des tables générées en C\#, en démonstration
+			\subitem + Attache de \textit{callbacks} 
+			\item \textit{Tests, améliorations, objectifs optionnels, etc.}\\
+		\end{enumerate} 
+		
+		L'ordre est important car chaque étape dépend des précédentes. Les structures de données ainsi que les algorithmes seront choisis au fur et à mesure des recherches dans les phases. Il en va de même pour les schémas UML (classes, séquences, etc.), en effet le projet est assez conséquent et tout concevoir avant la réalisation n'est pas une bonne approche. De ce fait chaque étape est à voir comme un module à part entière, et chacun de ces modules aura sa conception propre. Puis, dès que l'on aura une vision plus précise du tout, on pourra expliquer plus facilement le fonctionnement générale de la solution.\\
+		
+		Cette façon de procéder a l'avantage d'être plus résistante aux changements que l'on pourrait vouloir faire. Un peu comme un développement agile par itérations. Bien évidemment, il ne faut pas perdre de vue le projet dans sa globalité lors de chaque étape.			
+	
+	\section{Choix et définition de la grammaire non-contextuelle}
+	\label{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
+		\todo{bnf vs ebnf vs abnf}
+	
+		\subsection{Définition de l'AST pour la grammaire choisie}
+			\todo{voir iso ebnf}
 
 	\section{Conclusion}
 		\todo{à faire à la fin}
@@ -441,54 +500,7 @@
 				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait moins de 50 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 140ms. Notons qu'il y a de nombreuses ressources concernant Parsec.
 				
 				\begin{listing}[H]
-					\begin{minted}{haskell}
-						module EBNF
-							( TStatement(..)
-							, statements
-							) where
-						
-						import Text.Parsec as P
-						
-						data TOperator =
-								TConcatenation
-							| TAlternation
-								deriving (Show)
-						
-						data TExpression =
-								TTerminal String
-							| TRule String
-							| TBinary TExpression TOperator TExpression
-								deriving (Show)
-						
-						data TStatement =
-								TDefinition TExpression TExpression
-							| TStatements [TStatement]
-								deriving (Show)
-						
-						rule :: P.Parsec String st TExpression
-						rule = TRule <$> (P.try (P.char '<' *> ruleDef <* P.char '>') <|> ruleDef)
-							where
-								ruleDef = (:) <$> P.letter <*> P.many alpha
-								alpha = P.letter <|> P.digit
-						
-						operator :: P.Parsec String st TOperator
-						operator = choose <$> P.oneOf ",|"
-							where
-								choose ',' = TConcatenation
-								choose '|' = TAlternation
-						
-						expression :: P.Parsec String st TExpression
-						expression = P.try binaryOp <|> part
-							where
-							binaryOp = TBinary <$> part <*> operator <*> expression
-							part = TTerminal <$> (P.char '\'' *> P.many1 (P.noneOf "\'") <* P.char '\'')
-								<|> rule
-						
-						statements :: P.Parsec String st TStatement
-						statements = TStatements <$> P.many1 definition
-							where
-								definition = TDefinition <$> (rule <* P.char '=') <*> (expression <* P.char ';')
-					\end{minted}
+					\inputminted{haskell}{../../trials/haskell-simple-ebnf/src/EBNF.hs}
 					\caption{Utilisation de Parsec avec Haskell}
 				\end{listing}
 		
@@ -500,52 +512,7 @@
 				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/csharp-simple-ebnf}. La taille du module EBNF fait moins de 50 lignes, et est très simple à comprendre. Notons tout de même que Irony possède assez peu de ressources sur Internet.
 				
 				\begin{listing}[H]
-					\begin{minted}{csharp}
-						using Irony.Parsing;
-						
-						namespace csharp_simple_ebnf
-						{
-							class EBNF : Grammar
-							{
-								public EBNF() : base(false)
-								{
-									// Terminals
-									IdentifierTerminal TIdentifier = new IdentifierTerminal("identifier");
-									StringLiteral TTerminal = new StringLiteral("terminal", "\'");
-									KeyTerm TConcatenation = ToTerm(",", "concatenation");
-									KeyTerm TAlternation = ToTerm("|", "alternation");
-									
-									// Non terminals
-									NonTerminal TOperator = new NonTerminal("operator");
-									NonTerminal TExpression = new NonTerminal("expression");
-									NonTerminal TRule = new NonTerminal("rule");
-									NonTerminal TBinary = new NonTerminal("binary");
-									NonTerminal TStatement = new NonTerminal("statement");
-									NonTerminal TDefinition = new NonTerminal("definition");
-									NonTerminal TStatements = new NonTerminal("statements");
-									
-									// Rules definition
-									TOperator.Rule = TConcatenation | TAlternation;
-									TExpression.Rule = TTerminal | TRule | TBinary;
-									TRule.Rule = ToTerm("<") + TIdentifier + ">" | TIdentifier;
-									TBinary.Rule = TExpression + TOperator + TExpression;
-									TStatement.Rule = TDefinition;
-									TDefinition.Rule = TRule + "=" + TExpression + ";";
-									TStatements.Rule = MakePlusRule(TStatements, TStatement);
-									
-									// Operators precedence and associativity
-									RegisterOperators(1, TAlternation);
-									RegisterOperators(2, TConcatenation);
-									
-									// Clean tree
-									MarkPunctuation("<", ">", "=", ";");
-									
-									// Entry rule
-									this.Root = TStatements;
-								}
-							}
-						}
-					\end{minted}
+					\inputminted{csharp}{../../trials/csharp-simple-ebnf/csharp-simple-ebnf/EBNF.cs}
 					\caption{Utilisation de Irony avec C\#}
 				\end{listing}
 			
@@ -557,48 +524,7 @@
 				L'implémentation se trouve dans le dossier \texttt{./trials/fsharp-simple-ebnf}. Celle-ci est naturellement proche de celle en Haskell, cependant F\# oblige de définir une fonction avant qu'elle ne soit utilisée, et construire des règles récursives est plus compliqué. La taille du module EBNF fait également moins de 50 lignes.
 				
 				\begin{listing}[H]
-					\begin{minted}{fsharp}
-						module EBNF
-						
-						open FParsec
-						
-						type TOperator = 
-								TConcatenation 
-							| TAlternation 
-						
-						type TExpression = 
-								TTerminal of string 
-							| TRule of string 
-							| TBinary of TExpression * TOperator * TExpression 
-						
-						type TStatement = 
-								TDefinition of TExpression * TExpression 
-							| TStatements of TStatement list 
-						
-						let rule: Parser<TExpression, unit> = 
-							let alpha = letter <|> digit 
-							let ruleDef = many1Chars2 letter alpha
-							((pchar '<' >>. ruleDef .>> pchar '>') <|> ruleDef) |>> TRule
-						
-						let operator: Parser<TOperator, unit> = 
-							let choose c =
-								match c with
-								| ',' -> TConcatenation 
-								| '|' -> TAlternation
-							anyOf ",|" |>> choose 
-						
-						let expression, expressionRef = createParserForwardedToRef<TExpression, unit> ()
-						
-						let statements: Parser<TStatement, unit> = 
-							let definition = pipe2 (rule .>> pchar '=') (expression .>> pchar ';') (fun a b -> TDefinition (a, b))
-							many1 definition |>> TStatements
-						
-						expressionRef := 
-							let terminal = (pchar '\'' >>. many1Chars (noneOf "'") .>> pchar '\'') |>> TTerminal
-							let part = terminal <|> rule
-							let binaryOp = pipe3 part operator expression (fun a b c -> TBinary (a, b, c)) 
-							attempt binaryOp <|> part 
-					\end{minted}
+					\inputminted{fsharp}{../../trials/fsharp-simple-ebnf/fsharp-simple-ebnf/EBNF.fs}
 					\caption{Utilisation de FParsec avec F\#}
 				\end{listing}
 	
@@ -611,13 +537,47 @@
 						\url{https://en.wikipedia.org/wiki/Backus\%E2\%80\%93Naur_form}\\
 						
 					\bibitem{ebnf} EBNF, Extended Backus-Naur form, used to express a context-free grammar,\\ 
-						\url{https://en.wikipedia.org/wiki/Extended\_Backus\%E2\%80\%93Naur_form}\\
+						\url{https://en.wikipedia.org/wiki/Extended\_Backus\%E2\%80\%93Naur_form},\\
+						\url{http://standards.iso.org/ittf/PubliclyAvailableStandards/s026153_ISO_IEC_14977_1996(E).zip}\\
 					
 					\bibitem{goldparser} GOLD Parsing System, GOLD is a free parsing system that you can use to develop your own programming languages, scripting languages and interpreters,\\
 						\url{http://www.goldparser.org/}\\
 						
 					\bibitem{lalr} LALR, Look-Ahead LR parser,\\
-						\url{https://en.wikipedia.org/wiki/LALR_parser}
+						\url{https://en.wikipedia.org/wiki/LALR_parser}\\
+						
+					\bibitem{irony} Irony, .NET Language Implementation Kit,\\
+						\url{https://irony.codeplex.com/}\\
+						
+					\bibitem{ast} AST, Abstract Syntax Tree,\\
+						\url{https://en.wikipedia.org/wiki/Abstract_syntax_tree}\\
+						
+					\bibitem{git} Git, free and open source distributed version control system,\\
+						\url{https://git-scm.com/}\\
+					
+					\bibitem{github} Github, web-based Git or version control repository,\\
+						\url{https://github.com/}\\
+											
+					\bibitem{latex} LaTeX, a document preparation system,\\
+						\url{http://www.latex-project.org/}\\
+					
+					\bibitem{haskell} Haskell, a standardized, general-purpose purely functional programming language,\\
+						\url{https://www.haskell.org/}\\
+					
+					\bibitem{stack} Stack, a cross-platform program for developing Haskell projects,\\
+						\url{https://docs.haskellstack.org/en/stable/README/}\\
+					
+					\bibitem{cabal} Cabal, a system for building and packaging Haskell libraries and programs,\\
+						\url{https://www.haskell.org/cabal/}\\	
+					
+					\bibitem{atom} Atom, a text editor that's modern, approachable, yet hackable to the core,\\
+						\url{https://atom.io/}\\
+					
+					\bibitem{parsec} Parsec, an industrial-strength parser library for Haskell,\\
+						\url{https://hackage.haskell.org/package/parsec}\\
+						
+					\bibitem{fparsec} FParsec, a parser combinator library for F\#,\\
+						\url{http://www.quanttec.com/fparsec/}\\
 						
 				\end{thebibliography}
 			\endgroup

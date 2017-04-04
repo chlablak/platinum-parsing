@@ -1,5 +1,10 @@
 # TODO
 
+## Other
+- [ ] backup huawai
+- [ ] tiroir gimel
+- [ ] hygiéniste
+
 ## Now
 - [x] critères
   - [x] impl. test en c#
@@ -11,23 +16,33 @@
   - [x] comprendre ce qu'est les "data" en haskell
     - https://wiki.haskell.org/OOP_vs_type_classes
     - https://wiki.haskell.org/Algebraic_data_type
-- [ ] conception
-  - [ ] comprendre:
-    - [x] lexer (DFA, intégré à Parsec?)
-    - [ ] parser (LALR, ...)
-    - [x] AST
-    - [ ] template
-    - [ ] sorties
-    - [ ] ...
-  - [ ] définir la syntaxe ebnf (vs abnf vs bnf (expliquer))
-    - mixer les deux?
-    - ajouter lexeme regex?
-  - [ ] définition et conception des modules
-    - [ ] schémas UML (classes, séquences, ...)
+
+- [ ] comprendre:
+  - [x] lexer (DFA, intégré à Parsec?)
+  - [x] parser (LALR, ...)
+  - [x] AST
+  - [ ] exemple gold
+  - [ ] template
+  - [ ] sorties
+
+- [ ] définir la syntaxe ebnf (vs abnf vs bnf (expliquer))
+  - mixer les deux?
+  - ajouter lexeme regex?
+  - voir ISO pdf
+
+- [ ] définition et conception des modules
+  - [ ] schémas UML (classes, séquences, ...)
   - [ ] choix des structures de données
     - http://web.cs.dal.ca/~sjackson/lalr1.html
+  - EBNF -> AST
+
 - [ ] planification phase II
-  - [ ] vision large -> restreindre -> définir étapes
+  - [x] vision large -> restreindre -> définir étapes
+  - [ ] mettre dans le planning
+  - bnf > ast > lalr > test > cnc > test > gen > c# > test
+  - cli -> cli-help, cli-builder, ...
+
+- [ ] state of the art
 
 ## Then
 - [ ] revoir schéma (formalisme)
