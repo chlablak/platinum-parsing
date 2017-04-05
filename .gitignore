@@ -17,6 +17,7 @@ ignored/
 
 # Haskell
 **/.stack-work
+**/dist
 
 # C#
 **/.vs
