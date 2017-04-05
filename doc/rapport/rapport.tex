@@ -12,6 +12,7 @@
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{longtable}
 \usepackage{minted}
+\usepackage{caption}
 
 \pagestyle{fancy}
 
@@ -24,7 +25,7 @@
 \rfoot{}
 
 % Commands
-\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\newcommand{\todo}[1]{\textcolor{red}{TODO\ifthenelse{\equal{#1}{}}{}{:} #1}}
 
 % No subsubsection in tableofcontent
 \setcounter{tocdepth}{2}
@@ -34,9 +35,10 @@
 \setminted{
 	autogobble,
 	linenos,
-	bgcolor=mintedbg,
+	%bgcolor=mintedbg,
 	tabsize=2,
-	breaklines
+	breaklines,
+	frame=single
 }
 
 \begin{document}
@@ -393,17 +395,21 @@
 		\begin{enumerate}
 			\item Choix et définition de la grammaire non-contextuelle $\rightarrow$ voir section~\ref{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
 			\subitem + Définition de l'AST pour la grammaire choisie 
-			\item Création d'un parser pour la grammaire
+			\item Création d'un parser pour la grammaire $\rightarrow$ voir section~\ref{sec:creation-d-un-parser-pour-la-grammaire}
 			\subitem + Donnant en sortie l'AST correspondant
+			\subitem + Intégration dans le CLI
 			\item Génération de la table LALR à partir de l'AST
 			\subitem + Test avec une grammaire simple
+			\subitem + Intégration dans le CLI
 			\item Définition de la grammaire du langage ISO CNC
 			\subitem + Écriture d'un petit programme en ISO CNC
 			\item Test d'une grammaire à partir d'un texte en entrée
 			\subitem + Analyse de la validité de la grammaire
 			\subitem + Aide à la correction des erreurs de grammaire 
 			\subitem + Test avec des grammaires ambiguës simples
+			\subitem + Intégration dans le CLI
 			\item Génération des tables dans un langage cible selon un modèle
+			\subitem + Intégration dans le CLI
 			\item Utilisation des tables générées en C\#, en démonstration
 			\subitem + Attache de \textit{callbacks} 
 			\item \textit{Tests, améliorations, objectifs optionnels, etc.}\\
@@ -411,14 +417,58 @@
 		
 		L'ordre est important car chaque étape dépend des précédentes. Les structures de données ainsi que les algorithmes seront choisis au fur et à mesure des recherches dans les phases. Il en va de même pour les schémas UML (classes, séquences, etc.), en effet le projet est assez conséquent et tout concevoir avant la réalisation n'est pas une bonne approche. De ce fait chaque étape est à voir comme un module à part entière, et chacun de ces modules aura sa conception propre. Puis, dès que l'on aura une vision plus précise du tout, on pourra expliquer plus facilement le fonctionnement générale de la solution.\\
 		
-		Cette façon de procéder a l'avantage d'être plus résistante aux changements que l'on pourrait vouloir faire. Un peu comme un développement agile par itérations. Bien évidemment, il ne faut pas perdre de vue le projet dans sa globalité lors de chaque étape.			
+		Cette façon de procéder a l'avantage d'être plus résistante aux changements que l'on pourrait vouloir faire. Un peu comme un développement agile par itérations. Bien évidemment, il ne faut pas perdre de vue le projet dans sa globalité lors de chaque étape.\\
+		
+		La tâche \textit{Intégration dans le CLI} se fait en parallèle des étapes. Toutes ces fonctionnalités allant dans le CLI pour être mise en commun, et fournir une interface utilisateur simple. Il paraît donc évident que le CLI doit être développé en même temps.
 	
 	\section{Choix et définition de la grammaire non-contextuelle}
 	\label{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
-		\todo{bnf vs ebnf vs abnf}
+		Afin de créer le parser, l'utilisateur aura besoin de définir son langage à l'aide d'une grammaire. Le langage le plus connu pour cela est BNF, avec ces différentes variantes (qui elles-mêmes ont des variantes): EBNF et ABNF.\\
+		
+		Nous devons choisir quelle variante nous allons utiliser pour PP. ABNF est exclu car sa lisibilité n'est pas très bonne pour les humains, son utilisation est plutôt pour la définition de protocoles. Concernant BNF et EBNF, les deux offrent les mêmes possibilités mais EBNF est généralement plus lisible et agréable à utiliser. À cette adresse (\url{http://xahlee.info/parser/bnf_ebnf_abnf.html}) nous avons un bon résumé que je copie ici:
+		\begin{quote}
+			\textbf{Advantages over BNF}
+			
+			Any grammar defined in EBNF can also be represented in BNF though representations in the latter are generally lengthier. e.g., options and repetitions cannot be directly expressed in BNF and require the use of an intermediate rule or alternative production defined to be either nothing or the optional production for option, or either the repeated production of itself, recursively, for repetition. The same constructs can still be used in EBNF.\\
+			
+			The BNF uses the symbols ($<$, $>$, $|$, $::=$) for itself, but does not include quotes around terminal strings. This prevents these characters from being used in the languages, and requires a special symbol for the empty string. In EBNF, terminals are strictly enclosed within quotation marks ("..." or '...'). The angle brackets ("$<$...$>$") for nonterminals can be omitted.\\
+			
+			BNF syntax can only represent a rule in one line, whereas in EBNF a terminating character, the semicolon, marks the end of a rule.\\
+			
+			Furthermore, EBNF includes mechanisms for enhancements, defining the number of repetitions, excluding alternatives, comments, etc.\\
+		\end{quote}
+		
+		Nous choisissons donc EBNF comme langage pour la grammaire d'entrée de PP. De plus il s'agit du seul des trois qui est défini par une norme officielle: ISO/IEC 14977:1996. Nous avons donc une base solide sur laquelle nous appuyer.
 	
 		\subsection{Définition de l'AST pour la grammaire choisie}
-			\todo{voir iso ebnf}
+			À présent que le langage pour la grammaire a été choisi (EBNF), nous devons spécifier sa propre grammaire pour implémenter le parser. La norme ISO/IEC 14977:1996 nous donne cela, réécrit ci-après:
+			
+			\inputminted{ebnf}{../ebnf-of-ebnf.ebnf}
+			\captionof{listing}{EBNF utilisé pour se définir lui-même}
+			
+			L'AST en Haskell de cette grammaire est faite à l'aide d'un type de donnée algébrique, qui traduit l'EBNF ci-dessus simplement et assez directement:
+			
+			\todo{inclure code}
+			
+			Ce fichier fait parti du module \texttt{PP.Grammars.EBNF}, nous avons ici nos premiers modules:
+			\begin{figure}[H]
+				\centering
+				\begin{tabular}{ll}
+					\texttt{PP} & Import général pour \textit{Platinum Parsing}\\
+					\texttt{PP.Grammar} & Module pour le parsing d'une grammaire\\
+					\texttt{PP.Grammars} & Import général pour les grammaires pré-définies\\
+					\texttt{PP.Grammars.EBNF} & AST pour la grammaire EBNF\\
+				\end{tabular}
+				\caption{Modules pour ce qui touche la grammaire}
+			\end{figure}
+			
+	\section{Création d'un parser pour la grammaire}
+	\label{sec:creation-d-un-parser-pour-la-grammaire}
+		%+ Donnant en sortie l'AST correspondant
+		\todo{}
+		
+		\subsection{Intégration dans le CLI}
+			\todo{}
 
 	\section{Conclusion}
 		\todo{à faire à la fin}
@@ -499,10 +549,8 @@
 				
 				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait moins de 50 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 140ms. Notons qu'il y a de nombreuses ressources concernant Parsec.
 				
-				\begin{listing}[H]
-					\inputminted{haskell}{../../trials/haskell-simple-ebnf/src/EBNF.hs}
-					\caption{Utilisation de Parsec avec Haskell}
-				\end{listing}
+				\inputminted{haskell}{../../trials/haskell-simple-ebnf/src/EBNF.hs}
+				\captionof{listing}{Utilisation de Parsec avec Haskell}
 		
 			\subsubsection{Langage C\#}
 				C\# est un langage développé par Microsoft avec la base de .NET derrière. Les ressources sur Internet ne manquent pas et la communauté est bonne.\\
@@ -511,10 +559,8 @@
 				
 				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/csharp-simple-ebnf}. La taille du module EBNF fait moins de 50 lignes, et est très simple à comprendre. Notons tout de même que Irony possède assez peu de ressources sur Internet.
 				
-				\begin{listing}[H]
-					\inputminted{csharp}{../../trials/csharp-simple-ebnf/csharp-simple-ebnf/EBNF.cs}
-					\caption{Utilisation de Irony avec C\#}
-				\end{listing}
+				\inputminted{csharp}{../../trials/csharp-simple-ebnf/csharp-simple-ebnf/EBNF.cs}
+				\captionof{listing}{Utilisation de Irony avec C\#}
 			
 			\subsubsection{Langage F\#}
 				F\# possède plusieurs tutoriaux sur Internet et bénéficie de .NET derrière: \url{http://fsharp.org/learn.html}. Cependant les questions sur \textit{stack overflow} ne sont pas courante, et celles-ci ne reçoivent pas forcément des réponses. \\
@@ -523,10 +569,8 @@
 				
 				L'implémentation se trouve dans le dossier \texttt{./trials/fsharp-simple-ebnf}. Celle-ci est naturellement proche de celle en Haskell, cependant F\# oblige de définir une fonction avant qu'elle ne soit utilisée, et construire des règles récursives est plus compliqué. La taille du module EBNF fait également moins de 50 lignes.
 				
-				\begin{listing}[H]
-					\inputminted{fsharp}{../../trials/fsharp-simple-ebnf/fsharp-simple-ebnf/EBNF.fs}
-					\caption{Utilisation de FParsec avec F\#}
-				\end{listing}
+				\inputminted{fsharp}{../../trials/fsharp-simple-ebnf/fsharp-simple-ebnf/EBNF.fs}
+				\captionof{listing}{Utilisation de FParsec avec F\#}
 	
 		\subsection{Références}
 			\begingroup
@@ -538,6 +582,7 @@
 						
 					\bibitem{ebnf} EBNF, Extended Backus-Naur form, used to express a context-free grammar,\\ 
 						\url{https://en.wikipedia.org/wiki/Extended\_Backus\%E2\%80\%93Naur_form},\\
+						\url{https://www.iso.org/standard/26153.html},\\
 						\url{http://standards.iso.org/ittf/PubliclyAvailableStandards/s026153_ISO_IEC_14977_1996(E).zip}\\
 					
 					\bibitem{goldparser} GOLD Parsing System, GOLD is a free parsing system that you can use to develop your own programming languages, scripting languages and interpreters,\\

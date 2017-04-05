@@ -1,0 +1,69 @@
+(*
+	This example defines Extended BNF informally. Many of the syntax rules
+  include a comment to explain their meaning; inside a comment a meta identifier
+  is enclosed in angle brackets < and > to avoid confusion with similar English
+  words. The non-terminal symbols <letter>, <decimal digit> and <character> is
+  stated in a comment but not formally defined.
+
+  Source: ISO/IEC 14977:1996, page 10, part 8.2
+*)
+
+syntax = syntax	rule, {syntax rule};
+
+(* A <syntax rule> defines the sequences of symbols represented by a
+  <meta identifier> *)
+syntax rule = meta identifier, '=', definitions list, ';';
+
+(* | separates alternative <single definitions> *)
+definitions list = single definition, {'|', single definition};
+
+(* , separates successive <terms> *)
+single definition = term, {',', term};
+
+(* A <term> represents any sequence of symbols that is defined by the <factor>
+  but not defined by the <exception> *)
+term = factor, ['-', exception];
+
+(* A <factor> may be used as an <exception> if it could be replaced by a
+  <factor> containing no <meta identifiers> *)
+exception = factor;
+
+(* The <integer> specifies the number of repetitions of the <primary> *)
+factor = [integer, '*'], primary;
+
+primary
+  = optional sequence | repeated sequence	| special sequence
+  | grouped sequence | meta identifier | terminal string | empty;
+
+empty = ;
+
+(* The brackets [ and ] enclose symbols which are optional *)
+optional sequence = '[', definitions list, ']';
+
+(* The brackets { and } enclose symbols which may be repeated any number of
+  times *)
+repeated sequence = '{', definitions list, '}';
+
+(* The brackets ( and ) allow any <definitions list> to be a <primary> *)
+grouped sequence = '(', definitions list, ')';
+
+(* A <terminal string> represents the <characters> between the quote symbols
+  '...' or "..." *)
+terminal string
+	= "'", character - "'", {character - "'"}, "'"
+	| '"', character - '"', {character - '"'}, '"';
+
+(* A <meta identifier> is the name of a syntactic element of the langage being
+  defined *)
+meta identifier = letter, {letter | decimal digit};
+
+integer = decimal digit, {decimal digit};
+
+(* The meaning of a <special sequence> is not defined in the standard
+  metalangage. *)
+special sequence = '?', {character - '?'}, '?';
+
+(* A comment is allowed anywhere outside a <terminal string>, <meta identifier>,
+  <integer> or <special sequence> *)
+comment = '(*', {comment symbol}, '*)';
+comment symbol = comment | terminal string | special sequence | character;

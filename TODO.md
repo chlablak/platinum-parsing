@@ -25,7 +25,7 @@
   - [ ] template
   - [ ] sorties
 
-- [ ] définir la syntaxe ebnf (vs abnf vs bnf (expliquer))
+- [x] définir la syntaxe ebnf (vs abnf vs bnf (expliquer))
   - mixer les deux?
   - ajouter lexeme regex?
   - voir ISO pdf
@@ -33,12 +33,13 @@
 - [ ] définition et conception des modules
   - [ ] schémas UML (classes, séquences, ...)
   - [ ] choix des structures de données
+  - [ ] ast de l'ebnf
     - http://web.cs.dal.ca/~sjackson/lalr1.html
   - EBNF -> AST
 
 - [ ] planification phase II
   - [x] vision large -> restreindre -> définir étapes
-  - [ ] mettre dans le planning
+  - [ ] mettre dans le planning + màj heures
   - bnf > ast > lalr > test > cnc > test > gen > c# > test
   - cli -> cli-help, cli-builder, ...
 
