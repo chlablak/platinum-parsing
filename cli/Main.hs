@@ -1,16 +1,20 @@
 {-|
-Module      : PP
-Description : Global import for all PP functionnalities
+Module      : Main
+Description : Command Line Interface for Platinum Parsing
 Copyright   : (c) 2017 Patrick Champion
 License     : see LICENSE file
 Maintainer  : chlablak@gmail.com
 Stability   : provisional
 Portability : portable
 
-This module imports all functionnalities of Platinum Parsing.
+This module is the entry point for the pp-cli tool.
 For more informations about this tool, please look at:
   https://github.com/chlablak/platinum-parsing
 -}
-module PP
-    (
-    ) where
+
+module Main where
+
+import           PP
+
+main :: IO ()
+main = print "Hello CLI !"

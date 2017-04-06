@@ -311,7 +311,16 @@
 	\section{Technologies}
 	
 		\subsection{État de l'art}
-			\todo{\url{https://en.wikipedia.org/wiki/Comparison_of_parser_generators}}
+			La génération de parser est un domaine qui possède déjà nombre d'outils. Le lien suivant propose une liste de ceux-ci avec leurs spécificités: \url{https://en.wikipedia.org/wiki/Comparison_of_parser_generators}\\
+			
+			Ces outils diffèrent notamment au niveau des points suivants:
+			\begin{itemize}
+				\item Algorithmes de \textit{parsing} utilisés
+				\item Grammaires d'entrée acceptées
+				\item Langages de sortie proposés
+				\item Plateformes de développement possible
+				\item Licence
+			\end{itemize}
 	
 		\subsection{Choix du langage}
 			Un choix crucial dans ce projet est le choix du langage de programmation que nous allons utiliser pour implémenter notre solution. Plusieurs langages ont été choisis en début de projet pour être comparés:
@@ -371,6 +380,7 @@
 				\item Haskell \cite{haskell} : Langage de développement
 				\subitem Stack \cite{stack} : Gestionnaire de projet Haskell
 				\subitem Cabal \cite{cabal} : Système de \textit{package} pour les projets Haskell
+				\subitem Haddock \cite{haddock} : Générateur de documentation depuis les sources
 				\item Atom \cite{atom} : Éditeur de texte\\
 			\end{itemize}
 			
@@ -397,19 +407,19 @@
 			\subitem + Définition de l'AST pour la grammaire choisie 
 			\item Création d'un parser pour la grammaire $\rightarrow$ voir section~\ref{sec:creation-d-un-parser-pour-la-grammaire}
 			\subitem + Donnant en sortie l'AST correspondant
-			\subitem + Intégration dans le CLI
+			\subitem + Intégration au CLI
 			\item Génération de la table LALR à partir de l'AST
 			\subitem + Test avec une grammaire simple
-			\subitem + Intégration dans le CLI
+			\subitem + Intégration au CLI
 			\item Définition de la grammaire du langage ISO CNC
 			\subitem + Écriture d'un petit programme en ISO CNC
 			\item Test d'une grammaire à partir d'un texte en entrée
 			\subitem + Analyse de la validité de la grammaire
 			\subitem + Aide à la correction des erreurs de grammaire 
 			\subitem + Test avec des grammaires ambiguës simples
-			\subitem + Intégration dans le CLI
+			\subitem + Intégration au CLI
 			\item Génération des tables dans un langage cible selon un modèle
-			\subitem + Intégration dans le CLI
+			\subitem + Intégration au CLI
 			\item Utilisation des tables générées en C\#, en démonstration
 			\subitem + Attache de \textit{callbacks} 
 			\item \textit{Tests, améliorations, objectifs optionnels, etc.}\\
@@ -419,7 +429,7 @@
 		
 		Cette façon de procéder a l'avantage d'être plus résistante aux changements que l'on pourrait vouloir faire. Un peu comme un développement agile par itérations. Bien évidemment, il ne faut pas perdre de vue le projet dans sa globalité lors de chaque étape.\\
 		
-		La tâche \textit{Intégration dans le CLI} se fait en parallèle des étapes. Toutes ces fonctionnalités allant dans le CLI pour être mise en commun, et fournir une interface utilisateur simple. Il paraît donc évident que le CLI doit être développé en même temps.
+		La tâche \textit{Intégration au CLI} se fait en parallèle des étapes. Toutes ces fonctionnalités allant dans le CLI pour être mise en commun, et fournir une interface utilisateur simple. Il paraît donc évident que le CLI doit être développé en même temps.
 	
 	\section{Choix et définition de la grammaire non-contextuelle}
 	\label{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
@@ -446,28 +456,53 @@
 			\inputminted{ebnf}{../ebnf-of-ebnf.ebnf}
 			\captionof{listing}{EBNF utilisé pour se définir lui-même}
 			
+			\paragraph{}
 			L'AST en Haskell de cette grammaire est faite à l'aide d'un type de donnée algébrique, qui traduit l'EBNF ci-dessus simplement et assez directement:
 			
-			\todo{inclure code}
+			\begin{minted}{haskell}
+				newtype Syntax = Syntax [SyntaxRule]
+				data SyntaxRule = SyntaxRule MetaIdentifier DefinitionsList
+				newtype DefinitionsList = DefinitionsList [SingleDefinition]
+				newtype SingleDefinition = SingleDefinition [Term]
+				data Term = Term Factor (Maybe Exception)
+				newtype Exception = Exception Factor
+				data Factor = Factor (Maybe Integer) Primary
+				data Primary
+					= OptionalSequence DefinitionsList
+					| RepeatedSequence DefinitionsList
+					| SpecialSequence String
+					| GroupedSequence DefinitionsList
+					| PrimaryMetaIdentifier MetaIdentifier
+					| TerminalString String
+					| Empty
+				newtype MetaIdentifier = MetaIdentifier String
+			\end{minted}
+			\captionof{listing}{AST de l'EBNF en Haskell}
 			
+			\paragraph{}
 			Ce fichier fait parti du module \texttt{PP.Grammars.EBNF}, nous avons ici nos premiers modules:
 			\begin{figure}[H]
 				\centering
 				\begin{tabular}{ll}
 					\texttt{PP} & Import général pour \textit{Platinum Parsing}\\
-					\texttt{PP.Grammar} & Module pour le parsing d'une grammaire\\
-					\texttt{PP.Grammars} & Import général pour les grammaires pré-définies\\
 					\texttt{PP.Grammars.EBNF} & AST pour la grammaire EBNF\\
 				\end{tabular}
-				\caption{Modules pour ce qui touche la grammaire}
 			\end{figure}
+			
+			Notons que les commentaires ne sont pas représentés par l'AST.
 			
 	\section{Création d'un parser pour la grammaire}
 	\label{sec:creation-d-un-parser-pour-la-grammaire}
 		%+ Donnant en sortie l'AST correspondant
 		\todo{}
 		
-		\subsection{Intégration dans le CLI}
+		\subsection{Intégration au CLI}
+			\todo{}
+			
+	\section{Organisation du dossier du projet}
+		\todo{}
+		
+		\subsection{Organisation des modules de \texttt{PP}}
 			\todo{}
 
 	\section{Conclusion}
@@ -623,6 +658,9 @@
 						
 					\bibitem{fparsec} FParsec, a parser combinator library for F\#,\\
 						\url{http://www.quanttec.com/fparsec/}\\
+						
+					\bibitem{haddock} Haddock, A Haskell Documentation Tool,\\
+						\url{https://www.haskell.org/haddock/}\\
 						
 				\end{thebibliography}
 			\endgroup
