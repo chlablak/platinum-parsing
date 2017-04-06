@@ -407,6 +407,7 @@
 			\subitem + Définition de l'AST pour la grammaire choisie 
 			\item Création d'un parser pour la grammaire $\rightarrow$ voir section~\ref{sec:creation-d-un-parser-pour-la-grammaire}
 			\subitem + Donnant en sortie l'AST correspondant
+			\subitem + Test avec des grammaires
 			\subitem + Intégration au CLI
 			\item Génération de la table LALR à partir de l'AST
 			\subitem + Test avec une grammaire simple
@@ -453,7 +454,7 @@
 		\subsection{Définition de l'AST pour la grammaire choisie}
 			À présent que le langage pour la grammaire a été choisi (EBNF), nous devons spécifier sa propre grammaire pour implémenter le parser. La norme ISO/IEC 14977:1996 nous donne cela, réécrit ci-après:
 			
-			\inputminted{ebnf}{../ebnf-of-ebnf.ebnf}
+			\inputminted{ebnf}{../grammars/ebnf.ebnf}
 			\captionof{listing}{EBNF utilisé pour se définir lui-même}
 			
 			\paragraph{}
@@ -480,21 +481,27 @@
 			\captionof{listing}{AST de l'EBNF en Haskell}
 			
 			\paragraph{}
-			Ce fichier fait parti du module \texttt{PP.Grammars.EBNF}, nous avons ici nos premiers modules:
-			\begin{figure}[H]
-				\centering
-				\begin{tabular}{ll}
-					\texttt{PP} & Import général pour \textit{Platinum Parsing}\\
-					\texttt{PP.Grammars.EBNF} & AST pour la grammaire EBNF\\
-				\end{tabular}
-			\end{figure}
-			
 			Notons que les commentaires ne sont pas représentés par l'AST.
 			
 	\section{Création d'un parser pour la grammaire}
 	\label{sec:creation-d-un-parser-pour-la-grammaire}
 		%+ Donnant en sortie l'AST correspondant
+		Maintenant que nous avons notre grammaire ainsi que l'AST correspondant, nous pouvons implémenter un parser à l'aide de Parsec. Commençons par poser les premiers modules (fichiers Haskell) que nous allons utiliser: 
+		\begin{figure}[H]
+			\centering
+			\begin{tabular}{ll}
+				\texttt{PP} & \\
+				\texttt{PP.Grammar} & \\
+				\texttt{PP.Grammars} & \\
+				\texttt{PP.Grammars.EBNF} & \\
+			\end{tabular}
+			\caption{Premiers modules de PP}
+		\end{figure}
+		
 		\todo{}
+		
+		\subsection{Test avec des grammaires}
+			\todo{}
 		
 		\subsection{Intégration au CLI}
 			\todo{}

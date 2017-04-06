@@ -14,7 +14,5 @@ For more informations about this tool, please look at:
 
 module Main where
 
-import           PP
-
 main :: IO ()
 main = print "Hello CLI !"

@@ -12,5 +12,7 @@ For more informations about this tool, please look at:
   https://github.com/chlablak/platinum-parsing
 -}
 module PP
-    (
+    ( parse
     ) where
+
+import           PP.Grammar
