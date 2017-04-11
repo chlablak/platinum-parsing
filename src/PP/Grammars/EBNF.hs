@@ -12,10 +12,8 @@ Based on the grammar given in the ISO/IEC 14977:1996, page 10, part 8.2.
 Comments are valid in EBNF, but are not present in this AST.
 -}
 module PP.Grammars.EBNF
-    ( -- * Parser
-      syntax
-      -- * AST
-    , Syntax(..)
+    ( -- * AST
+      Syntax(..)
     , SyntaxRule(..)
     , DefinitionsList(..)
     , SingleDefinition(..)
@@ -28,6 +26,8 @@ module PP.Grammars.EBNF
 
 import           Control.Applicative                    ((<$>), (<*>))
 import           Data.Maybe
+import           Data.Text                              (pack, strip, unpack)
+import           PP.Grammar
 import           Text.ParserCombinators.Parsec
 import           Text.ParserCombinators.Parsec.Language (emptyDef)
 import qualified Text.ParserCombinators.Parsec.Token    as Token
@@ -107,27 +107,111 @@ braces = Token.braces lexer         -- ^between { and }
 angles = Token.angles lexer         -- ^between < and >
 brackets = Token.brackets lexer     -- ^between [ and ]
 
--- |EBNF start parser
+-- |Syntax parser
 syntax :: Parser Syntax
-syntax = whiteSpace *> (Syntax <$> many1 syntaxRule)
+syntax = whiteSpace *> (Syntax <$> many1 syntaxRule) <?> "syntax"
+
+-- |SyntaxRule parser
+syntaxRule :: Parser SyntaxRule
+syntaxRule = SyntaxRule <$> metaIdentifier <* reservedOp "="
+                        <*> definitionsList <* reservedOp ";"
+  <?> "syntax rule"
+
+-- |DefinitionsList parser
+definitionsList :: Parser DefinitionsList
+definitionsList = DefinitionsList <$> sepBy1 singleDefinition (reservedOp "|")
+  <?> "definitions list"
+
+-- |SingleDefinition parser
+singleDefinition :: Parser SingleDefinition
+singleDefinition = SingleDefinition <$> sepBy1 term (reservedOp ",")
+  <?> "single definition"
+
+-- |Term parser
+term :: Parser Term
+term = Term <$> factor <*> optionMaybe (reservedOp "-" *> exception)
+  <?> "term"
+
+-- |Exception parser
+exception :: Parser Exception
+exception = Exception <$> factor <?> "exception"
+
+-- |Factor parser
+factor :: Parser Factor
+factor = Factor <$> optionMaybe (natural <* reservedOp "*") <*> primary
+  <?> "factor"
+
+-- |Primary parser
+primary :: Parser Primary
+primary = option Empty (
+          OptionalSequence <$> brackets definitionsList
+      <|> RepeatedSequence <$> braces definitionsList
+      <|> SpecialSequence <$> between (reservedOp "?")
+                                      (reservedOp "?")
+                                      (many anyChar)
+      <|> GroupedSequence <$> parens definitionsList
+      <|> PrimaryMetaIdentifier <$> metaIdentifier
+      <|> TerminalString <$> ((char '"' *> many1 (noneOf "\"") <* char '"')
+                         <|> (char '\'' *> many1 (noneOf "'") <* char '\''))
+          ) -- end of option
+  <?> "primary"
+
+-- |MetaIdentifier parser
+metaIdentifier :: Parser MetaIdentifier
+metaIdentifier = trimMetaIdentifier <$> (angles identifier <|> identifier)
+  <?> "meta identifier"
   where
-    syntaxRule = SyntaxRule <$> metaIdentifier <* reservedOp "="
-                            <*> definitionsList <* reservedOp ";"
-    definitionsList = DefinitionsList <$> sepBy1 singleDefinition
-                                                 (reservedOp "|")
-    singleDefinition = SingleDefinition <$> sepBy1 term (reservedOp ",")
-    term = Term <$> factor <*> optionMaybe (reservedOp "-" *> exception)
-    exception = Exception <$> factor
-    factor = Factor <$> optionMaybe (natural <* reservedOp "*") <*> primary
-    primary = option Empty (
-              OptionalSequence <$> brackets definitionsList
-          <|> RepeatedSequence <$> braces definitionsList
-          <|> SpecialSequence <$> between (reservedOp "?")
-                                          (reservedOp "?")
-                                          (many anyChar)
-          <|> GroupedSequence <$> parens definitionsList
-          <|> PrimaryMetaIdentifier <$> metaIdentifier
-          <|> TerminalString <$> ((char '"' *> many1 (noneOf "\"") <* char '"')
-                             <|> (char '\'' *> many1 (noneOf "'") <* char '\''))
-              ) -- end of option
-    metaIdentifier = MetaIdentifier <$> (angles identifier <|> identifier)
+    trimMetaIdentifier = MetaIdentifier . unpack . strip . pack
+
+-- * InputGrammar instances for EBNF AST
+instance InputGrammar Syntax where
+  parser = syntax
+  stringify (Syntax [])     = ""
+  stringify (Syntax [sr])   = stringify sr
+  stringify (Syntax (sr:r)) = stringify sr ++ "\n" ++ stringify (Syntax r)
+
+instance InputGrammar SyntaxRule where
+  parser = syntaxRule
+  stringify (SyntaxRule mi dl) = stringify mi ++ "=" ++ stringify dl ++ ";"
+
+instance InputGrammar DefinitionsList where
+  parser = definitionsList
+  stringify (DefinitionsList []) = ""
+  stringify (DefinitionsList [sd]) = stringify sd
+  stringify (DefinitionsList (sd:r)) =
+    stringify sd ++ "|" ++ stringify (DefinitionsList r)
+
+instance InputGrammar SingleDefinition where
+  parser = singleDefinition
+  stringify (SingleDefinition []) = ""
+  stringify (SingleDefinition [t]) = stringify t
+  stringify (SingleDefinition (t:r)) =
+    stringify t ++ "," ++ stringify (SingleDefinition r)
+
+instance InputGrammar Term where
+  parser = term
+  stringify (Term f Nothing)  = stringify f
+  stringify (Term f (Just e)) = stringify f ++ "-" ++ stringify e
+
+instance InputGrammar Exception where
+  parser = exception
+  stringify (Exception f) = stringify f
+
+instance InputGrammar Factor where
+  parser = factor
+  stringify (Factor Nothing p)  = stringify p
+  stringify (Factor (Just i) p) = show i ++ "*" ++ stringify p
+
+instance InputGrammar Primary where
+  parser = primary
+  stringify (OptionalSequence dl)      = "[" ++ stringify dl ++ "]"
+  stringify (RepeatedSequence dl)      = "{" ++ stringify dl ++ "}"
+  stringify (SpecialSequence s)        = "?" ++ s ++ "?"
+  stringify (GroupedSequence dl)       = "(" ++ stringify dl ++ ")"
+  stringify (PrimaryMetaIdentifier mi) = stringify mi
+  stringify (TerminalString s)         = show s
+  stringify Empty                      = ""
+
+instance InputGrammar MetaIdentifier where
+  parser = metaIdentifier
+  stringify (MetaIdentifier s) = "<" ++ s ++ ">"

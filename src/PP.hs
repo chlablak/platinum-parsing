@@ -12,7 +12,7 @@ For more informations about this tool, please look at:
   https://github.com/chlablak/platinum-parsing
 -}
 module PP
-    ( parse
+    ( module PP.Grammar
     ) where
 
 import           PP.Grammar

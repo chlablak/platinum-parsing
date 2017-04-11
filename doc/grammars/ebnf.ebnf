@@ -8,7 +8,7 @@
   Source: ISO/IEC 14977:1996, page 10, part 8.2
 *)
 
-syntax = syntax	rule, {syntax rule};
+syntax = syntax rule, {syntax rule};
 
 (* A <syntax rule> defines the sequences of symbols represented by a
   <meta identifier> *)
@@ -50,8 +50,8 @@ grouped sequence = '(', definitions list, ')';
 (* A <terminal string> represents the <characters> between the quote symbols
   '...' or "..." *)
 terminal string
-	= "'", character - "'", {character - "'"}, "'"
-	| '"', character - '"', {character - '"'}, '"';
+  = "'", character - "'", {character - "'"}, "'"
+  | '"', character - '"', {character - '"'}, '"';
 
 (* A <meta identifier> is the name of a syntactic element of the langage being
   defined *)

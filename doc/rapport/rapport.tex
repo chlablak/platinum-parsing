@@ -194,7 +194,7 @@
 			
 			Nous voyons que ce \textit{quelque chose d'autre} peut prendre plusieurs formes: une interprétation directement, des fichiers transpilés, ou encore d'autres choses (ici en exemple des tables).\\
 			
-			Comment allons-nous créer cet exécutable? Ce prochain schéma va nous montrer cela, avec les acteurs des cas d'utilisation pour plus de clareté (voir section~\ref{sec:etudes-des-cas-d-utilisation}):
+			Comment allons-nous créer cet exécutable? Ce prochain schéma va nous montrer cela, avec les acteurs des cas d'utilisation pour plus de clareté (voir \autoref{sec:etudes-des-cas-d-utilisation}):
 			\begin{figure}[H]
 				\centering
 				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline} 
@@ -387,7 +387,7 @@
 			Le langage choisi étant Haskell, nous allons nous baser sur ces \textit{guidelines} pour le développement:\\ \url{https://wiki.haskell.org/Programming_guidelines}
 		
 	\section{Planification des tâches}
-		Dans la section~\ref{sec:architecture-du-projet} \textit{architecture du projet} nous avons poser la forme générale de Platinum Parsing, cependant cette approche reste très générale et nous devons à présent la réduire pour répondre efficacement aux objectifs principaux du projet. Cette section cherche à organiser le développement dans ce sens. Évidemment, une fois ces objectifs remplis, la suite logique est d'aller vers l'architecture générale.\\
+		Dans la \autoref{sec:architecture-du-projet} \textit{architecture du projet} nous avons poser la forme générale de Platinum Parsing, cependant cette approche reste très générale et nous devons à présent la réduire pour répondre efficacement aux objectifs principaux du projet. Cette section cherche à organiser le développement dans ce sens. Évidemment, une fois ces objectifs remplis, la suite logique est d'aller vers l'architecture générale.\\
 		
 		Rappelons donc les objectifs principaux:
 		\begin{itemize}
@@ -403,9 +403,9 @@
 		
 		À partir de cette liste, nous pouvons organiser le développement en phases successives:
 		\begin{enumerate}
-			\item Choix et définition de la grammaire non-contextuelle $\rightarrow$ voir section~\ref{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
+			\item Choix et définition de la grammaire non-contextuelle $\rightarrow$ voir \autoref{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
 			\subitem + Définition de l'AST pour la grammaire choisie 
-			\item Création d'un parser pour la grammaire $\rightarrow$ voir section~\ref{sec:creation-d-un-parser-pour-la-grammaire}
+			\item Création d'un parser pour la grammaire $\rightarrow$ voir \autoref{sec:creation-d-un-parser-pour-la-grammaire}
 			\subitem + Donnant en sortie l'AST correspondant
 			\subitem + Test avec des grammaires
 			\subitem + Intégration au CLI
