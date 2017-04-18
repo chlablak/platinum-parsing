@@ -12,24 +12,24 @@ syntax = syntax rule, {syntax rule};
 
 (* A <syntax rule> defines the sequences of symbols represented by a
   <meta identifier> *)
-syntax rule = meta identifier, '=', definitions list, ';';
+syntax rule = meta identifier, "=", definitions list, ";";
 
 (* | separates alternative <single definitions> *)
-definitions list = single definition, {'|', single definition};
+definitions list = single definition, {"|", single definition};
 
 (* , separates successive <terms> *)
-single definition = term, {',', term};
+single definition = term, {",", term};
 
 (* A <term> represents any sequence of symbols that is defined by the <factor>
   but not defined by the <exception> *)
-term = factor, ['-', exception];
+term = factor, ["-", exception];
 
 (* A <factor> may be used as an <exception> if it could be replaced by a
   <factor> containing no <meta identifiers> *)
 exception = factor;
 
 (* The <integer> specifies the number of repetitions of the <primary> *)
-factor = [integer, '*'], primary;
+factor = [integer, "*"], primary;
 
 primary
   = optional sequence | repeated sequence	| special sequence
@@ -38,20 +38,20 @@ primary
 empty = ;
 
 (* The brackets [ and ] enclose symbols which are optional *)
-optional sequence = '[', definitions list, ']';
+optional sequence = "[", definitions list, "]";
 
 (* The brackets { and } enclose symbols which may be repeated any number of
   times *)
-repeated sequence = '{', definitions list, '}';
+repeated sequence = "{", definitions list, "}";
 
 (* The brackets ( and ) allow any <definitions list> to be a <primary> *)
-grouped sequence = '(', definitions list, ')';
+grouped sequence = "(", definitions list, ")";
 
 (* A <terminal string> represents the <characters> between the quote symbols
-  '...' or "..." *)
+  "..." or "..." *)
 terminal string
-  = "'", character - "'", {character - "'"}, "'"
-  | '"', character - '"', {character - '"'}, '"';
+  = "'", <character> - "'", {<character> - "'"}, "'"
+  | "\"", <character> - "\"", {<character> - "\""}, "\"";
 
 (* A <meta identifier> is the name of a syntactic element of the langage being
   defined *)
@@ -61,9 +61,9 @@ integer = decimal digit, {decimal digit};
 
 (* The meaning of a <special sequence> is not defined in the standard
   metalangage. *)
-special sequence = '?', {character - '?'}, '?';
+special sequence = "?", {<character> - "?"}, "?";
 
 (* A comment is allowed anywhere outside a <terminal string>, <meta identifier>,
   <integer> or <special sequence> *)
-comment = '(*', {comment symbol}, '*)';
+comment = "(*", {comment symbol}, "*)";
 comment symbol = comment | terminal string | special sequence | character;

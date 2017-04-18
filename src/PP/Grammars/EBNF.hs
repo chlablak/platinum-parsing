@@ -98,14 +98,15 @@ lexer = Token.makeTokenParser def
       , Token.caseSensitive = True
     }
 
-identifier = Token.identifier lexer -- ^identifier
-reservedOp = Token.reservedOp lexer -- ^reserved operator
-natural = Token.natural lexer       -- ^natural positive number
-whiteSpace = Token.whiteSpace lexer -- ^white spaces
-parens = Token.parens lexer         -- ^between ( and )
-braces = Token.braces lexer         -- ^between { and }
-angles = Token.angles lexer         -- ^between < and >
-brackets = Token.brackets lexer     -- ^between [ and ]
+identifier = Token.identifier lexer       -- ^identifier
+reservedOp = Token.reservedOp lexer       -- ^reserved operator
+stringLiteral = Token.stringLiteral lexer -- ^string literal
+natural = Token.natural lexer             -- ^natural positive number
+whiteSpace = Token.whiteSpace lexer       -- ^white spaces
+parens = Token.parens lexer               -- ^between ( and )
+braces = Token.braces lexer               -- ^between { and }
+angles = Token.angles lexer               -- ^between < and >
+brackets = Token.brackets lexer           -- ^between [ and ]
 
 -- |Syntax parser
 syntax :: Parser Syntax
@@ -151,8 +152,7 @@ primary = option Empty (
                                       (many anyChar)
       <|> GroupedSequence <$> parens definitionsList
       <|> PrimaryMetaIdentifier <$> metaIdentifier
-      <|> TerminalString <$> ((char '"' *> many1 (noneOf "\"") <* char '"')
-                         <|> (char '\'' *> many1 (noneOf "'") <* char '\''))
+      <|> TerminalString <$> stringLiteral
           ) -- end of option
   <?> "primary"
 

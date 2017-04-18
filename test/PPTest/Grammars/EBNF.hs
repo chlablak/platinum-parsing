@@ -28,8 +28,8 @@ specs = describe "PPTest.Grammars.EBNF" $ do
       Left e -> show e `shouldBe` "not an error"
       Right o -> stringify o `shouldBe` "<a>=<b>,(<c>|<d>);\n<e>=4*[<f>];\n<h>=<i>|<j>;"
 
-  it "should parse the two kind of terminal string" $
-    case parse "a = \"h 'w\"; b = 'h \"w';" :: To Syntax of
+  it "should parse terminal string" $
+    case parse "a = \"h 'w\"; b = \"h \\\"w\";" :: To Syntax of
       Left e  -> show e `shouldBe` "not an error"
       Right o -> stringify o `shouldBe` "<a>=\"h 'w\";\n<b>=\"h \\\"w\";"
 
