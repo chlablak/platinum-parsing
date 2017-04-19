@@ -471,7 +471,6 @@
 				data Primary
 					= OptionalSequence DefinitionsList
 					| RepeatedSequence DefinitionsList
-					| SpecialSequence String
 					| GroupedSequence DefinitionsList
 					| PrimaryMetaIdentifier MetaIdentifier
 					| TerminalString String
@@ -481,7 +480,7 @@
 			\captionof{listing}{AST de l'EBNF en Haskell}
 			
 			\paragraph{}
-			Notons que les commentaires ne sont pas représentés par l'AST.
+			Notons que les commentaires ne sont pas représentés par l'AST, ni les \textit{special sequence} qui n'ont pas de signification utile.
 			
 	\section{Création d'un parser pour la grammaire}
 	\label{sec:creation-d-un-parser-pour-la-grammaire}
@@ -490,27 +489,88 @@
 		\begin{figure}[H]
 			\centering
 			\begin{tabular}{ll}
-				\texttt{PP} & \\
-				\texttt{PP.Grammar} & \\
-				\texttt{PP.Grammars} & \\
-				\texttt{PP.Grammars.EBNF} & \\
+				\texttt{PP} & Import global des fonctionnalités de PP\\
+				\texttt{PP.Grammar} & Définition des fonctions communes aux différentes grammaires (classe de type)\\
+				\texttt{PP.Grammars.Ebnf} & Définition de la grammaire EBNF (AST, \textit{parsers}, instances)\\
 			\end{tabular}
 			\caption{Premiers modules de PP}
 		\end{figure}
 		
-		\todo{}
+		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage. 
+		
+		\todo{expliquer \texttt{PP.Grammar.InputGrammar}}
+		
+		Notons encore que les guillemets simples \texttt{'...'} pour les \textit{terminal string} ne sont pas supportés pour le moment, Parsec ne propose en effet pas de moyen rapide contrairement aux guillemets doubles qui sont eux très bien gérés. 
 		
 		\subsection{Test avec des grammaires}
+			Afin de valider notre implémentation du \textit{parser} pour la grammaire EBNF, nous allons utiliser un framework de test d'Haskell: \texttt{Hspec} \cite{hspec}\\
+			
+			Cela nous permet d'automatiser les tests. Ainsi si nous devons modifier ultérieurement le \textit{parser}, nous pourrons relancer directement les tests.\\
+			
+			Nous allons utiliser des modules avec une hiérarchie proche de PP pour avoir un projet homogène:
+			\begin{figure}[H]
+				\centering
+				\begin{tabular}{ll}
+					\texttt{Spec} & Regroupement des différents tests\\
+					\texttt{PPTest.Grammars.Ebnf} & Tests pour la grammaire EBNF\\
+				\end{tabular}
+				\caption{Premiers modules de test}
+			\end{figure}  
+			
+			\todo{expliquer \texttt{Hspec}, utilité de \texttt{stringify}}
+			
+			Ces tests nous ont révéler certains problèmes du \textit{parser}, cependant ceux-ci sont mineurs et nous allons donc simplement ouvrir des tickets pour les corriger plus tard:
+			\begin{itemize}
+				\item Le tiret étant admis dans les \textit{meta identifier}, la règle d'exception \mintinline{ebnf}{character - "'"} doit être écrite \mintinline{ebnf}{<character> - "'"} pour enlever l'ambigüité
+				\item La règle \mintinline{ebnf}{a=<b>;} retourne une erreur sur le $<$ suivant le $=$, cela uniquement lorsque les deux sont collés 
+			\end{itemize}
+		
+		\subsection{Intégration au CLI}
+			Le CLI a trois tâches principales:
+			\begin{enumerate}
+				\item récupérer et comprendre les arguments passés au programme
+				\item envoyer ces arguments à la bonne commande
+				\item exécuter la commande correctement\\
+			\end{enumerate}
+			
+			Pour parser les options de la ligne de commande, Haskell possède plusieurs bibliothèques pour nous simplifier la vie: \url{https://wiki.haskell.org/Command_line_option_parsers}. Parmi ces possibilités, nous allons choisir \texttt{optparse-applicative} \cite{optparse} car elle est moderne, populaire, et elle répond à nos besoins.\\
+			
+			L'organisation des modules du CLI se fait assez simplement à partir des tâches listées ci-dessus:
+			\begin{figure}[H]
+				\centering
+				\begin{tabular}{ll}
+					\texttt{Main} & Traitement des arguments et délégation à la bonne commande\\
+					\texttt{Args} & Structure Haskell représentant les arguments possibles\\
+					\texttt{Cmd.Ebnf} & Implémentation des fonctionnalités de la commande \texttt{pp ebnf}\\
+				\end{tabular}
+				\caption{Premiers modules du CLI}
+			\end{figure} 
+			
+			Actuellement la seule commande disponible donne le résultat suivant:
+			\begin{minted}{console}
+				prompt$ pp ebnf -f doc/grammars/ebnf.ebnf --minify
+			\end{minted}
+			\begin{minted}{console}
+				<syntax>=<syntax rule>,{<syntax rule>};
+				<syntax rule>=<meta identifier>,"=",<definitions list>,";";
+				<definitions list>=<single definition>,{"|",<single definition>};
+				...
+			\end{minted}
+			
+			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \texttt{stringify} l'AST et on l'affiche.
+			
+	\section{Génération de la table LALR}
+		\todo{}	
+		
+		\subsection{Test avec une grammaire simple}
 			\todo{}
 		
 		\subsection{Intégration au CLI}
 			\todo{}
 			
-	\section{Organisation du dossier du projet}
-		\todo{}
-		
-		\subsection{Organisation des modules de \texttt{PP}}
-			\todo{}
+	\section{TODO}
+		\todo{organisation du dossier du projet\\}
+		\todo{modules finaux de PP\\}
 
 	\section{Conclusion}
 		\todo{à faire à la fin}
@@ -668,6 +728,12 @@
 						
 					\bibitem{haddock} Haddock, A Haskell Documentation Tool,\\
 						\url{https://www.haskell.org/haddock/}\\
+						
+					\bibitem{hspec} Hspec, A testing framework for Haskell,\\
+						\url{http://hackage.haskell.org/package/hspec}\\
+						
+					\bibitem{optparse} optparse-applicative, parsing options on the command line,\\
+						\url{https://hackage.haskell.org/package/optparse-applicative}\\
 						
 				\end{thebibliography}
 			\endgroup

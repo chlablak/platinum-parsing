@@ -14,5 +14,34 @@ For more informations about this tool, please look at:
 
 module Main where
 
+import           Args
+import qualified Cmd.Ebnf
+import           Data.Semigroup      ((<>))
+import           Options.Applicative
+
 main :: IO ()
-main = print "Hello CLI !"
+main = dispatch =<< execParser opts
+  where
+    opts = info (args <**> helper)
+      ( fullDesc
+      <> progDesc "Platinum Parsing CLI"
+      <> header "tools for helping PP projects" )
+
+-- |Dispatch arguments to commands
+dispatch :: Args -> IO ()
+dispatch a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
+
+-- |Arguments
+args :: Parser Args
+args = Args <$> commonArgs <*> commandArgs
+
+-- |Common arguments
+commonArgs :: Parser CommonArgs
+commonArgs = CommonArgs
+  <$> switch ( long "verbose" <> short 'v'
+    <> help "Enable verbose mode" )
+
+-- |Commands arguments
+commandArgs :: Parser CommandArgs
+commandArgs = hsubparser
+  ( command "ebnf" (info Cmd.Ebnf.commandArgs (progDesc "Manipulate EBNF grammars")) )

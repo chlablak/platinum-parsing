@@ -1,5 +1,5 @@
 {-|
-Module      : PP.Grammars.EBNF
+Module      : PP.Grammars.Ebnf
 Description : Defines a AST and parser for the EBNF language
 Copyright   : (c) 2017 Patrick Champion
 License     : see LICENSE file
@@ -11,7 +11,7 @@ AST for the EBNF language.
 Based on the grammar given in the ISO/IEC 14977:1996, page 10, part 8.2.
 Comments are valid in EBNF, but are not present in this AST.
 -}
-module PP.Grammars.EBNF
+module PP.Grammars.Ebnf
     ( -- * AST
       Syntax(..)
     , SyntaxRule(..)
@@ -67,8 +67,6 @@ data Primary
   = OptionalSequence DefinitionsList
   -- |Encloses symbols which may be repeated any number of times
   | RepeatedSequence DefinitionsList
-  -- |The meaning of a SpecialSequence is not defined in the standard metalangage
-  | SpecialSequence String
   -- |Allows any DefinitionsList to be a Primary
   | GroupedSequence DefinitionsList
   -- |A Primary can be a MetaIdentifier
@@ -114,8 +112,8 @@ syntax = whiteSpace *> (Syntax <$> many1 syntaxRule) <?> "syntax"
 
 -- |SyntaxRule parser
 syntaxRule :: Parser SyntaxRule
-syntaxRule = SyntaxRule <$> metaIdentifier <* reservedOp "="
-                        <*> definitionsList <* reservedOp ";"
+syntaxRule = SyntaxRule <$> (metaIdentifier <* reservedOp "=")
+                        <*> (definitionsList <* reservedOp ";")
   <?> "syntax rule"
 
 -- |DefinitionsList parser
@@ -147,9 +145,6 @@ primary :: Parser Primary
 primary = option Empty (
           OptionalSequence <$> brackets definitionsList
       <|> RepeatedSequence <$> braces definitionsList
-      <|> SpecialSequence <$> between (reservedOp "?")
-                                      (reservedOp "?")
-                                      (many anyChar)
       <|> GroupedSequence <$> parens definitionsList
       <|> PrimaryMetaIdentifier <$> metaIdentifier
       <|> TerminalString <$> stringLiteral
@@ -206,7 +201,6 @@ instance InputGrammar Primary where
   parser = primary
   stringify (OptionalSequence dl)      = "[" ++ stringify dl ++ "]"
   stringify (RepeatedSequence dl)      = "{" ++ stringify dl ++ "}"
-  stringify (SpecialSequence s)        = "?" ++ s ++ "?"
   stringify (GroupedSequence dl)       = "(" ++ stringify dl ++ ")"
   stringify (PrimaryMetaIdentifier mi) = stringify mi
   stringify (TerminalString s)         = show s

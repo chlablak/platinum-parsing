@@ -1,12 +1,12 @@
-module PPTest.Grammars.EBNF (specs) where
+module PPTest.Grammars.Ebnf (specs) where
 
 import           Data.Either
 import           PP
-import           PP.Grammars.EBNF
+import           PP.Grammars.Ebnf
 import           System.IO
 import           Test.Hspec
 
-specs = describe "PPTest.Grammars.EBNF" $ do
+specs = describe "PPTest.Grammars.Ebnf" $ do
 
   it "should detect a simple syntax error" $
     case parse "a = b" :: To Syntax of
@@ -34,9 +34,9 @@ specs = describe "PPTest.Grammars.EBNF" $ do
       Right o -> stringify o `shouldBe` "<a>=\"h 'w\";\n<b>=\"h \\\"w\";"
 
   it "should parse complex meta identifiers" $
-    case parse "a a = b; a = b b;" :: To Syntax of
+    case parse "a a = b; a = b b; <a>=b; a=<b>;" :: To Syntax of
       Left e  -> show e `shouldBe` "not an error"
-      Right o -> stringify o `shouldBe` "<a a>=<b>;\n<a>=<b b>;"
+      Right o -> stringify o `shouldBe` "<a a>=<b>;\n<a>=<b b>;\n<a>=<b>;\n<a>=<b>;"
 
   it "should ignore comments" $
     case parse "(* 1 *) a = b; (* 2 *) c = d; (* 3 *)" :: To Syntax of
@@ -54,3 +54,18 @@ specs = describe "PPTest.Grammars.EBNF" $ do
     case parse g :: To Syntax of
       Left e  -> show e `shouldBe` "not an error"
       Right o -> stringify o ++ "\n" `shouldBe` m
+
+  it "should parse the complete minified EBNF grammar" $ do
+    g <- readFile "doc/grammars/ebnf.min.ebnf"
+    m <- readFile "doc/grammars/ebnf.min.ebnf"
+    case parse g :: To Syntax of
+      Left e  -> show e `shouldBe` "not an error"
+      Right o -> stringify o ++ "\n" `shouldBe` m
+
+  it "should handle multiple parse and stringify" $
+    case parse "a = b;" :: To Syntax of
+      Left e1  -> show e1 `shouldBe` "not an error (e1)"
+      Right o1 -> let s1 = stringify o1 in
+        case parse s1 :: To Syntax of
+          Left e2  -> show e2 `shouldBe` "not an error (e2)"
+          Right o2 -> stringify o2 `shouldBe` "<a>=<b>;"

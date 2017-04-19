@@ -16,7 +16,7 @@ import           Data.Either
 import qualified Text.Parsec as P
 
 -- |Syntactic sugar
--- For exemple: `let (Right ast) = (PP.parse input :: PP.To EBNF.Syntax) in ...`
+-- For exemple: `case PP.parse input :: (PP.To Ebnf.Syntax) of ...`
 type To ast = Either P.ParseError ast
 
 -- |Type class for grammars
