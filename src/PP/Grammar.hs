@@ -13,6 +13,7 @@ module PP.Grammar
     ) where
 
 import           Data.Either
+import           PP.Rule     (Rule)
 import qualified Text.Parsec as P
 
 -- |Syntactic sugar
@@ -29,3 +30,5 @@ class (Eq ast, Show ast, Read ast) => InputGrammar ast where
   -- |AST to String
   stringify :: ast -> String
   stringify = show
+  -- |AST to canonical rules
+  rules :: ast -> [Rule]

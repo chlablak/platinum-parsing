@@ -559,8 +559,42 @@
 			
 			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \texttt{stringify} l'AST et on l'affiche.
 			
-	\section{Génération de la table LALR}
-		\todo{}	
+	\section{Génération de la table LALR}		
+		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
+		\begin{enumerate}
+			\item transformation des règles EBNF en règles canoniques
+			\subitem soit une fonction \mintinline{haskell}{toRules :: Ebnf.Syntax -> [Rule]} 
+			\subitem avec \mintinline{haskell}{type Rule = (String, [Part])} 
+			\subitem et \mintinline{haskell}{data Part = Term Char | NonTerm String | Empty}
+			
+			\item augmenter la grammaire (\mintinline{haskell}{[Rule]}) pour avoir la grammaire augmentée
+			\subitem soit une fonction \mintinline{haskell}{augmente :: [Rule] -> Either String [Rule]}
+			\subitem (on utilise le type \mintinline{haskell}{Either} car la fonction peut échouer)
+			
+			\item générer les collections d'items LR(1) canonique pour la grammaire
+			\subitem soit une fonction \mintinline{haskell}{generateSet :: [Rule] -> Either String Lr1Set}
+			\subitem avec \mintinline{haskell}{type Lr1Set = Array Integer (Set Lr1Item)}
+			\subitem et \mintinline{haskell}{type Lr1Item = (Rule, Integer, Part)}
+			\subitem et qui aura besoin des fonctions suivantes:
+			\subitem \mintinline{haskell}{closing :: (Set Lr1Item) -> (Set Lr1Item)}
+			\subitem \mintinline{haskell}{goto :: (Set Lr1Item) -> Part -> (Set Lr1Item)}
+			\subitem \mintinline{haskell}{first :: Part -> [Part]}
+			
+			\item fusion de la collection LR(1) pour avoir une collection LALR(1) de plus petite taille
+			\subitem soit une fonction \mintinline{haskell}{fusion :: Lr1Set -> Either String LalrSet}
+			\subitem avec \mintinline{haskell}{type LalrSet = Lr1Set}
+			
+			\item génération de la table LALR proprement dite
+			\subitem soit une fonction \mintinline{haskell}{generateTable :: LalrSet -> Either String LalrTable}
+			\subitem avec \mintinline{haskell}{type LalrTable = Array (Integer, Part) Action}
+			\subitem et \mintinline{haskell}{data Action = Shift ... | Reduce ... | Goto ... | Error ... | Accept}\\
+		\end{enumerate}
+		
+		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \texttt{toRules}, \texttt{augmente}, \texttt{first}, \texttt{closing}, \texttt{goto}, \texttt{generateSet}, \texttt{fusion} et pour finir \texttt{generateTable}.\\
+		
+		Voyons donc en premier la fonction \texttt{toRules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \texttt{Rule} dans \texttt{PP.Rule}, et nous ajoutons une fonction \mintinline{haskell}{rules :: ast -> [Rule]} à la classe de type \texttt{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \texttt{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \texttt{PPTest.Grammars.Ebnf} naturellement.\\
+		
+		\todo{}
 		
 		\subsection{Test avec une grammaire simple}
 			\todo{}
@@ -734,6 +768,9 @@
 						
 					\bibitem{optparse} optparse-applicative, parsing options on the command line,\\
 						\url{https://hackage.haskell.org/package/optparse-applicative}\\
+						
+					\bibitem{ebnftobnf} EBNF to BNF,\\
+						\url{http://lampwww.epfl.ch/teaching/archive/compilation-ssc/2000/part4/parsing/node3.html}\\
 						
 				\end{thebibliography}
 			\endgroup

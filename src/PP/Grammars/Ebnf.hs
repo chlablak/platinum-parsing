@@ -14,6 +14,7 @@ Comments are valid in EBNF, but are not present in this AST.
 module PP.Grammars.Ebnf
     ( -- * AST
       Syntax(..)
+      -- ** Inner ASTs
     , SyntaxRule(..)
     , DefinitionsList(..)
     , SingleDefinition(..)
@@ -25,9 +26,11 @@ module PP.Grammars.Ebnf
     ) where
 
 import           Control.Applicative                    ((<$>), (<*>))
+import qualified Data.List                              as L
 import           Data.Maybe
 import           Data.Text                              (pack, strip, unpack)
 import           PP.Grammar
+import qualified PP.Rule                                as R
 import           Text.ParserCombinators.Parsec
 import           Text.ParserCombinators.Parsec.Language (emptyDef)
 import qualified Text.ParserCombinators.Parsec.Token    as Token
@@ -164,10 +167,13 @@ instance InputGrammar Syntax where
   stringify (Syntax [])     = ""
   stringify (Syntax [sr])   = stringify sr
   stringify (Syntax (sr:r)) = stringify sr ++ "\n" ++ stringify (Syntax r)
+  rules (Syntax srs) = R.uniformize $ L.concatMap rules srs
 
 instance InputGrammar SyntaxRule where
   parser = syntaxRule
   stringify (SyntaxRule mi dl) = stringify mi ++ "=" ++ stringify dl ++ ";"
+  rules (SyntaxRule (MetaIdentifier mi) dl) =
+    [R.Rule mi [r, R.Empty] | r <- rules dl]
 
 instance InputGrammar DefinitionsList where
   parser = definitionsList
@@ -175,6 +181,7 @@ instance InputGrammar DefinitionsList where
   stringify (DefinitionsList [sd]) = stringify sd
   stringify (DefinitionsList (sd:r)) =
     stringify sd ++ "|" ++ stringify (DefinitionsList r)
+  rules (DefinitionsList sds) = L.concatMap rules sds
 
 instance InputGrammar SingleDefinition where
   parser = singleDefinition
@@ -182,20 +189,29 @@ instance InputGrammar SingleDefinition where
   stringify (SingleDefinition [t]) = stringify t
   stringify (SingleDefinition (t:r)) =
     stringify t ++ "," ++ stringify (SingleDefinition r)
+  rules (SingleDefinition [t]) = rules t
+  rules (SingleDefinition (t:ts)) =
+    [R.Concat [r,n] | r <- rules t, n <- rules (SingleDefinition ts)]
 
 instance InputGrammar Term where
   parser = term
   stringify (Term f Nothing)  = stringify f
   stringify (Term f (Just e)) = stringify f ++ "-" ++ stringify e
+  rules (Term f Nothing) = rules f
+  rules _                = undefined -- no translation yet
 
 instance InputGrammar Exception where
   parser = exception
   stringify (Exception f) = stringify f
+  rules _ = undefined -- should not be called, look at the Term instance
 
 instance InputGrammar Factor where
   parser = factor
   stringify (Factor Nothing p)  = stringify p
   stringify (Factor (Just i) p) = show i ++ "*" ++ stringify p
+  rules (Factor Nothing p)  = rules p
+  rules (Factor (Just i) p) =
+    [R.Concat . concat $ replicate (fromIntegral i) (rules p)]
 
 instance InputGrammar Primary where
   parser = primary
@@ -205,7 +221,18 @@ instance InputGrammar Primary where
   stringify (PrimaryMetaIdentifier mi) = stringify mi
   stringify (TerminalString s)         = show s
   stringify Empty                      = ""
+  rules a@(OptionalSequence dl)    = let x = stringify a in
+    R.NonTerm x : R.Rule x [R.Empty] : [R.Rule x [r, R.Empty] | r <- rules dl]
+  rules a@(RepeatedSequence dl)    = let x = stringify a in
+    R.NonTerm x : R.Rule x [R.Empty] :
+      [R.Rule x [R.NonTerm x, r, R.Empty] | r <- rules dl]
+  rules a@(GroupedSequence dl)     = let x = stringify a in
+    R.NonTerm x : [R.Rule x [r, R.Empty] | r <- rules dl]
+  rules (PrimaryMetaIdentifier mi) = rules mi
+  rules (TerminalString s)         = [R.Concat $ L.map R.Term s]
+  rules Empty                      = [R.Empty]
 
 instance InputGrammar MetaIdentifier where
   parser = metaIdentifier
   stringify (MetaIdentifier s) = "<" ++ s ++ ">"
+  rules (MetaIdentifier s) = [R.NonTerm s]

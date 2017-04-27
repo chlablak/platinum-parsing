@@ -13,6 +13,8 @@ For more informations about this tool, please look at:
 -}
 module PP
     ( module PP.Grammar
+    , module PP.Rule
     ) where
 
 import           PP.Grammar
+import           PP.Rule
