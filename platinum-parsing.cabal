@@ -22,6 +22,7 @@ library
   build-depends:       base >= 4.7 && < 5
                      , parsec
                      , text
+                     , containers
   default-language:    Haskell2010
 
 executable pp
@@ -44,6 +45,7 @@ test-suite pp-test
   build-depends:       base
                      , platinum-parsing
                      , hspec
+                     , containers
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 

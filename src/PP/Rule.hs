@@ -8,13 +8,22 @@ Stability   : provisional
 Portability : portable
 -}
 module PP.Rule
-    ( Rule(..)
+    ( -- * Canonical low-level rule
+      Rule(..)
     , uniformize
     , extend
+      -- * Canonical rules as Map
+    , RuleSet
+    , ruleSet
+    , rule
+      -- * Rules first set (Map)
+    , FirstSet
+    , firstSet
     ) where
 
 import           Data.Either
 import           Data.List
+import qualified Data.Map.Strict as Map
 
 data Rule
   -- |A rule is defined by a non terminal and a list of Term and NonTerm
@@ -79,3 +88,39 @@ candidates = map (fst . head) . filter (all snd) . grp . sortOn fst . evaluate
     evaluate (Rule s xs : ys) = (s, True) : evaluate xs ++ evaluate ys
     evaluate (NonTerm s : xs) = (s, False) : evaluate xs
     evaluate (_ : xs)         = evaluate xs
+
+-- |Rules as a map
+type RuleSet = Map.Map String [[Rule]]
+
+-- |Compute the rule set
+ruleSet :: [Rule] -> RuleSet
+ruleSet xs = Map.fromList [(n, collect n xs) | n <- names xs]
+  where
+    names = nub . map (\(Rule s _) -> s)
+    collect n = map (\(Rule _ r) -> r) . filter (\(Rule s _) -> s == n)
+
+-- |Get rule from a RuleSet
+rule :: String -> RuleSet -> [Rule]
+rule name rs = case Map.lookup name rs of
+  Nothing -> []
+  Just xs -> map (Rule name) xs
+
+-- |First set type
+type FirstSet = Map.Map String [Rule]
+
+-- |Compute the complete first set
+firstSet :: RuleSet -> FirstSet
+firstSet rs = Map.mapWithKey (\k _ -> first k rs) rs
+
+-- |Compute first set of a given rule
+first :: String -> RuleSet -> [Rule]
+first name rs = nub . sort $ concatMap compute $ rule name rs
+  where
+    match name = filter (\(Rule s _) -> s == name)
+    compute (Rule _ [Empty]) = [Empty]
+    compute (Rule _ (x:xs)) = case compute x of
+      [Empty] -> compute $ Rule name xs
+      a       -> a
+    compute a@(Term c) = [a]
+    compute (NonTerm s) = first s rs
+    compute Empty = [Empty]

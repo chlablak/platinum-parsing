@@ -1,5 +1,6 @@
 module PPTest.Rule (specs) where
 
+import           Data.Map.Strict (toList)
 import           PP
 import           Test.Hspec
 
@@ -36,3 +37,32 @@ specs = describe "PPTest.Rule" $ do
              Rule "b" [Term 'd', Empty],
              Rule "c" [NonTerm "b", Empty]]
     extend r `shouldBe` Left "cannot extend, no start rule found (candidates: [\"a\",\"c\"])"
+
+  it "should generate the correct RuleSet" $ do
+    let r = [Rule "__start" [NonTerm "a", Empty],
+             Rule "a" [Term 'b', Empty],
+             Rule "a" [NonTerm "c", Empty],
+             Rule "c" [Term 'd', Empty],
+             Rule "c" [Empty],
+             Rule "e" [Empty]]
+    let e = [("__start", [[NonTerm "a", Empty]]),
+             ("a", [[Term 'b', Empty], [NonTerm "c", Empty]]),
+             ("c", [[Term 'd', Empty], [Empty]]),
+             ("e", [[Empty]])]
+    toList (ruleSet r) `shouldBe` e
+
+  it "should generate the correct FirstSet" $ do
+    let r = [Rule "__start" [NonTerm "A", Empty],
+             Rule "A" [NonTerm "B", Empty],
+             Rule "A" [Term 'a', Empty],
+             Rule "B" [Term 'b', Empty],
+             Rule "B" [NonTerm "C", NonTerm "D", Empty],
+             Rule "C" [Term 'c', Empty],
+             Rule "C" [Empty],
+             Rule "D" [Term 'd', Empty]]
+    let e = [("A", [Term 'a', Term 'b', Term 'c', Empty]),
+             ("B", [Term 'b', Term 'c', Empty]),
+             ("C", [Term 'c', Empty]),
+             ("D", [Term 'd']),
+             ("__start", [Term 'a', Term 'b', Term 'c', Empty])]
+    toList (firstSet (ruleSet r)) `shouldBe` e

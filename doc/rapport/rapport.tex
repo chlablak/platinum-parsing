@@ -562,8 +562,9 @@
 			
 	\section{Génération de la table LALR}		
 		\todo{parler du dragon book, chapitre, ...\\}
+		\todo{mettre des bouts de code\\}
 	
-		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
+		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées (informatif):
 		\begin{enumerate}
 			\item transformation des règles EBNF en règles canoniques
 			\subitem soit une fonction \hs{rules :: Ebnf.Syntax -> [Rule]} 
@@ -598,6 +599,31 @@
 		Voyons donc en premier la fonction \hs{rules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \hs{Rule} dans \hs{PP.Rule}, et nous ajoutons une fonction \hs{rules :: ast -> [Rule]} à la classe de type \hs{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \hs{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \hs{PPTest.Grammars.Ebnf} naturellement.\\
 		
 		Passons à la fonction \hs{extend :: [Rule] -> Either String [Rule]}. Celle-ci doit augmenter la grammaire, c'est-à-dire pour une grammaire \mintinline{ebnf}{a = b; b = 'c';} on aura: \mintinline{ebnf}{__start = a; a = b; b = 'c';}. Il est possible que la grammaire ne contienne aucune ou plusieurs règles de départ, cela doit être détecté évidemment. L'implémentation se trouve dans \hs{PP.Rule} et les tests dans \hs{PPTest.Rule}.\\
+		
+		\todo{parler de RuleSet\\}
+		
+		La fonction suivante est \hs{first} qui doit construire l'ensemble PREMIER d'une règle. Pour optimiser cela, nous allons réunir tous ces ensembles dans une structure \hs{FirstSet}. De plus les calculs ne seront réalisés qu'une seule fois. Cela est également fait dans \hs{PP.Rule}.\\
+		
+		Faisons un résumé de ce que nous avons actuellement:
+		\begin{minted}{haskell}
+			let g = {- EBNF grammar -} :: String
+			
+			-- Construct EBNF AST
+			let Right ast = parse g :: To Ebnf.Syntax
+			
+			-- Construct augmented grammar
+			let Right g' = extend . rules $ ast 
+			
+			-- Construct RuleSet
+			let rs = ruleSet g'
+			
+			-- Construct FirstSet
+			let fs = firstSet rs
+		\end{minted}
+		\captionof{listing}{Passage d'une grammaire EBNF en \hs{RuleSet} et \hs{FirstSet}}
+		
+		\paragraph{}
+		À présent nous pouvons attaquer un nouveau module, \hs{PP.Builders.Lr1}, avec la fonction \hs{closing} et les types \hs{Lr1Item} et \hs{Lr1Set}. \todo{}\\	
 		
 		\todo{}
 		
