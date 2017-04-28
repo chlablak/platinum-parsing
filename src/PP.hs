@@ -12,9 +12,11 @@ For more informations about this tool, please look at:
   https://github.com/chlablak/platinum-parsing
 -}
 module PP
-    ( module PP.Grammar
+    ( module PP.Builder
+    , module PP.Grammar
     , module PP.Rule
     ) where
 
+import           PP.Builder
 import           PP.Grammar
 import           PP.Rule

@@ -16,6 +16,8 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     PP
+                     , PP.Builder
+                     , PP.Builders.Lr1
                      , PP.Grammar
                      , PP.Grammars.Ebnf
                      , PP.Rule
@@ -23,6 +25,7 @@ library
                      , parsec
                      , text
                      , containers
+                     , array
   default-language:    Haskell2010
 
 executable pp
@@ -40,7 +43,8 @@ test-suite pp-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       PPTest.Grammars.Ebnf
+  other-modules:       PPTest.Builders.Lr1
+                     , PPTest.Grammars.Ebnf
                      , PPTest.Rule
   build-depends:       base
                      , platinum-parsing
