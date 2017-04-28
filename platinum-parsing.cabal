@@ -40,6 +40,7 @@ test-suite pp-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       PPTest.Grammars.Ebnf
+                     , PPTest.Rule
   build-depends:       base
                      , platinum-parsing
                      , hspec

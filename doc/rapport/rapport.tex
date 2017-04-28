@@ -26,6 +26,7 @@
 
 % Commands
 \newcommand{\todo}[1]{\textcolor{red}{TODO\ifthenelse{\equal{#1}{}}{}{:} #1}}
+\newcommand{\hs}[1]{\mintinline{haskell}{#1}}
 
 % No subsubsection in tableofcontent
 \setcounter{tocdepth}{2}
@@ -489,16 +490,16 @@
 		\begin{figure}[H]
 			\centering
 			\begin{tabular}{ll}
-				\texttt{PP} & Import global des fonctionnalités de PP\\
-				\texttt{PP.Grammar} & Définition des fonctions communes aux différentes grammaires (classe de type)\\
-				\texttt{PP.Grammars.Ebnf} & Définition de la grammaire EBNF (AST, \textit{parsers}, instances)\\
+				\hs{PP} & Import global des fonctionnalités de PP\\
+				\hs{PP.Grammar} & Définition des fonctions communes aux différentes grammaires (classe de type)\\
+				\hs{PP.Grammars.Ebnf} & Définition de la grammaire EBNF (AST, \textit{parsers}, instances)\\
 			\end{tabular}
 			\caption{Premiers modules de PP}
 		\end{figure}
 		
 		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage. 
 		
-		\todo{expliquer \texttt{PP.Grammar.InputGrammar}}
+		\todo{expliquer \hs{PP.Grammar.InputGrammar}}
 		
 		Notons encore que les guillemets simples \texttt{'...'} pour les \textit{terminal string} ne sont pas supportés pour le moment, Parsec ne propose en effet pas de moyen rapide contrairement aux guillemets doubles qui sont eux très bien gérés. 
 		
@@ -511,13 +512,13 @@
 			\begin{figure}[H]
 				\centering
 				\begin{tabular}{ll}
-					\texttt{Spec} & Regroupement des différents tests\\
-					\texttt{PPTest.Grammars.Ebnf} & Tests pour la grammaire EBNF\\
+					\hs{Spec} & Regroupement des différents tests\\
+					\hs{PPTest.Grammars.Ebnf} & Tests pour la grammaire EBNF\\
 				\end{tabular}
 				\caption{Premiers modules de test}
 			\end{figure}  
 			
-			\todo{expliquer \texttt{Hspec}, utilité de \texttt{stringify}}
+			\todo{expliquer \texttt{Hspec}, utilité de \hs{stringify}}
 			
 			Ces tests nous ont révéler certains problèmes du \textit{parser}, cependant ceux-ci sont mineurs et nous allons donc simplement ouvrir des tickets pour les corriger plus tard:
 			\begin{itemize}
@@ -539,9 +540,9 @@
 			\begin{figure}[H]
 				\centering
 				\begin{tabular}{ll}
-					\texttt{Main} & Traitement des arguments et délégation à la bonne commande\\
-					\texttt{Args} & Structure Haskell représentant les arguments possibles\\
-					\texttt{Cmd.Ebnf} & Implémentation des fonctionnalités de la commande \texttt{pp ebnf}\\
+					\hs{Main} & Traitement des arguments et délégation à la bonne commande\\
+					\hs{Args} & Structure Haskell représentant les arguments possibles\\
+					\hs{Cmd.Ebnf} & Implémentation des fonctionnalités de la commande \texttt{pp ebnf}\\
 				\end{tabular}
 				\caption{Premiers modules du CLI}
 			\end{figure} 
@@ -557,42 +558,46 @@
 				...
 			\end{minted}
 			
-			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \texttt{stringify} l'AST et on l'affiche.
+			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
 			
 	\section{Génération de la table LALR}		
+		\todo{parler du dragon book, chapitre, ...\\}
+	
 		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
 		\begin{enumerate}
 			\item transformation des règles EBNF en règles canoniques
-			\subitem soit une fonction \mintinline{haskell}{toRules :: Ebnf.Syntax -> [Rule]} 
-			\subitem avec \mintinline{haskell}{type Rule = (String, [Part])} 
-			\subitem et \mintinline{haskell}{data Part = Term Char | NonTerm String | Empty}
+			\subitem soit une fonction \hs{rules :: Ebnf.Syntax -> [Rule]} 
+			\subitem avec \hs{type Rule = (String, [Part])} 
+			\subitem et \hs{data Part = Term Char | NonTerm String | Empty}
 			
-			\item augmenter la grammaire (\mintinline{haskell}{[Rule]}) pour avoir la grammaire augmentée
-			\subitem soit une fonction \mintinline{haskell}{augmente :: [Rule] -> Either String [Rule]}
-			\subitem (on utilise le type \mintinline{haskell}{Either} car la fonction peut échouer)
+			\item augmenter la grammaire (\hs{[Rule]}) pour avoir la grammaire augmentée
+			\subitem soit une fonction \hs{extend :: [Rule] -> Either String [Rule]}
+			\subitem (on utilise le type \hs{Either} car la fonction peut échouer)
 			
 			\item générer les collections d'items LR(1) canonique pour la grammaire
-			\subitem soit une fonction \mintinline{haskell}{generateSet :: [Rule] -> Either String Lr1Set}
-			\subitem avec \mintinline{haskell}{type Lr1Set = Array Integer (Set Lr1Item)}
-			\subitem et \mintinline{haskell}{type Lr1Item = (Rule, Integer, Part)}
+			\subitem soit une fonction \hs{generateSet :: [Rule] -> Either String Lr1Set}
+			\subitem avec \hs{type Lr1Set = Array Integer (Set Lr1Item)}
+			\subitem et \hs{type Lr1Item = (Rule, Integer, Part)}
 			\subitem et qui aura besoin des fonctions suivantes:
-			\subitem \mintinline{haskell}{closing :: (Set Lr1Item) -> (Set Lr1Item)}
-			\subitem \mintinline{haskell}{goto :: (Set Lr1Item) -> Part -> (Set Lr1Item)}
-			\subitem \mintinline{haskell}{first :: Part -> [Part]}
+			\subitem \hs{closing :: (Set Lr1Item) -> (Set Lr1Item)}
+			\subitem \hs{goto :: (Set Lr1Item) -> Part -> (Set Lr1Item)}
+			\subitem \hs{first :: Part -> [Part]}
 			
 			\item fusion de la collection LR(1) pour avoir une collection LALR(1) de plus petite taille
-			\subitem soit une fonction \mintinline{haskell}{fusion :: Lr1Set -> Either String LalrSet}
-			\subitem avec \mintinline{haskell}{type LalrSet = Lr1Set}
+			\subitem soit une fonction \hs{fusion :: Lr1Set -> Either String LalrSet}
+			\subitem avec \hs{type LalrSet = Lr1Set}
 			
 			\item génération de la table LALR proprement dite
-			\subitem soit une fonction \mintinline{haskell}{generateTable :: LalrSet -> Either String LalrTable}
-			\subitem avec \mintinline{haskell}{type LalrTable = Array (Integer, Part) Action}
-			\subitem et \mintinline{haskell}{data Action = Shift ... | Reduce ... | Goto ... | Error ... | Accept}\\
+			\subitem soit une fonction \hs{generateTable :: LalrSet -> Either String LalrTable}
+			\subitem avec \hs{type LalrTable = Array (Integer, Part) Action}
+			\subitem et \hs{data Action = Shift ... | Reduce ... | Goto ... | Error ... | Accept}\\
 		\end{enumerate}
 		
-		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \texttt{toRules}, \texttt{augmente}, \texttt{first}, \texttt{closing}, \texttt{goto}, \texttt{generateSet}, \texttt{fusion} et pour finir \texttt{generateTable}.\\
+		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \hs{rules}, \hs{extend}, \hs{first}, \hs{closing}, \hs{goto}, \hs{generateSet}, \hs{fusion} et pour finir \hs{generateTable}.\\
 		
-		Voyons donc en premier la fonction \texttt{toRules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \texttt{Rule} dans \texttt{PP.Rule}, et nous ajoutons une fonction \mintinline{haskell}{rules :: ast -> [Rule]} à la classe de type \texttt{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \texttt{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \texttt{PPTest.Grammars.Ebnf} naturellement.\\
+		Voyons donc en premier la fonction \hs{rules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \hs{Rule} dans \hs{PP.Rule}, et nous ajoutons une fonction \hs{rules :: ast -> [Rule]} à la classe de type \hs{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \hs{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \hs{PPTest.Grammars.Ebnf} naturellement.\\
+		
+		Passons à la fonction \hs{extend :: [Rule] -> Either String [Rule]}. Celle-ci doit augmenter la grammaire, c'est-à-dire pour une grammaire \mintinline{ebnf}{a = b; b = 'c';} on aura: \mintinline{ebnf}{__start = a; a = b; b = 'c';}. Il est possible que la grammaire ne contienne aucune ou plusieurs règles de départ, cela doit être détecté évidemment. L'implémentation se trouve dans \hs{PP.Rule} et les tests dans \hs{PPTest.Rule}.\\
 		
 		\todo{}
 		
