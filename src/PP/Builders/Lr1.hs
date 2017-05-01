@@ -11,8 +11,7 @@ module PP.Builders.Lr1
     ( Lr1Item(..)
     ) where
 
-import qualified Data.List  as L
-import qualified Data.Set   as S
+import qualified Data.Set   as Set
 import           PP.Builder
 import           PP.Rule
 
@@ -29,10 +28,10 @@ instance LrBuilder Lr1Item where
 closure :: LrSet Lr1Item -> RuleSet -> FirstSet -> LrSet Lr1Item
 closure is rs fs = case list is rs fs of
   [] -> is
-  xs -> S.union is (closure (S.fromList xs) rs fs)
+  xs -> Set.union is (closure (Set.fromList xs) rs fs)
   where
     list is rs fs = [Lr1Item r 0 t |
-      i <- S.toList is,
+      i <- Set.toList is,
       r <- rule (next i) rs,
       t <- term i fs]
     next (Lr1Item (Rule _ xs) pos _) = case xs !! pos of
@@ -41,3 +40,10 @@ closure is rs fs = case list is rs fs of
     term (Lr1Item (Rule _ xs) pos la) fs = case xs !! (pos + 1) of
       Empty -> first la fs
       r     -> first r fs
+
+-- |Compute the GOTO of a items set for a given rule
+goto :: LrSet Lr1Item -> Rule -> RuleSet -> FirstSet -> LrSet Lr1Item
+goto is r = closure (Set.fromList [inc i | i <- Set.toList is, accept i r])
+  where
+    inc (Lr1Item r p la) = Lr1Item r (p + 1) la
+    accept (Lr1Item (Rule _ xs) p _) r = xs !! p == r
