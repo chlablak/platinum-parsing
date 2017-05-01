@@ -19,11 +19,13 @@ module PP.Rule
       -- * Rules first set (Map)
     , FirstSet
     , firstSet
+    , first
     ) where
 
 import           Data.Either
 import           Data.List
 import qualified Data.Map.Strict as Map
+import           Data.Maybe
 
 data Rule
   -- |A rule is defined by a non terminal and a list of Term and NonTerm
@@ -110,17 +112,20 @@ type FirstSet = Map.Map String [Rule]
 
 -- |Compute the complete first set
 firstSet :: RuleSet -> FirstSet
-firstSet rs = Map.mapWithKey (\k _ -> first k rs) rs
-
--- |Compute first set of a given rule
-first :: String -> RuleSet -> [Rule]
-first name rs = nub . sort $ concatMap compute $ rule name rs
+firstSet rs = Map.mapWithKey (\k _ -> find k rs) rs
   where
-    match name = filter (\(Rule s _) -> s == name)
+    find name rs = nub . sort $ concatMap compute $ rule name rs
     compute (Rule _ [Empty]) = [Empty]
-    compute (Rule _ (x:xs)) = case compute x of
+    compute (Rule name (x:xs)) = case compute x of
       [Empty] -> compute $ Rule name xs
       a       -> a
-    compute a@(Term c) = [a]
-    compute (NonTerm s) = first s rs
+    compute a@(Term _) = [a]
+    compute (NonTerm s) = find s rs
     compute Empty = [Empty]
+
+-- |Compute first set of a given rule
+first :: Rule -> FirstSet -> [Rule]
+first Empty _           = [Empty]
+first a@(Term _) _      = [a]
+first (NonTerm s) fs    = fromMaybe [Empty] (Map.lookup s fs)
+first (Rule _ (x:_)) fs = first x fs

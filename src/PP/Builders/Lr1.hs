@@ -9,21 +9,35 @@ Portability : portable
 -}
 module PP.Builders.Lr1
     ( Lr1Item(..)
-    , Lr1Set(..)
     ) where
 
-import qualified Data.Array as Array
-import qualified Data.Set   as Set
+import qualified Data.List  as L
+import qualified Data.Set   as S
 import           PP.Builder
 import           PP.Rule
 
 -- |LR(1) item
 data Lr1Item = Lr1Item Rule Int Rule
-
--- |LR(1) items set
-newtype Lr1Set = Lr1Set (Array.Array Int (Set.Set Lr1Item))
+  deriving (Eq, Ord, Show, Read)
 
 -- |LrBuilder instance for Lr1Set
-instance LrBuilder Lr1Set where
-  buildSet = undefined
-  buildTable = undefined
+instance LrBuilder Lr1Item where
+  collection = undefined
+  table = undefined
+
+-- |Compute the closure of a items set
+closure :: LrSet Lr1Item -> RuleSet -> FirstSet -> LrSet Lr1Item
+closure is rs fs = case list is rs fs of
+  [] -> is
+  xs -> S.union is (closure (S.fromList xs) rs fs)
+  where
+    list is rs fs = [Lr1Item r 0 t |
+      i <- S.toList is,
+      r <- rule (next i) rs,
+      t <- term i fs]
+    next (Lr1Item (Rule _ xs) pos _) = case xs !! pos of
+      (NonTerm r) -> r
+      _           -> ""
+    term (Lr1Item (Rule _ xs) pos la) fs = case xs !! (pos + 1) of
+      Empty -> first la fs
+      r     -> first r fs
