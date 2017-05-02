@@ -39,7 +39,18 @@ data Rule
   | Empty
   -- |Concatenated rules, useful for PP.InputGrammar.rules
   | Concat [Rule]
-    deriving (Show, Eq, Read, Ord)
+    deriving (Eq, Ord)
+
+instance Show Rule where
+  show (Rule a xs) = a ++ " -> " ++ right xs
+    where
+      right []     = ""
+      right [x]    = show x
+      right (x:xs) = show x ++ "," ++ right xs
+  show (NonTerm a) = a
+  show (Term c) = show c
+  show Empty = "$"
+  show (Concat xs) = "Concat " ++ show xs
 
 -- |Uniformize a list of rules
 uniformize :: [Rule] -> [Rule]

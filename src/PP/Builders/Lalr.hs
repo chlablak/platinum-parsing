@@ -20,11 +20,22 @@ import           PP.Rule
 
 -- |LALR item
 data LalrItem = LalrItem Rule Int Rule
-  deriving (Eq, Ord, Show, Read)
+  deriving (Eq, Ord)
+
+instance Show LalrItem where
+  show (LalrItem (Rule a xs) p la) =
+    "[" ++ a ++ " -> " ++ right xs p ++ "; " ++ show la ++ "]"
+    where
+      right :: [Rule] -> Int -> String
+      right [] _     = ""
+      right xs 0     = "*," ++ right xs (-1)
+      right [x] _    = show x
+      right (x:xs) p = show x ++ "," ++ right xs (p - 1)
 
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where
   collection rs = fusion (collection rs :: LrCollection Lr1Item)
+  table = undefined
 
 -- |Compute the LALR collection from a LR(1) collection
 fusion :: LrCollection Lr1Item -> LrCollection LalrItem

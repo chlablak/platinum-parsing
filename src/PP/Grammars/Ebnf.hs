@@ -37,33 +37,33 @@ import qualified Text.ParserCombinators.Parsec.Token    as Token
 
 -- |Start rule
 newtype Syntax = Syntax [SyntaxRule]
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |Defines the sequence of symbols represented by a MetaIdentifier
 data SyntaxRule = SyntaxRule MetaIdentifier DefinitionsList
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |Separates alternative SingleDefinition
 newtype DefinitionsList = DefinitionsList [SingleDefinition]
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |Separates successive Term
 newtype SingleDefinition = SingleDefinition [Term]
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |Represents any sequence of symbols that is defined by the Factor
 -- but not defined by the Exception
 data Term = Term Factor (Maybe Exception)
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |A Factor may be used as an Exception if it could be replaced by a
 -- Factor containing no MetaIdentifier
 newtype Exception = Exception Factor
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |The Integer specifies the number of repetitions of the Primay
 data Factor = Factor (Maybe Integer) Primary
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 data Primary
   -- |Encloses symbols which are optional
@@ -78,11 +78,11 @@ data Primary
   | TerminalString String
   -- |Empty Primary
   | Empty
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq)
 
 -- |A MetaIdentifier is the name of a syntactic element of the langage being defined
 newtype MetaIdentifier = MetaIdentifier String
-  deriving (Show, Eq, Read)
+  deriving (Show, Eq)
 
 -- |Lexer definitions for EBNF
 lexer = Token.makeTokenParser def

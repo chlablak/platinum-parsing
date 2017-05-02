@@ -21,7 +21,7 @@ import qualified Text.Parsec as P
 type To ast = Either P.ParseError ast
 
 -- |Type class for grammars
-class (Eq ast, Show ast, Read ast) => InputGrammar ast where
+class (Eq ast, Show ast) => InputGrammar ast where
   -- |Entry parser
   parser :: P.Parsec String () ast
   -- |Parse String to AST

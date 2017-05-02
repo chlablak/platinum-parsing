@@ -28,8 +28,9 @@ data LrAction
   = LrShift Int
   | LrReduce Int
   | LrGoto Int
-  | LrError String
+  | LrError
   | LrAccept
+    deriving(Show, Eq)
 
 -- |LR items set collection
 type LrCollection item = Vector (LrSet item)
@@ -43,4 +44,3 @@ class Ord item => LrBuilder item where
   collection :: RuleSet -> LrCollection item
   -- |Build the parsing table
   table :: LrCollection item -> LrTable
-  table = undefined

@@ -19,7 +19,17 @@ import           PP.Rule
 
 -- |LR(1) item
 data Lr1Item = Lr1Item Rule Int Rule
-  deriving (Eq, Ord, Show, Read)
+  deriving (Eq, Ord)
+
+instance Show Lr1Item where
+  show (Lr1Item (Rule a xs) p la) =
+    "[" ++ a ++ " -> " ++ right xs p ++ "; " ++ show la ++ "]"
+    where
+      right :: [Rule] -> Int -> String
+      right [] _     = ""
+      right xs 0     = "*," ++ right xs (-1)
+      right [x] _    = show x
+      right (x:xs) p = show x ++ "," ++ right xs (p - 1)
 
 -- |LrBuilder instance for Lr1Item
 instance LrBuilder Lr1Item where
@@ -41,6 +51,9 @@ instance LrBuilder Lr1Item where
       initialise =
         Vector.singleton $ closure (Set.singleton start) rs (firstSet rs)
       start = Lr1Item (head $ rule "__start" rs) 0 Empty
+
+  -- |Not impl. yet
+  table = undefined
 
 -- |Compute the closure of a items set
 closure :: LrSet Lr1Item -> RuleSet -> FirstSet -> LrSet Lr1Item
