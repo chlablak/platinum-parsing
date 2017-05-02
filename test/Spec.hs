@@ -1,5 +1,6 @@
 module Main where
 
+import qualified PPTest.Builders.Lalr
 import qualified PPTest.Builders.Lr1
 import qualified PPTest.Grammars.Ebnf
 import qualified PPTest.Rule
@@ -11,3 +12,4 @@ main = hspec $
     PPTest.Grammars.Ebnf.specs
     PPTest.Rule.specs
     PPTest.Builders.Lr1.specs
+    PPTest.Builders.Lalr.specs

@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     PP
                      , PP.Builder
+                     , PP.Builders.Lalr
                      , PP.Builders.Lr1
                      , PP.Grammar
                      , PP.Grammars.Ebnf
@@ -43,7 +44,8 @@ test-suite pp-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       PPTest.Builders.Lr1
+  other-modules:       PPTest.Builders.Lalr
+                     , PPTest.Builders.Lr1
                      , PPTest.Grammars.Ebnf
                      , PPTest.Rule
   build-depends:       base

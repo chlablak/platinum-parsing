@@ -43,3 +43,4 @@ class Ord item => LrBuilder item where
   collection :: RuleSet -> LrCollection item
   -- |Build the parsing table
   table :: LrCollection item -> LrTable
+  table = undefined

@@ -618,7 +618,9 @@
 		\captionof{listing}{Passage d'une grammaire EBNF en \hs{RuleSet} et \hs{FirstSet}}
 		
 		\paragraph{}
-		À présent nous pouvons attaquer la génération de la collection LR(1) canonique. Pour cela nous avons le module \hs{PP.Builder} qui contient la classe de type pour les différents \textit{builders} LR: \hs{LrBuilder}. Puis nous définissons un module \hs{PP.Builders.Lr1} qui contiendra l'instance de cette classe pour le type \hs{Lr1Item}. Les tests sont eux dans \hs{PPTest.Builders.Lr1}.
+		À présent nous pouvons attaquer la génération de la collection LR(1) canonique. Pour cela nous avons le module \hs{PP.Builder} qui contient la classe de type pour les différents \textit{builders} LR: \hs{LrBuilder}. Puis nous définissons un module \hs{PP.Builders.Lr1} qui contiendra l'instance de cette classe pour le type \hs{Lr1Item}. Les tests sont eux dans \hs{PPTest.Builders.Lr1}.\\
+		
+		La construction de la collection LALR peut être faîte à partir de la collection LR(1). Pour cela nous avons une fonction \hs{fusion} qui s'occupe de mettre ensemble les set d'items ayant le même coeur. L'implémentation se trouve dans \hs{PP.Builders.Lalr} et les tests dans \hs{PPTest.Builders.Lalr}.\\
 		
 		\todo{\\}
 		

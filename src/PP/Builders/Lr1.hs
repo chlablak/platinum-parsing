@@ -21,7 +21,7 @@ import           PP.Rule
 data Lr1Item = Lr1Item Rule Int Rule
   deriving (Eq, Ord, Show, Read)
 
--- |LrBuilder instance for Lr1Set
+-- |LrBuilder instance for Lr1Item
 instance LrBuilder Lr1Item where
   collection rs = collection' initialise
     where
@@ -41,9 +41,6 @@ instance LrBuilder Lr1Item where
       initialise =
         Vector.singleton $ closure (Set.singleton start) rs (firstSet rs)
       start = Lr1Item (head $ rule "__start" rs) 0 Empty
-
-  -- |Not impl. at the moment
-  table = undefined
 
 -- |Compute the closure of a items set
 closure :: LrSet Lr1Item -> RuleSet -> FirstSet -> LrSet Lr1Item
