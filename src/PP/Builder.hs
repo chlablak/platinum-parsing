@@ -8,19 +8,20 @@ Stability   : provisional
 Portability : portable
 -}
 module PP.Builder
-    ( LrTable
+    ( LrTable(..)
     , LrAction(..)
-    , LrCollection
-    , LrSet
+    , LrCollection(..)
+    , LrSet(..)
     , LrBuilder(..)
     ) where
 
-import           Data.Array
+import           Data.Map
 import           Data.Set
+import           Data.Vector
 import           PP.Rule
 
 -- |All LR parsers have the same table format
-type LrTable = Array (Int, Rule) LrAction
+type LrTable = Map (Int, Rule) LrAction
 
 -- |LR actions for a LR parser
 data LrAction
@@ -31,7 +32,7 @@ data LrAction
   | LrAccept
 
 -- |LR items set collection
-type LrCollection set = Array Int set
+type LrCollection item = Vector (LrSet item)
 
 -- |LR items set
 type LrSet item = Set item
@@ -39,6 +40,6 @@ type LrSet item = Set item
 -- |LR parser common functions
 class Ord item => LrBuilder item where
   -- |Build the items set collection
-  collection :: RuleSet -> LrCollection (LrSet item)
+  collection :: RuleSet -> LrCollection item
   -- |Build the parsing table
-  table :: LrCollection (LrSet item) -> LrTable
+  table :: LrCollection item -> LrTable

@@ -31,10 +31,10 @@ data Rule
   -- |A rule is defined by a non terminal and a list of Term and NonTerm
   -- The list should end with Empty
   = Rule String [Rule]
-  -- |Terminal character
-  | Term Char
   -- |Non terminal string
   | NonTerm String
+  -- |Terminal character
+  | Term Char
   -- |Empty
   | Empty
   -- |Concatenated rules, useful for PP.InputGrammar.rules

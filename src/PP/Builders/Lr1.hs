@@ -11,7 +11,9 @@ module PP.Builders.Lr1
     ( Lr1Item(..)
     ) where
 
-import qualified Data.Set   as Set
+import qualified Data.List   as L
+import qualified Data.Set    as Set
+import qualified Data.Vector as Vector
 import           PP.Builder
 import           PP.Rule
 
@@ -21,7 +23,26 @@ data Lr1Item = Lr1Item Rule Int Rule
 
 -- |LrBuilder instance for Lr1Set
 instance LrBuilder Lr1Item where
-  collection = undefined
+  collection rs = collection' initialise
+    where
+      collection' c = case list c of
+        [] -> c
+        xs -> collection' $ c Vector.++ Vector.fromList xs
+      list c = [g |
+        is <- Vector.toList c,
+        x <- symbol is,
+        let g = goto is x rs (firstSet rs),
+        accept g c]
+      accept is c = not (Set.null is) && Vector.notElem is c
+      symbol is = L.nub [x |
+        Lr1Item (Rule _ xs) p _ <- Set.toList is,
+        let x = xs !! p,
+        x /= Empty]
+      initialise =
+        Vector.singleton $ closure (Set.singleton start) rs (firstSet rs)
+      start = Lr1Item (head $ rule "__start" rs) 0 Empty
+
+  -- |Not impl. at the moment
   table = undefined
 
 -- |Compute the closure of a items set

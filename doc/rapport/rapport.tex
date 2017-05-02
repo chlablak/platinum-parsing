@@ -564,43 +564,38 @@
 		\todo{parler du dragon book, chapitre, ...\\}
 		\todo{mettre des bouts de code\\}
 	
-		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées (informatif):
+		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
 		\begin{enumerate}
 			\item transformation des règles EBNF en règles canoniques
-			\subitem soit une fonction \hs{rules :: Ebnf.Syntax -> [Rule]} 
-			\subitem avec \hs{type Rule = (String, [Part])} 
-			\subitem et \hs{data Part = Term Char | NonTerm String | Empty}
+			\subitem soit une fonction \hs{rules :: InputGrammar ast => ast -> [Rule]} 
+			\subitem avec \hs{data Rule = Rule String [Rule] | NonTerm String | Term Char | Empty} 
 			
 			\item augmenter la grammaire (\hs{[Rule]}) pour avoir la grammaire augmentée
 			\subitem soit une fonction \hs{extend :: [Rule] -> Either String [Rule]}
 			\subitem (on utilise le type \hs{Either} car la fonction peut échouer)
 			
 			\item générer les collections d'items LR(1) canonique pour la grammaire
-			\subitem soit une fonction \hs{generateSet :: [Rule] -> Either String Lr1Set}
-			\subitem avec \hs{type Lr1Set = Array Integer (Set Lr1Item)}
-			\subitem et \hs{type Lr1Item = (Rule, Integer, Part)}
-			\subitem et qui aura besoin des fonctions suivantes:
-			\subitem \hs{closing :: (Set Lr1Item) -> (Set Lr1Item)}
-			\subitem \hs{goto :: (Set Lr1Item) -> Part -> (Set Lr1Item)}
-			\subitem \hs{first :: Part -> [Part]}
+			\subitem soit une fonction \hs{collection :: LrBuilder item => RuleSet -> LrCollection item}
+			\subitem avec \hs{type LrCollection item = Vector (LrSet item)} 
+			\subitem et \hs{type LrSet item = Set item}
+			\subitem et \hs{data Lr1Item = Lr1Item Rule Int Rule}
+			\subitem et qui aura besoin des fonctions suivantes: \hs{closure}, \hs{goto} et \hs{first}
 			
 			\item fusion de la collection LR(1) pour avoir une collection LALR(1) de plus petite taille
-			\subitem soit une fonction \hs{fusion :: Lr1Set -> Either String LalrSet}
-			\subitem avec \hs{type LalrSet = Lr1Set}
+			\subitem soit une fonction \hs{fusion :: LrSet Lr1Item -> Either String (LrSet LalrItem)}
+			\subitem avec \hs{data LalrItem = LalrItem Rule Int Rule}
 			
 			\item génération de la table LALR proprement dite
-			\subitem soit une fonction \hs{generateTable :: LalrSet -> Either String LalrTable}
-			\subitem avec \hs{type LalrTable = Array (Integer, Part) Action}
-			\subitem et \hs{data Action = Shift ... | Reduce ... | Goto ... | Error ... | Accept}\\
+			\subitem soit une fonction \hs{table :: LrBuilder item => LrCollection item -> LrTable}
+			\subitem avec \hs{type LrTable = Map (Int, Rule) LrAction}
+			\subitem et \hs{data LrAction = LrShift ... | LrReduce ... | ...}\\
 		\end{enumerate}
 		
-		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \hs{rules}, \hs{extend}, \hs{first}, \hs{closing}, \hs{goto}, \hs{generateSet}, \hs{fusion} et pour finir \hs{generateTable}.\\
+		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \hs{rules}, \hs{extend}, \hs{first}, \hs{closure}, \hs{goto}, \hs{collection}, \hs{fusion} et pour finir \hs{table}.\\
 		
 		Voyons donc en premier la fonction \hs{rules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \hs{Rule} dans \hs{PP.Rule}, et nous ajoutons une fonction \hs{rules :: ast -> [Rule]} à la classe de type \hs{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \hs{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \hs{PPTest.Grammars.Ebnf} naturellement.\\
 		
-		Passons à la fonction \hs{extend :: [Rule] -> Either String [Rule]}. Celle-ci doit augmenter la grammaire, c'est-à-dire pour une grammaire \mintinline{ebnf}{a = b; b = 'c';} on aura: \mintinline{ebnf}{__start = a; a = b; b = 'c';}. Il est possible que la grammaire ne contienne aucune ou plusieurs règles de départ, cela doit être détecté évidemment. L'implémentation se trouve dans \hs{PP.Rule} et les tests dans \hs{PPTest.Rule}.\\
-		
-		\todo{parler de RuleSet\\}
+		Passons à la fonction \hs{extend}. Celle-ci doit augmenter la grammaire, c'est-à-dire pour une grammaire \mintinline{ebnf}{a = b; b = 'c';} on aura: \mintinline{ebnf}{__start = a; a = b; b = 'c';}. Il est possible que la grammaire ne contienne aucune ou plusieurs règles de départ, cela doit être détecté évidemment. L'implémentation se trouve dans \hs{PP.Rule} et les tests dans \hs{PPTest.Rule}.\\
 		
 		La fonction suivante est \hs{first} qui doit construire l'ensemble PREMIER d'une règle. Pour optimiser cela, nous allons réunir tous ces ensembles dans une structure \hs{FirstSet}. De plus les calculs ne seront réalisés qu'une seule fois. Cela est également fait dans \hs{PP.Rule}.\\
 		
@@ -623,9 +618,19 @@
 		\captionof{listing}{Passage d'une grammaire EBNF en \hs{RuleSet} et \hs{FirstSet}}
 		
 		\paragraph{}
-		À présent nous pouvons attaquer un nouveau module, \hs{PP.Builders.Lr1}, avec la fonction \hs{closing} et les types \hs{Lr1Item} et \hs{Lr1Set}. \todo{}\\	
+		À présent nous pouvons attaquer la génération de la collection LR(1) canonique. Pour cela nous avons le module \hs{PP.Builder} qui contient la classe de type pour les différents \textit{builders} LR: \hs{LrBuilder}. Puis nous définissons un module \hs{PP.Builders.Lr1} qui contiendra l'instance de cette classe pour le type \hs{Lr1Item}. Les tests sont eux dans \hs{PPTest.Builders.Lr1}.
 		
-		\todo{}
+		\todo{\\}
+		
+		Pour finir le \textit{pipeline} de l'extrait de code ci-dessus:
+		\begin{minted}{haskell}
+			-- Construct the LALR items set collection
+			let c = collection rs :: LrCollection LalrItem
+			
+			-- Construct the final LALR table
+			let t = table c
+		\end{minted}
+		\captionof{listing}{Passage du \hs{RuleSet} en \hs{LrTable}}
 		
 		\subsection{Test avec une grammaire simple}
 			\todo{}
