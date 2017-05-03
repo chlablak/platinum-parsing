@@ -12,6 +12,8 @@ module PP.Builders.Lalr
     ) where
 
 import qualified Data.List       as L
+import qualified Data.Map.Strict as Map
+import           Data.Maybe
 import qualified Data.Set        as Set
 import qualified Data.Vector     as Vector
 import           PP.Builder
@@ -35,7 +37,37 @@ instance Show LalrItem where
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where
   collection rs = fusion (collection rs :: LrCollection Lr1Item)
-  table = undefined
+  table c = {-Map.union (Map.fromList $ actions c)-} (Map.fromList $ gotos c)
+    where
+      actions c = undefined
+      gotos c = [((i, s), LrGoto $ fromJust j)
+               | i <- [0..(Vector.length c - 1)]
+               , let is = c Vector.! i
+               , s <- symbol is
+               , nonTerm s
+               , let j = goto c i s
+               , isJust j]
+      nonTerm (NonTerm _) = True
+      nonTerm _           = False
+
+-- |Find the next possible symbols
+symbol :: LrSet LalrItem -> [Rule]
+symbol is = L.sort $ L.nub [x
+                          | LalrItem (Rule _ xs) p _ <- Set.toList is
+                          , let x = xs !! p
+                          , x /= Empty]
+
+-- |Find the next set
+goto :: LrCollection LalrItem -> Int -> Rule -> Maybe Int
+goto c i = goto' (c Vector.! i)
+  where
+    goto' is r = case list is r of
+      []    -> Nothing
+      (x:_) -> find $ inc x
+    find x = Vector.findIndex (Set.member x) c
+    list is r = [x | x <- Set.toList is, accept x r]
+    accept (LalrItem (Rule _ xs) p _) r = xs !! p == r
+    inc (LalrItem r p la) = LalrItem r (p + 1) la
 
 -- |Compute the LALR collection from a LR(1) collection
 fusion :: LrCollection Lr1Item -> LrCollection LalrItem
