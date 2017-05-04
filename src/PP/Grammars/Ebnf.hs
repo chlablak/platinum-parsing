@@ -198,7 +198,7 @@ instance InputGrammar Term where
   stringify (Term f Nothing)  = stringify f
   stringify (Term f (Just e)) = stringify f ++ "-" ++ stringify e
   rules (Term f Nothing) = rules f
-  rules _                = undefined -- no translation yet
+  rules _                = error "no translation for exception" -- ... yet
 
 instance InputGrammar Exception where
   parser = exception

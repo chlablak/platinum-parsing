@@ -497,9 +497,9 @@
 			\caption{Premiers modules de PP}
 		\end{figure}
 		
-		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage. 
+		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage.\\
 		
-		\todo{expliquer \hs{PP.Grammar.InputGrammar}}
+		La classe de type \hs{PP.Grammar.InputGrammar} définit les fonctions communes à tous les AST, on peut voir cela comme une interface en Java.\\
 		
 		Notons encore que les guillemets simples \texttt{'...'} pour les \textit{terminal string} ne sont pas supportés pour le moment, Parsec ne propose en effet pas de moyen rapide contrairement aux guillemets doubles qui sont eux très bien gérés. 
 		
@@ -517,8 +517,6 @@
 				\end{tabular}
 				\caption{Premiers modules de test}
 			\end{figure}  
-			
-			\todo{expliquer \texttt{Hspec}, utilité de \hs{stringify}}
 			
 			Ces tests nous ont révéler certains problèmes du \textit{parser}, cependant ceux-ci sont mineurs et nous allons donc simplement ouvrir des tickets pour les corriger plus tard:
 			\begin{itemize}
@@ -561,9 +559,6 @@
 			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
 			
 	\section{Génération de la table LALR}		
-		\todo{parler du dragon book, chapitre, ...\\}
-		\todo{mettre des bouts de code\\}
-	
 		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
 		\begin{enumerate}
 			\item transformation des règles EBNF en règles canoniques
@@ -635,11 +630,37 @@
 		\end{minted}
 		\captionof{listing}{Passage du \hs{RuleSet} en \hs{LrTable}}
 		
+		\paragraph{}
+		L'implémentation ci-dessus se base sur le Dragon Book \cite{dragonbook}, chapitres 4.7 à 4.7.4. Les chapitres suivants proposent une construction plus efficace (en terme de mémoire notamment) de la table LALR, cela pourrait faire l'objet d'une amélioration pour plus tard.\\
+		
+		Notons que la table n'est pas stockée comme un tableau à deux dimensions. En effet, une bonne partie de la table est positionnée à \hs{LrError}, il ne sert à rien de stocker cela. Nous utilisons donc une \hs{Data.Map.Strict} à la place.
+		
 		\subsection{Test avec une grammaire simple}
-			\todo{}
+			Les tests ont utilisés la grammaire suivantes:
+			\begin{minted}{ebnf}
+				S = C, C;
+				C = "c", C | "d";
+			\end{minted}
+			Tirée du Dragon Book \cite{dragonbook}, afin d'avoir une référence fiable sur les bons résultats à obtenir.
 		
 		\subsection{Intégration au CLI}
-			\todo{}
+			L'intégration au CLI se fait dans le module \hs{Cmd.Lalr}, les différentes options sont:
+			\begin{minted}{console}
+				prompt$ pp lalr --help
+			\end{minted}
+			\begin{minted}{console}
+				Usage: pp lalr (-g|--grammar FILENAME) [--collection] [--set I] [--table]
+					Generate LALR parsing table
+				
+				Available options:
+					-g,--grammar FILENAME    Input grammar (EBNF)
+					--collection             Print the items sets collection
+					--set I                  Print a specific items set
+					--table                  Print the LALR parsing table
+					-h,--help                Show this help text
+			\end{minted}
+			
+			L'affichage de la table LALR (flag \texttt{--table}) s'affiche encore comme la \hs{Map} qui contient la table, cela fera l'objet d'une amélioration future.
 			
 	\section{TODO}
 		\todo{organisation du dossier du projet\\}
@@ -751,6 +772,10 @@
 			\begingroup
 				\renewcommand{\section}[2]{}
 				\begin{thebibliography}{9}
+					
+					\bibitem{dragonbook} Compilateurs : Principes, techniques et outils,\\
+						2ème édition - Pearson Education,\\
+						A. Aho, M. Lam, R. Sethi et J. Ullman\\
 					
 					\bibitem{bnf} BNF, Backus-Naur form,\\
 						\url{https://en.wikipedia.org/wiki/Backus\%E2\%80\%93Naur_form}\\

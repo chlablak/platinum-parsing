@@ -29,10 +29,12 @@ commandArgs = EbnfCmd <$> ebnfArgs
         <> help "Input file" )
       <*> switch ( long "minify"
         <> help "Print the minified grammar" )
+      <*> switch ( long "rules"
+        <> help "Print the obtained rules" )
 
 -- |Command dispatch
 dispatch :: Args -> IO ()
-dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs file minify))) = do
+dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs file minify rules))) = do
 
   -- Compute common things
   input <- readFile file
@@ -41,10 +43,13 @@ dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs file minify))) = do
       putStrLn $ "error in file '" ++ file ++ "':"
       print err
     Right ast -> do
-      let minified = PP.stringify ast
-
       -- Flag `--minify`
-      when minify $ putStrLn minified
+      when minify $ putStrLn (PP.stringify ast)
+
+      -- Flag `--rules`
+      when rules $ do
+        let r = PP.rules ast
+        mapM_ print r
 
   -- End
   return ()

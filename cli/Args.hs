@@ -13,6 +13,7 @@ module Args
     , CommonArgs(..)
     , CommandArgs(..)
     , EbnfArgs(..)
+    , LalrArgs(..)
     ) where
 
 -- |Global arguments
@@ -26,13 +27,24 @@ newtype CommonArgs = CommonArgs
     deriving Show
 
 -- |Allowed commands
-newtype CommandArgs
+data CommandArgs
   = EbnfCmd EbnfArgs -- ^EBNF command
+  | LalrCmd LalrArgs -- ^LALR command
   deriving Show
 
 -- |EBNF command arguments
 data EbnfArgs = EbnfArgs
   { file   :: String   -- ^Input file
   , minify :: Bool     -- ^Print the minified grammar to output
+  , rules  :: Bool     -- ^Print the obtained rules
+  }
+    deriving Show
+
+-- |LALR command arguments
+data LalrArgs = LalrArgs
+  { grammar    :: String  -- ^Input grammar (file)
+  , collection :: Bool    -- ^Print the items sets collection
+  , set        :: Int     -- ^Print a specific items set
+  , table      :: Bool    -- ^Print the LALR table
   }
     deriving Show

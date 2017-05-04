@@ -16,6 +16,7 @@ module Main where
 
 import           Args
 import qualified Cmd.Ebnf
+import qualified Cmd.Lalr
 import           Data.Semigroup      ((<>))
 import           Options.Applicative
 
@@ -30,6 +31,7 @@ main = dispatch =<< execParser opts
 -- |Dispatch arguments to commands
 dispatch :: Args -> IO ()
 dispatch a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
+dispatch a@(Args _ (LalrCmd _)) = Cmd.Lalr.dispatch a
 
 -- |Arguments
 args :: Parser Args
@@ -44,4 +46,5 @@ commonArgs = CommonArgs
 -- |Commands arguments
 commandArgs :: Parser CommandArgs
 commandArgs = hsubparser
-  ( command "ebnf" (info Cmd.Ebnf.commandArgs (progDesc "Manipulate EBNF grammars")) )
+  ( command "ebnf" (info Cmd.Ebnf.commandArgs (progDesc "Manipulate EBNF grammars"))
+  <> command "lalr" (info Cmd.Lalr.commandArgs (progDesc "Generate LALR parsing table")))
