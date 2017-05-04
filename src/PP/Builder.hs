@@ -32,18 +32,18 @@ action t i r = fromMaybe LrError (Map.lookup (i, r) t)
 -- |LR actions for a LR parser
 data LrAction
   = LrShift Int
-  | LrReduce Int
+  | LrReduce Rule
   | LrGoto Int
   | LrError
   | LrAccept
     deriving(Eq)
 
 instance Show LrAction where
-  show (LrShift i)  = 's' : show i
-  show (LrReduce i) = 'r' : show i
-  show (LrGoto i)   = show i
-  show LrError      = ""
-  show LrAccept     = "acc"
+  show (LrShift i)  = "shift " ++ show i
+  show (LrReduce r) = "reduce " ++ show r
+  show (LrGoto i)   = "goto " ++ show i
+  show LrError      = "error"
+  show LrAccept     = "accept"
 
 -- |LR items set collection
 type LrCollection item = Vector.Vector (LrSet item)

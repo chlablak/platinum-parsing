@@ -1,12 +1,13 @@
 module PPTest.Builders.Lalr (specs) where
 
+import qualified Data.Map.Strict  as Map
 import qualified Data.Set         as Set
 import qualified Data.Vector      as Vector
 import           PP
 import           PP.Builders.Lalr
 import           Test.Hspec
 
-specs = describe "PPTest.Builders.Lalr" $
+specs = describe "PPTest.Builders.Lalr" $ do
 
   it "should build the LALR items set collection" $ do
     let rs = ruleSet [Rule "__start" [NonTerm "S", Empty],
@@ -48,3 +49,30 @@ specs = describe "PPTest.Builders.Lalr" $
     Set.toList (c Vector.! 4) `shouldBe` e4
     Set.toList (c Vector.! 5) `shouldBe` e5
     Set.toList (c Vector.! 6) `shouldBe` e6
+
+  it "should build the LALR parsing table" $ do
+    let r0 = Rule "S" [NonTerm "C", NonTerm "C", Empty]
+    let r1 = Rule "C" [Term 'c', NonTerm "C", Empty]
+    let r2 = Rule "C" [Term 'd', Empty]
+    let rs = ruleSet [Rule "__start" [NonTerm "S", Empty], r0, r1, r2]
+    let c = collection rs :: LrCollection LalrItem
+    let t = table c
+    Map.size t `shouldBe` 18
+    action t 0 (Term 'c') `shouldBe` LrShift 1
+    action t 0 (Term 'd') `shouldBe` LrShift 2
+    action t 0 (NonTerm "S") `shouldBe` LrGoto 4
+    action t 0 (NonTerm "C") `shouldBe` LrGoto 3
+    action t 1 (Term 'c') `shouldBe` LrShift 1
+    action t 1 (Term 'd') `shouldBe` LrShift 2
+    action t 1 (NonTerm "C") `shouldBe` LrGoto 5
+    action t 2 (Term 'c') `shouldBe` LrReduce r2
+    action t 2 (Term 'd') `shouldBe` LrReduce r2
+    action t 2 Empty `shouldBe` LrReduce r2
+    action t 3 (Term 'c') `shouldBe` LrShift 1
+    action t 3 (Term 'd') `shouldBe` LrShift 2
+    action t 3 (NonTerm "C") `shouldBe` LrGoto 6
+    action t 4 Empty `shouldBe` LrAccept
+    action t 5 (Term 'c') `shouldBe` LrReduce r1
+    action t 5 (Term 'd') `shouldBe` LrReduce r1
+    action t 5 Empty `shouldBe` LrReduce r1
+    action t 6 Empty `shouldBe` LrReduce r0

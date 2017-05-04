@@ -582,7 +582,7 @@
 			\subitem et qui aura besoin des fonctions suivantes: \hs{closure}, \hs{goto} et \hs{first}
 			
 			\item fusion de la collection LR(1) pour avoir une collection LALR(1) de plus petite taille
-			\subitem soit une fonction \hs{fusion :: LrSet Lr1Item -> Either String (LrSet LalrItem)}
+			\subitem soit une fonction \hs{fusion :: LrCollection Lr1Item -> LrCollection LalrItem}
 			\subitem avec \hs{data LalrItem = LalrItem Rule Int Rule}
 			
 			\item génération de la table LALR proprement dite
@@ -622,15 +622,16 @@
 		
 		La construction de la collection LALR peut être faîte à partir de la collection LR(1). Pour cela nous avons une fonction \hs{fusion} qui s'occupe de mettre ensemble les set d'items ayant le même coeur. L'implémentation se trouve dans \hs{PP.Builders.Lalr} et les tests dans \hs{PPTest.Builders.Lalr}.\\
 		
-		\todo{\\}
-		
-		Pour finir le \textit{pipeline} de l'extrait de code ci-dessus:
+		Pour finir, la construction de la table de \textit{parsing} LALR se trouve dans \hs{PP.Builders.Lalr}. Ce qui nous amène à l'API suivante (continuation du code ci-dessus):
 		\begin{minted}{haskell}
 			-- Construct the LALR items set collection
 			let c = collection rs :: LrCollection LalrItem
 			
 			-- Construct the final LALR table
 			let t = table c
+			
+			-- Get an action from the table (state 2, term 'c')
+			action t 2 (Term 'c')
 		\end{minted}
 		\captionof{listing}{Passage du \hs{RuleSet} en \hs{LrTable}}
 		

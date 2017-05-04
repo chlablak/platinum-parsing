@@ -37,18 +37,55 @@ instance Show LalrItem where
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where
   collection rs = fusion (collection rs :: LrCollection Lr1Item)
-  table c = {-Map.union (Map.fromList $ actions c)-} (Map.fromList $ gotos c)
+  table c = Map.union (Map.fromList actions) (Map.fromList gotos)
     where
-      actions c = undefined
-      gotos c = [((i, s), LrGoto $ fromJust j)
+      actions = shifts ++ reduces ++ accepts -- conflicts ?
+      shifts = [((i, s), LrShift $ fromJust j)
+              | i <- [0..(Vector.length c - 1)]
+              , let is = c Vector.! i
+              , s <- symbol is
+              , term s
+              , let j = next gs i s
+              , isJust j]
+      reduces = [((i, la), LrReduce r)
                | i <- [0..(Vector.length c - 1)]
                , let is = c Vector.! i
-               , s <- symbol is
-               , nonTerm s
-               , let j = goto c i s
-               , isJust j]
+               , x@(LalrItem r@(Rule s _) _ la) <- reductibles is
+               , s /= "__start"]
+      accepts = [((i, Empty), LrAccept)
+               | i <- [0..(Vector.length c - 1)]
+               , let is = c Vector.! i
+               , acc is]
+      gotos = [((i, s), LrGoto $ fromJust j)
+             | i <- [0..(Vector.length c - 1)]
+             , let is = c Vector.! i
+             , s <- symbol is
+             , nonTerm s
+             , let j = next gs i s
+             , isJust j]
+      term (Term _) = True
+      term _        = False
+      reductibles is = [x | x <- Set.toList is, reductible x]
+      reductible (LalrItem (Rule _ xs) p _) = L.length xs == p + 1
+      acc = not . Set.null . Set.filter
+        (\(LalrItem (Rule s _) p la) -> s == "__start" && p == 1 && la == Empty)
       nonTerm (NonTerm _) = True
       nonTerm _           = False
+      gs = gotoSet c
+
+-- |Construct the GOTO table
+type GotoSet = Map.Map (Int, Rule) Int
+gotoSet :: LrCollection LalrItem -> GotoSet
+gotoSet c = Map.fromList [((i, s), fromJust j)
+                        | i <- [0..(Vector.length c - 1)]
+                        , let is = c Vector.! i
+                        , s <- symbol is
+                        , let j = goto c i s
+                        , isJust j]
+
+-- |Get the next items set
+next :: GotoSet -> Int -> Rule -> Maybe Int
+next gs i r = Map.lookup (i, r) gs
 
 -- |Find the next possible symbols
 symbol :: LrSet LalrItem -> [Rule]
