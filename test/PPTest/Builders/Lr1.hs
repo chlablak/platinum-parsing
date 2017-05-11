@@ -13,7 +13,8 @@ specs = describe "PPTest.Builders.Lr1" $
                       Rule "S" [NonTerm "C", NonTerm "C", Empty],
                       Rule "C" [Term 'c', NonTerm "C", Empty],
                       Rule "C" [Term 'd', Empty]]
-    let c = collection rs :: LrCollection Lr1Item
+    let fs = firstSet rs
+    let c = collection rs fs :: LrCollection Lr1Item
     let e0 = [Lr1Item (Rule "C" [Term 'c',NonTerm "C",Empty]) 0 (Term 'c'),
               Lr1Item (Rule "C" [Term 'c',NonTerm "C",Empty]) 0 (Term 'd'),
               Lr1Item (Rule "C" [Term 'd',Empty]) 0 (Term 'c'),

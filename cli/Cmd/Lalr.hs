@@ -19,6 +19,7 @@ import qualified Data.Map.Strict     as Map
 import           Data.Semigroup      ((<>))
 import qualified Data.Set            as Set
 import qualified Data.Vector         as Vector
+import qualified Log
 import           Options.Applicative
 import qualified PP
 import qualified PP.Builders.Lalr    as Lalr
@@ -29,7 +30,7 @@ commandArgs :: Parser CommandArgs
 commandArgs = LalrCmd <$> lalrArgs
   where
     lalrArgs = LalrArgs
-      <$> strOption ( long "grammar" <> short 'g' <> metavar "FILENAME"
+      <$> strOption ( long "file" <> short 'f' <> metavar "FILENAME"
         <> help "Input grammar (EBNF)" )
       <*> switch ( long "collection"
         <> help "Print the items sets collection" )
@@ -51,25 +52,32 @@ dispatch (Args (CommonArgs verbose) (LalrCmd (LalrArgs grammar collection set ta
       putStrLn $ "error in file '" ++ grammar ++ "':"
       print err
     Right ast -> do
-      let rules = PP.rules ast
+      rules <- Log.task verbose "compute rules" (\() -> PP.rules ast)
       case PP.extend rules of
         Left err -> do
           putStrLn "cannot extend the input grammar:"
           print err
         Right g' -> do
           let rs = PP.ruleSet g'
-          let c = PP.collection rs :: PP.LrCollection Lalr.LalrItem
+          let fs = PP.firstSet rs
+          c <- Log.task verbose "compute collection" (\() ->
+            PP.collection rs fs :: PP.LrCollection Lalr.LalrItem)
 
           -- Flag '--collection'
-          when collection $ printCollection c
+          when collection $ do
+            Log.msg verbose 0 "LALR" "collection:"
+            printCollection c
 
           -- Flag '--set'
-          when (set /= (-1)) $ printSet set $ c Vector.! set
+          when (set /= (-1)) $
+            printSet set $ c Vector.! set
 
           -- Flag '--table'
           when table $ do
-            let t = PP.table c
+            t <- Log.task verbose "compute table" (\() -> PP.table c)
+            Log.msg verbose 0 "LALR" "table:"
             printTable t
+
   -- End
   return ()
 

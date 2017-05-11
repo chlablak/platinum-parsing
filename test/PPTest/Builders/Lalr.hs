@@ -14,7 +14,8 @@ specs = describe "PPTest.Builders.Lalr" $ do
                       Rule "S" [NonTerm "C", NonTerm "C", Empty],
                       Rule "C" [Term 'c', NonTerm "C", Empty],
                       Rule "C" [Term 'd', Empty]]
-    let c = collection rs :: LrCollection LalrItem
+    let fs = firstSet rs
+    let c = collection rs fs :: LrCollection LalrItem
     let e0 = [LalrItem (Rule "C" [Term 'c',NonTerm "C",Empty]) 0 (Term 'c'),
               LalrItem (Rule "C" [Term 'c',NonTerm "C",Empty]) 0 (Term 'd'),
               LalrItem (Rule "C" [Term 'd',Empty]) 0 (Term 'c'),
@@ -55,7 +56,8 @@ specs = describe "PPTest.Builders.Lalr" $ do
     let r1 = Rule "C" [Term 'c', NonTerm "C", Empty]
     let r2 = Rule "C" [Term 'd', Empty]
     let rs = ruleSet [Rule "__start" [NonTerm "S", Empty], r0, r1, r2]
-    let c = collection rs :: LrCollection LalrItem
+    let fs = firstSet rs
+    let c = collection rs fs :: LrCollection LalrItem
     let t = table c
     Map.size t `shouldBe` 18
     action t 0 (Term 'c') `shouldBe` LrShift 1

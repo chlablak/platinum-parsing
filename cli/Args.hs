@@ -37,6 +37,7 @@ data EbnfArgs = EbnfArgs
   { file   :: String   -- ^Input file
   , minify :: Bool     -- ^Print the minified grammar to output
   , rules  :: Bool     -- ^Print the obtained rules
+  , first  :: Bool     -- ^Print the first set
   }
     deriving Show
 

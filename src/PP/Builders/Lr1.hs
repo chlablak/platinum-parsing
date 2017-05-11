@@ -33,7 +33,7 @@ instance Show Lr1Item where
 
 -- |LrBuilder instance for Lr1Item
 instance LrBuilder Lr1Item where
-  collection rs = collection' initialise
+  collection rs fs = collection' initialise
     where
       collection' c = case list c of
         [] -> c
@@ -41,7 +41,7 @@ instance LrBuilder Lr1Item where
       list c = [g
               | is <- Vector.toList c
               , x <- symbol is
-              , let g = goto is x rs (firstSet rs)
+              , let g = goto is x rs fs
               , accept g c]
       accept is c = not (Set.null is) && Vector.notElem is c
       symbol is = L.nub [x
@@ -49,7 +49,7 @@ instance LrBuilder Lr1Item where
                        , let x = xs !! p
                        , x /= Empty]
       initialise =
-        Vector.singleton $ closure (Set.singleton start) rs (firstSet rs)
+        Vector.singleton $ closure (Set.singleton start) rs fs
       start = Lr1Item (head $ rule "__start" rs) 0 Empty
 
   -- |Not impl. yet
@@ -59,7 +59,7 @@ instance LrBuilder Lr1Item where
 closure :: LrSet Lr1Item -> RuleSet -> FirstSet -> LrSet Lr1Item
 closure is rs fs = case list is rs fs of
   [] -> is
-  xs -> Set.union is (closure (Set.fromList xs) rs fs)
+  xs -> Set.union is $ closure (Set.fromList xs) rs fs
   where
     list is rs fs = [Lr1Item r 0 t
                    | i <- Set.toList is
@@ -74,7 +74,7 @@ closure is rs fs = case list is rs fs of
 
 -- |Compute the GOTO of a items set for a given rule
 goto :: LrSet Lr1Item -> Rule -> RuleSet -> FirstSet -> LrSet Lr1Item
-goto is r = closure (Set.fromList [inc i | i <- Set.toList is, accept i r])
+goto is r = closure $ Set.fromList [inc i | i <- Set.toList is, accept i r]
   where
     inc (Lr1Item r p la) = Lr1Item r (p + 1) la
     accept (Lr1Item (Rule _ xs) p _) r = xs !! p == r

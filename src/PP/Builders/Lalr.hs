@@ -36,7 +36,7 @@ instance Show LalrItem where
 
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where
-  collection rs = fusion (collection rs :: LrCollection Lr1Item)
+  collection rs fs = fusion (collection rs fs :: LrCollection Lr1Item)
   table c = Map.union (Map.fromList actions) (Map.fromList gotos)
     where
       actions = shifts ++ reduces ++ accepts -- conflicts ?

@@ -92,13 +92,13 @@ specs = describe "PPTest.Grammars.Ebnf" $ do
   it "should handle translation to canonical rules (repeated sequences, left)" $
     let Right ast = parse "a = {b}, c;" :: To Syntax in
       rules ast `shouldBe` [Rule "a" [NonTerm "{<b>}", NonTerm "c", PP.Empty],
-                            Rule "{<b>}" [NonTerm "{<b>}", NonTerm "b", PP.Empty],
+                            Rule "{<b>}" [NonTerm "b", NonTerm "{<b>}", PP.Empty],
                             Rule "{<b>}" [PP.Empty]]
 
   it "should handle translation to canonical rules (repeated sequences, right)"$
     let Right ast = parse "a = c, {b};" :: To Syntax in
       rules ast `shouldBe` [Rule "a" [NonTerm "c", NonTerm "{<b>}", PP.Empty],
-                            Rule "{<b>}" [NonTerm "{<b>}", NonTerm "b", PP.Empty],
+                            Rule "{<b>}" [NonTerm "b", NonTerm "{<b>}", PP.Empty],
                             Rule "{<b>}" [PP.Empty]]
 
   it "should handle translation to canonical rules (grouped sequences)" $
@@ -125,5 +125,5 @@ specs = describe "PPTest.Grammars.Ebnf" $ do
                             Rule "[(<b>,<c>)|{<d>}]" [PP.Empty],
                             Rule "a" [NonTerm "(<f>|<g>)",PP.Empty],
                             Rule "a" [NonTerm "[(<b>,<c>)|{<d>}]",NonTerm "e",PP.Empty],
-                            Rule "{<d>}" [NonTerm "{<d>}",NonTerm "d",PP.Empty],
+                            Rule "{<d>}" [NonTerm "d",NonTerm "{<d>}",PP.Empty],
                             Rule "{<d>}" [PP.Empty]]

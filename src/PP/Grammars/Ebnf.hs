@@ -225,7 +225,7 @@ instance InputGrammar Primary where
     R.NonTerm x : R.Rule x [R.Empty] : [R.Rule x [r, R.Empty] | r <- rules dl]
   rules a@(RepeatedSequence dl)    = let x = stringify a in
     R.NonTerm x : R.Rule x [R.Empty] :
-      [R.Rule x [R.NonTerm x, r, R.Empty] | r <- rules dl]
+      [R.Rule x [r, R.NonTerm x, R.Empty] | r <- rules dl]
   rules a@(GroupedSequence dl)     = let x = stringify a in
     R.NonTerm x : [R.Rule x [r, R.Empty] | r <- rules dl]
   rules (PrimaryMetaIdentifier mi) = rules mi

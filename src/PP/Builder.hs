@@ -54,6 +54,6 @@ type LrSet item = Set.Set item
 -- |LR parser common functions
 class Ord item => LrBuilder item where
   -- |Build the items set collection
-  collection :: RuleSet -> LrCollection item
+  collection :: RuleSet -> FirstSet -> LrCollection item
   -- |Build the parsing table
   table :: LrCollection item -> LrTable
