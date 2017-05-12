@@ -17,7 +17,7 @@ import           PP.Rule     (Rule)
 import qualified Text.Parsec as P
 
 -- |Syntactic sugar
--- For exemple: `case PP.parse input :: (PP.To Ebnf.Syntax) of ...`
+-- For exemple: `case PP.toAst input :: (PP.To Ebnf.Syntax) of ...`
 type To ast = Either P.ParseError ast
 
 -- |Type class for grammars
@@ -25,8 +25,8 @@ class (Eq ast, Show ast) => InputGrammar ast where
   -- |Entry parser
   parser :: P.Parsec String () ast
   -- |Parse String to AST
-  parse :: String -> To ast
-  parse = P.parse parser ""
+  toAst :: String -> To ast
+  toAst = P.parse parser ""
   -- |AST to String
   stringify :: ast -> String
   stringify = show

@@ -14,9 +14,11 @@ For more informations about this tool, please look at:
 module PP
     ( module PP.Builder
     , module PP.Grammar
+    , module PP.Parser
     , module PP.Rule
     ) where
 
 import           PP.Builder
 import           PP.Grammar
+import           PP.Parser
 import           PP.Rule

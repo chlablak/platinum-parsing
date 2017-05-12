@@ -21,6 +21,8 @@ library
                      , PP.Builders.Lr1
                      , PP.Grammar
                      , PP.Grammars.Ebnf
+                     , PP.Parser
+                     , PP.Parsers.Lr
                      , PP.Rule
   build-depends:       base >= 4.7 && < 5
                      , parsec
