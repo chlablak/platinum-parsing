@@ -24,26 +24,35 @@ import           Options.Applicative
 import qualified PP
 import qualified PP.Builders.Lalr    as Lalr
 import qualified PP.Grammars.Ebnf    as Ebnf
+import qualified PP.Parsers.Lr       as Lr
 
 -- |Command arguments
 commandArgs :: Parser CommandArgs
 commandArgs = LalrCmd <$> lalrArgs
   where
     lalrArgs = LalrArgs
-      <$> strOption ( long "file" <> short 'f' <> metavar "FILENAME"
+      <$> strOption ( long "file"
+        <> short 'f'
+        <> metavar "FILENAME"
         <> help "Input grammar (EBNF)" )
       <*> switch ( long "collection"
         <> help "Print the items sets collection" )
       <*> option auto ( long "set"
         <> metavar "I"
         <> value (-1)
-        <> help "Print a specific items set")
+        <> help "Print a specific items set" )
       <*> switch ( long "table"
         <> help "Print the LALR parsing table" )
+      <*> strOption ( long "test-with"
+        <> short 't'
+        <> metavar "FILENAME"
+        <> value ""
+        <> help "Test the table on a source file" )
 
 -- |Command dispatch
 dispatch :: Args -> IO ()
-dispatch (Args (CommonArgs verbose) (LalrCmd (LalrArgs grammar collection set table))) = do
+dispatch (Args (CommonArgs verbose)
+               (LalrCmd (LalrArgs grammar collection set table testWith))) = do
 
   -- Compute common things
   input <- readFile grammar
@@ -86,12 +95,18 @@ dispatch (Args (CommonArgs verbose) (LalrCmd (LalrArgs grammar collection set ta
                   Left err -> do
                     putStrLn "grammar is not LALR:"
                     mapM_ putStrLn err
-                  Right t ->
+                  Right t -> do
 
                     -- Flag '--table'
                     when table $ do
                       Log.msg verbose 0 "LALR" "table:"
                       printTable t
+
+                    -- Flag '--test-with'
+                    when (testWith /= "") $ do
+                      source <- readFile testWith
+                      let cfg = PP.parse' t $ PP.config t source :: [Lr.LrConfig]
+                      printCfg cfg
 
   -- End
   return ()
@@ -113,3 +128,13 @@ printSet i is = do
 -- |Pretty print for table
 printTable :: PP.LrTable -> IO ()
 printTable = putStrLn . Map.showTree
+
+-- |Pretty print for configuration
+printCfg :: [Lr.LrConfig] -> IO ()
+printCfg = printCfg' . head
+  where
+    printCfg' (Lr.LrConfig c _ a i) = do
+      putStr $ "after " ++ show c ++ " iterations: "
+      case a of
+        PP.LrAccept -> putStrLn "input accepted"
+        _           -> putStrLn $ "error at " ++ show (take 20 i)

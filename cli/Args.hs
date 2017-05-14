@@ -48,5 +48,6 @@ data LalrArgs = LalrArgs
   , collection :: Bool    -- ^Print the items sets collection
   , set        :: Int     -- ^Print a specific items set
   , table      :: Bool    -- ^Print the LALR table
+  , testWith   :: String  -- ^Test the LALR table on a source file
   }
     deriving Show
