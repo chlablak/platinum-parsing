@@ -58,7 +58,7 @@ specs = describe "PPTest.Builders.Lalr" $ do
     let rs = ruleSet [Rule "__start" [NonTerm "S", Empty], r0, r1, r2]
     let fs = firstSet rs
     let c = collection rs fs :: LrCollection LalrItem
-    let t = table c
+    let Right t = table c
     Map.size t `shouldBe` 18
     action t 0 (Term 'c') `shouldBe` LrShift 1
     action t 0 (Term 'd') `shouldBe` LrShift 2

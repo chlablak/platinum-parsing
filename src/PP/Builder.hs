@@ -62,4 +62,4 @@ class Ord item => LrBuilder item where
   -- |Build the items set collection
   collection :: RuleSet -> FirstSet -> LrCollection item
   -- |Build the parsing table
-  table :: LrCollection item -> LrTable
+  table :: LrCollection item -> Either [String] LrTable

@@ -10,11 +10,13 @@ Portability : portable
 module PP.Grammar
     ( To
     , InputGrammar(..)
+    , rules'
     ) where
 
+import           Control.Exception
 import           Data.Either
-import           PP.Rule     (Rule)
-import qualified Text.Parsec as P
+import           PP.Rule           (Rule)
+import qualified Text.Parsec       as P
 
 -- |Syntactic sugar
 -- For exemple: `case PP.parseAst input :: (PP.To Ebnf.Syntax) of ...`
@@ -32,3 +34,11 @@ class (Eq ast, Show ast) => InputGrammar ast where
   stringify = show
   -- |AST to canonical rules
   rules :: ast -> [Rule]
+
+-- |Exception-safe version of `rules`
+rules' :: (InputGrammar ast) => ast -> IO (Either String [Rule])
+rules' ast = do
+    a <- try (evaluate $ rules ast) :: IO (Either SomeException [Rule])
+    case a of
+        Left e  -> return $ Left $ head $ lines $ displayException e
+        Right r -> return $ Right r

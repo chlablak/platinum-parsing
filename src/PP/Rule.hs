@@ -16,6 +16,7 @@ module PP.Rule
     , RuleSet
     , ruleSet
     , rule
+    , check
       -- * Rules first set (Map)
     , FirstSet
     , firstSet
@@ -117,6 +118,26 @@ rule :: String -> RuleSet -> [Rule]
 rule name rs = case Map.lookup name rs of
   Nothing -> []
   Just xs -> map (Rule name) xs
+
+-- |Check a rule set, return: (errors, warnings)
+check :: RuleSet -> ([String], [String])
+check rs = (missing ++ leftRec, unused)
+  where
+    missing = ["missing non-terminal: " ++ n | n <- right, n `notElem` left]
+    leftRec = ["left-recusion: " ++ n | n <- left, hasLeftRec n]
+    unused = ["unused non-terminal: " ++ n
+              | n <- left
+              , n /= "__start"
+              , n `notElem` right]
+    hasLeftRec n = hasLeftRec' n /= []
+    hasLeftRec' n = [0 | (Rule _ (x:_)) <- rule n rs, hasLeftRec'' n x]
+    hasLeftRec'' n (NonTerm s) = n == s
+    hasLeftRec'' _ _           = False
+    left = Map.keys rs
+    right = nub $ concat [nonTerm xs | n <- left, (Rule _ xs) <- rule n rs]
+    nonTerm []               = []
+    nonTerm (NonTerm s : xs) = s : nonTerm xs
+    nonTerm (_:xs)           = nonTerm xs
 
 -- |First set type
 type FirstSet = Map.Map String [Rule]

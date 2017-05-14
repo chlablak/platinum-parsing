@@ -52,31 +52,46 @@ dispatch (Args (CommonArgs verbose) (LalrCmd (LalrArgs grammar collection set ta
       putStrLn $ "error in file '" ++ grammar ++ "':"
       print err
     Right ast -> do
-      rules <- Log.task verbose "compute rules" (\() -> PP.rules ast)
-      case PP.extend rules of
-        Left err -> do
-          putStrLn "cannot extend the input grammar:"
-          print err
-        Right g' -> do
-          let rs = PP.ruleSet g'
-          let fs = PP.firstSet rs
-          c <- Log.task verbose "compute collection" (\() ->
-            PP.collection rs fs :: PP.LrCollection Lalr.LalrItem)
+      Log.msg verbose 0 "LALR" "compute rules"
+      r <- PP.rules' ast
+      case r of
+        Left err -> putStrLn $ "cannot make rules: " ++ err
+        Right rules ->
+          case PP.extend rules of
+            Left err -> do
+              putStrLn "cannot extend the input grammar:"
+              print err
+            Right g' -> do
+              let rs = PP.ruleSet g'
+              let (errors, warnings) = PP.check rs
+              if errors /= [] then do
+                putStrLn "errors found in rules:"
+                mapM_ putStrLn errors
+              else do
+                let fs = PP.firstSet rs
+                c <- Log.task verbose "compute collection" (\() ->
+                  PP.collection rs fs :: PP.LrCollection Lalr.LalrItem)
 
-          -- Flag '--collection'
-          when collection $ do
-            Log.msg verbose 0 "LALR" "collection:"
-            printCollection c
+                -- Flag '--collection'
+                when collection $ do
+                  Log.msg verbose 0 "LALR" "collection:"
+                  printCollection c
 
-          -- Flag '--set'
-          when (set /= (-1)) $
-            printSet set $ c Vector.! set
+                -- Flag '--set'
+                when (set /= (-1)) $
+                  printSet set $ c Vector.! set
 
-          -- Flag '--table'
-          when table $ do
-            t <- Log.task verbose "compute table" (\() -> PP.table c)
-            Log.msg verbose 0 "LALR" "table:"
-            printTable t
+                t <- Log.task verbose "compute table" (\() -> PP.table c)
+                case t of
+                  Left err -> do
+                    putStrLn "grammar is not LALR:"
+                    mapM_ putStrLn err
+                  Right t ->
+
+                    -- Flag '--table'
+                    when table $ do
+                      Log.msg verbose 0 "LALR" "table:"
+                      printTable t
 
   -- End
   return ()

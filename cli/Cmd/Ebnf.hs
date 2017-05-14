@@ -35,12 +35,14 @@ commandArgs = EbnfCmd <$> ebnfArgs
         <> help "Print the obtained rules" )
       <*> switch ( long "first"
         <> help "Print the first set" )
+      <*> switch ( long "check"
+        <> help "Search for errors" )
 
 -- |Command dispatch
 dispatch :: Args -> IO ()
-dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs file minify rules first))) = do
+dispatch (Args (CommonArgs verbose)
+               (EbnfCmd (EbnfArgs file minify rules first check))) = do
 
-  -- Compute common things
   input <- readFile file
   case PP.parseAst input :: (PP.To Ebnf.Syntax) of
     Left err -> do
@@ -52,19 +54,36 @@ dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs file minify rules first))
         Log.msg verbose 0 "EBNF" "minified:"
         putStrLn (PP.stringify ast)
 
-      -- Flag `--rules`
-      when rules $ do
-        let r = PP.rules ast
-        Log.msg verbose 0 "EBNF" "rules:"
-        mapM_ print r
+      r <- PP.rules' ast
+      case r of
+        Left err -> putStrLn $ "cannot make rules: " ++ err
+        Right r ->
+          case PP.extend r of
+            Left err -> do
+              putStrLn "cannot extend the input grammar:"
+              print err
+            Right g' -> do
+              let rs = PP.ruleSet g'
+              let fs = PP.firstSet rs
 
-      -- Flag `--first`
-      when first $ do
-        let r = PP.rules ast
-        let rs = PP.ruleSet r
-        let fs = PP.firstSet rs
-        Log.msg verbose 0 "EBNF" "first set:"
-        mapM_ print $ Map.toList fs
+              -- Flag `--rules`
+              when rules $ do
+                Log.msg verbose 0 "EBNF" "rules:"
+                mapM_ print g'
+
+              -- Flag `--first`
+              when first $ do
+                Log.msg verbose 0 "EBNF" "first set:"
+                mapM_ print $ Map.toList fs
+
+              -- Flag `--check`
+              when check $ do
+                let (err, warn) = PP.check rs
+                Log.msg verbose 0 "EBNF" "check:"
+                Log.msg verbose 0 "EBNF" "errors:"
+                mapM_ putStrLn err
+                Log.msg verbose 0 "EBNF" "warnings:"
+                mapM_ putStrLn warn
 
   -- End
   return ()

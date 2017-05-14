@@ -37,9 +37,18 @@ instance Show LalrItem where
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where
   collection rs fs = fusion (collection rs fs :: LrCollection Lr1Item)
-  table c = Map.union (Map.fromList actions) (Map.fromList gotos)
+  table c = case actions of
+    Right act -> Right $ Map.union (Map.fromList act) (Map.fromList gotos)
+    Left err  -> Left err
     where
-      actions = shifts ++ reduces ++ accepts -- conflicts ?
+      actions = let act = shifts ++ reduces ++ accepts in
+        case conflict [] [] act of
+          [] -> Right act
+          xs -> Left xs
+      conflict _ con [] = con
+      conflict acc con ((k, v):xs) = case L.lookup k acc of
+        Nothing -> conflict ((k,v):acc) con xs
+        Just v2 -> conflict acc ((show k ++ " conflict: " ++ show v ++ " with " ++ show v2) : con) xs
       shifts = [((i, s), LrShift $ fromJust j)
               | i <- [0..(Vector.length c - 1)]
               , let is = c Vector.! i

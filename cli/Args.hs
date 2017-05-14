@@ -38,6 +38,7 @@ data EbnfArgs = EbnfArgs
   , minify :: Bool     -- ^Print the minified grammar to output
   , rules  :: Bool     -- ^Print the obtained rules
   , first  :: Bool     -- ^Print the first set
+  , check  :: Bool     -- ^Search for errors in grammar
   }
     deriving Show
 

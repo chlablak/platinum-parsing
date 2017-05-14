@@ -16,7 +16,7 @@ r6 = Rule "F" [Term 'x', Empty]
 rs = ruleSet [r0, r1, r2, r3, r4, r5, r6]
 fs = firstSet rs
 c = collection rs fs :: LrCollection LalrItem
-t = table c
+Right t = table c
 
 specs = describe "PPTest.Parsers.Lr" $ do
 
