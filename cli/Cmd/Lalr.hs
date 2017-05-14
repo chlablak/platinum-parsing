@@ -47,7 +47,7 @@ dispatch (Args (CommonArgs verbose) (LalrCmd (LalrArgs grammar collection set ta
 
   -- Compute common things
   input <- readFile grammar
-  case PP.toAst input :: (PP.To Ebnf.Syntax) of
+  case PP.parseAst input :: (PP.To Ebnf.Syntax) of
     Left err -> do
       putStrLn $ "error in file '" ++ grammar ++ "':"
       print err

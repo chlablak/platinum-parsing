@@ -11,21 +11,30 @@ module PP.Parsers.Lr
     ( LrConfig(..)
     ) where
 
-import qualified Data.Map.Strict as Map
-import           PP.Builder      (LrAction (..), LrTable (..), action)
-import           PP.Parser       (LrParser (..))
-import           PP.Rule         (Rule (..))
+import           PP.Builder (LrAction (..), LrTable (..), action, action')
+import           PP.Parser  (LrParser (..))
+import           PP.Rule    (Rule (..))
 
 -- |Configuration for LR parser
 data LrConfig = LrConfig
-  { lrStack :: [Int]    -- ^State stack
-  , lrInput :: String   -- ^Input
+  { lrCount  :: Int        -- ^Counter
+  , lrStack  :: [Int]      -- ^State stack
+  , lrAction :: LrAction   -- ^Action to do
+  , lrInput  :: String     -- ^Input
   } deriving (Eq, Show)
 
 instance LrParser LrConfig where
-  config = LrConfig [0]
-  parse = parse'
-
--- |LrParser.parse implementation
-parse' :: LrTable -> LrConfig -> Either String LrConfig
-parse' t c = undefined
+  config t i = LrConfig 0 [0] (action' t 0 i) i
+  next t (LrConfig c ss (LrShift s) (_:i)) =
+    LrConfig (c + 1) (s : ss) (action' t s i) i
+  next t (LrConfig c ss (LrReduce (Rule r xs)) i) =
+    LrConfig (c + 1) sr (action t m $ NonTerm r) i
+    where
+      sr@(m:_) = drop (length xs - 1) ss
+  next t (LrConfig c ss (LrGoto s) i) =
+    LrConfig (c + 1) (s : ss) (action' t s i) i
+  next _ c@(LrConfig _ _ LrError _)    = c
+  next _ c@(LrConfig _ _ LrAccept _)   = c
+  hasNext _ (LrConfig _ _ LrError _)  = False
+  hasNext _ (LrConfig _ _ LrAccept _) = False
+  hasNext _ _                         = True

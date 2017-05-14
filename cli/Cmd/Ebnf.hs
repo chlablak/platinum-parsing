@@ -42,7 +42,7 @@ dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs file minify rules first))
 
   -- Compute common things
   input <- readFile file
-  case PP.toAst input :: (PP.To Ebnf.Syntax) of
+  case PP.parseAst input :: (PP.To Ebnf.Syntax) of
     Left err -> do
       putStrLn $ "error in file '" ++ file ++ "':"
       print err

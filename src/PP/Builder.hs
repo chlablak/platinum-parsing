@@ -10,6 +10,7 @@ Portability : portable
 module PP.Builder
     ( LrTable(..)
     , action
+    , action'
     , LrAction(..)
     , LrCollection(..)
     , LrSet(..)
@@ -27,7 +28,12 @@ type LrTable = Map.Map (Int, Rule) LrAction
 
 -- |Get a LrAction from a LrTable
 action :: LrTable -> Int -> Rule -> LrAction
-action t i r = fromMaybe LrError (Map.lookup (i, r) t)
+action t i r    = fromMaybe LrError (Map.lookup (i, r) t)
+
+-- |Get a LrAction from a LrTable
+action' :: LrTable -> Int -> String -> LrAction
+action' t i []    = action t i Empty
+action' t i (x:_) = action t i $ Term x
 
 -- |LR actions for a LR parser
 data LrAction
