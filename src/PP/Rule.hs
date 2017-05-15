@@ -146,7 +146,10 @@ type FirstSet = Map.Map String [Rule]
 firstSet :: RuleSet -> FirstSet
 firstSet rs = Map.mapWithKey (\k _ -> find k rs) rs
   where
-    find name rs = nub . sort $ concatMap compute $ rule name rs
+    find name rs = nub . sort $ concatMap compute $ noLeftRec $ rule name rs
+    noLeftRec = filter (\(Rule a (x:_)) -> case x of
+      NonTerm b -> a /= b
+      _         -> True)
     compute (Rule _ [Empty]) = [Empty]
     compute (Rule name (x:xs)) = case compute x of
       [Empty] -> compute $ Rule name xs

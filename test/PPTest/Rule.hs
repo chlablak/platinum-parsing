@@ -66,3 +66,17 @@ specs = describe "PPTest.Rule" $ do
              ("D", [Term 'd']),
              ("__start", [Term 'a', Term 'b', Term 'c', Empty])]
     toList (firstSet (ruleSet r)) `shouldBe` e
+
+  it "should handle left recursion (firstSet)" $ do
+      let r = [Rule "__start" [NonTerm "E", Empty],
+               Rule "E" [NonTerm "E", Term '+', NonTerm "T", Empty],
+               Rule "E" [NonTerm "T", Empty],
+               Rule "T" [NonTerm "T", Term '*', NonTerm "F", Empty],
+               Rule "T" [NonTerm "F", Empty],
+               Rule "F" [Term '(', NonTerm "E", Term ')', Empty],
+               Rule "F" [Term 'x', Empty]]
+      let e = [("E", [Term '(', Term 'x']),
+               ("F", [Term '(', Term 'x']),
+               ("T", [Term '(', Term 'x']),
+               ("__start", [Term '(', Term 'x'])]
+      toList (firstSet (ruleSet r)) `shouldBe` e

@@ -33,8 +33,7 @@ instance LrParser LrConfig where
       sr@(m:_) = drop (length xs - 1) ss
   next t (LrConfig c ss (LrGoto s) i) =
     LrConfig (c + 1) (s : ss) (action' t s i) i
-  next _ c@(LrConfig _ _ LrError _)    = c
-  next _ c@(LrConfig _ _ LrAccept _)   = c
+  next _ c = c
   hasNext _ (LrConfig _ _ LrError _)  = False
   hasNext _ (LrConfig _ _ LrAccept _) = False
   hasNext _ _                         = True
