@@ -85,6 +85,32 @@
 	
 	\section{Introduction}
 		\todo{à faire à la fin}
+		
+	\section{Cadre du projet}
+		Dans cette section, nous allons mettre les documents fournis au début du projet. Ainsi un lecteur pourra connaître les spécifications initiales.
+		
+		\subsection{Énoncé original}
+			Pour faciliter l'écriture de compilateurs, ce travail de diplôme vise à réaliser un outil complet avec un environnement de développement intégré, permettant :
+			\begin{itemize}
+				\item d'éditer une grammaire selon une syntaxe de type BNF
+				\item d'analyser automatiquement cette BNF, de détecter les erreurs de syntaxe, incohérences et conflits de règles.
+				\item de générer dans n'importe quel langage de programmation cible, sur la base d'un template textuel fourni par l'utilisateur, les tables pour le lexer et le parser LALR.\\
+			\end{itemize}
+			
+			Ce travail de diplôme vise à développer un outil capable de remplacer "Gold Parsing System", un outil libre intéressant, mais malheureusement fortement pénalisé par des bugs récurrents. L'IDE sera réalisé sous la forme d'un plugin du logiciel oStudio d'Objectis, avec les technologies très en vogue C\# et WPF. Le générateur de compilateurs sera mis en ligne sur Internet en libre accès, permettant à la communauté Internet de bénéficier gratuitement de cette technologie. 
+			
+		\subsection{Cahier des charges original}
+			Les objectifs du travail sont :
+			\begin{itemize}
+				\item Analyser et formaliser la liste des fonctionnalités répondant aux besoins des différents types d'utilisateurs dans un cahier des charges fonctionnel.
+				\item Concevoir l'architecture de la solution.
+				\item Évaluer et sélectionner les briques technologiques à utiliser pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage.
+				\item Développer le module d'analyse BNF, capable de lire une grammaire selon la syntaxe EBNF, d'analyser la validité de la grammaire définie, d'aider la correction des erreurs et de tester la grammaire pour la reconnaissance d'un texte d'entrée.
+				\item Développer un module de génération des tables LALR et capable de les traduire dans un code source selon des modèles fournis par l'utilisateur, ce qui permet de cibler différents langages.
+				\item Intégrer l'ensemble dans un environnement de développement à sélectionner pour en faciliter l'usage.
+				\item Réaliser une démonstration finale de la solution développée en développant un lexer et un parser pour langage ISO CNC en C\#.
+				\item Fournir une documentation de conception et un rapport final du travail réalisé.
+			\end{itemize}
 	
 	\section{Études des cas d'utilisation}
 	\label{sec:etudes-des-cas-d-utilisation}
@@ -662,6 +688,30 @@
 			
 			L'affichage de la table LALR (flag \texttt{--table}) s'affiche encore comme la \hs{Map} qui contient la table, cela fera l'objet d'une amélioration future.
 			
+	\section{Définition de la grammaire du langage ISO CNC}
+		\todo{ok mais à test}
+	
+		\subsection{Écriture d'un petit programme en ISO CNC}
+			\todo{fourni}
+		
+	\section{Test d'une grammaire à partir d'un texte en entrée}
+		\todo{parser lr}
+	
+		\subsection{Analyse de la validité de la grammaire}
+			\todo{check, conflits}
+		
+		\subsection{Aide à la correction des erreurs de grammaire}
+			\todo{liste des erreurs trouvables, iso cnc}
+		
+		\subsection{Test avec des grammaires ambiguës simples}
+			\todo{PPTest}
+		
+		\subsection{Intégration au CLI}
+			\todo{--test-with, --check}
+			
+		\subsection{Test avec la grammaire ISO CNC}
+			\todo{}
+			
 	\section{TODO}
 		\todo{organisation du dossier du projet\\}
 		\todo{modules finaux de PP\\}
@@ -670,29 +720,6 @@
 		\todo{à faire à la fin}
 	
 	\section{Annexes}
-	
-		\subsection{Énoncé original}
-			Pour faciliter l'écriture de compilateurs, ce travail de diplôme vise à réaliser un outil complet avec un environnement de développement intégré, permettant :
-			\begin{itemize}
-				\item d'éditer une grammaire selon une syntaxe de type BNF
-				\item d'analyser automatiquement cette BNF, de détecter les erreurs de syntaxe, incohérences et conflits de règles.
-				\item de générer dans n'importe quel langage de programmation cible, sur la base d'un template textuel fourni par l'utilisateur, les tables pour le lexer et le parser LALR.\\
-			\end{itemize}
-			
-			Ce travail de diplôme vise à développer un outil capable de remplacer "Gold Parsing System", un outil libre intéressant, mais malheureusement fortement pénalisé par des bugs récurrents. L'IDE sera réalisé sous la forme d'un plugin du logiciel oStudio d'Objectis, avec les technologies très en vogue C\# et WPF. Le générateur de compilateurs sera mis en ligne sur Internet en libre accès, permettant à la communauté Internet de bénéficier gratuitement de cette technologie. 
-			
-		\subsection{Cahier des charges original}
-			Les objectifs du travail sont :
-			\begin{itemize}
-				\item Analyser et formaliser la liste des fonctionnalités répondant aux besoins des différents types d'utilisateurs dans un cahier des charges fonctionnel.
-				\item Concevoir l'architecture de la solution.
-				\item Évaluer et sélectionner les briques technologiques à utiliser pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage.
-				\item Développer le module d'analyse BNF, capable de lire une grammaire selon la syntaxe EBNF, d'analyser la validité de la grammaire définie, d'aider la correction des erreurs et de tester la grammaire pour la reconnaissance d'un texte d'entrée.
-				\item Développer un module de génération des tables LALR et capable de les traduire dans un code source selon des modèles fournis par l'utilisateur, ce qui permet de cibler différents langages.
-				\item Intégrer l'ensemble dans un environnement de développement à sélectionner pour en faciliter l'usage.
-				\item Réaliser une démonstration finale de la solution développée en développant un lexer et un parser pour langage ISO CNC en C\#.
-				\item Fournir une documentation de conception et un rapport final du travail réalisé.
-			\end{itemize}
 			
 		\subsection{Table des figures}
 			\begingroup

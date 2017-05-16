@@ -80,3 +80,25 @@ specs = describe "PPTest.Rule" $ do
                ("T", [Term '(', Term 'x']),
                ("__start", [Term '(', Term 'x'])]
       toList (firstSet (ruleSet r)) `shouldBe` e
+
+  it "should check a rules set for missing non-terminals" $ do
+    let r = [Rule "__start" [NonTerm "A", Empty],
+             Rule "A" [NonTerm "B", NonTerm "C", Empty],
+             Rule "C" [Empty]]
+    let e = (["missing non-terminal: B"], [])
+    check (ruleSet r) `shouldBe` e
+
+  it "should check a rules set for unused non-terminals" $ do
+    let r = [Rule "__start" [NonTerm "A", Empty],
+             Rule "A" [NonTerm "B", Empty],
+             Rule "B" [Empty],
+             Rule "C" [Empty]]
+    let e = ([], ["unused non-terminal: C"])
+    check (ruleSet r) `shouldBe` e
+
+  it "should check a rules set for left recursion" $ do
+    let r = [Rule "__start" [NonTerm "A", Empty],
+             Rule "A" [NonTerm "B", Empty],
+             Rule "B" [NonTerm "B", Term 'b', Empty]]
+    let e = (["direct left-recusion: B"], [])
+    check (ruleSet r) `shouldBe` e

@@ -124,7 +124,7 @@ check :: RuleSet -> ([String], [String])
 check rs = (missing ++ leftRec, unused)
   where
     missing = ["missing non-terminal: " ++ n | n <- right, n `notElem` left]
-    leftRec = ["left-recusion: " ++ n | n <- left, hasLeftRec n]
+    leftRec = ["direct left-recusion: " ++ n | n <- left, hasLeftRec n]
     unused = ["unused non-terminal: " ++ n
               | n <- left
               , n /= "__start"

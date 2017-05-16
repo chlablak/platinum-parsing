@@ -58,23 +58,42 @@ specs = describe "PPTest.Builders.Lalr" $ do
     let rs = ruleSet [Rule "__start" [NonTerm "S", Empty], r0, r1, r2]
     let fs = firstSet rs
     let c = collection rs fs :: LrCollection LalrItem
-    let Right t = table c
-    Map.size t `shouldBe` 18
-    action t 0 (Term 'c') `shouldBe` LrShift 1
-    action t 0 (Term 'd') `shouldBe` LrShift 2
-    action t 0 (NonTerm "S") `shouldBe` LrGoto 4
-    action t 0 (NonTerm "C") `shouldBe` LrGoto 3
-    action t 1 (Term 'c') `shouldBe` LrShift 1
-    action t 1 (Term 'd') `shouldBe` LrShift 2
-    action t 1 (NonTerm "C") `shouldBe` LrGoto 5
-    action t 2 (Term 'c') `shouldBe` LrReduce r2
-    action t 2 (Term 'd') `shouldBe` LrReduce r2
-    action t 2 Empty `shouldBe` LrReduce r2
-    action t 3 (Term 'c') `shouldBe` LrShift 1
-    action t 3 (Term 'd') `shouldBe` LrShift 2
-    action t 3 (NonTerm "C") `shouldBe` LrGoto 6
-    action t 4 Empty `shouldBe` LrAccept
-    action t 5 (Term 'c') `shouldBe` LrReduce r1
-    action t 5 (Term 'd') `shouldBe` LrReduce r1
-    action t 5 Empty `shouldBe` LrReduce r1
-    action t 6 Empty `shouldBe` LrReduce r0
+    case table c of
+      Left err -> show err `shouldBe` "not an error"
+      Right t -> do
+        Map.size t `shouldBe` 18
+        action t 0 (Term 'c') `shouldBe` LrShift 1
+        action t 0 (Term 'd') `shouldBe` LrShift 2
+        action t 0 (NonTerm "S") `shouldBe` LrGoto 4
+        action t 0 (NonTerm "C") `shouldBe` LrGoto 3
+        action t 1 (Term 'c') `shouldBe` LrShift 1
+        action t 1 (Term 'd') `shouldBe` LrShift 2
+        action t 1 (NonTerm "C") `shouldBe` LrGoto 5
+        action t 2 (Term 'c') `shouldBe` LrReduce r2
+        action t 2 (Term 'd') `shouldBe` LrReduce r2
+        action t 2 Empty `shouldBe` LrReduce r2
+        action t 3 (Term 'c') `shouldBe` LrShift 1
+        action t 3 (Term 'd') `shouldBe` LrShift 2
+        action t 3 (NonTerm "C") `shouldBe` LrGoto 6
+        action t 4 Empty `shouldBe` LrAccept
+        action t 5 (Term 'c') `shouldBe` LrReduce r1
+        action t 5 (Term 'd') `shouldBe` LrReduce r1
+        action t 5 Empty `shouldBe` LrReduce r1
+        action t 6 Empty `shouldBe` LrReduce r0
+
+  it "should detect conflicts during the table generation" $ do
+    let r0 = Rule "__start" [NonTerm "S", Empty]
+    let r1 = Rule "S" [Term 'a', NonTerm "A", Term 'd', Empty]
+    let r2 = Rule "S" [Term 'b', NonTerm "B", Term 'd', Empty]
+    let r3 = Rule "S" [Term 'a', NonTerm "B", Term 'e', Empty]
+    let r4 = Rule "S" [Term 'b', NonTerm "A", Term 'e', Empty]
+    let r5 = Rule "A" [Term 'c', Empty]
+    let r6 = Rule "B" [Term 'c', Empty]
+    let rs = ruleSet [r0, r1, r2, r3, r4, r5, r6]
+    let fs = firstSet rs
+    let c = collection rs fs :: LrCollection LalrItem
+    let e = ["(4,'e') conflict: reduce B -> 'c',$ with reduce A -> 'c',$",
+             "(4,'d') conflict: reduce B -> 'c',$ with reduce A -> 'c',$"]
+    case table c of
+      Left err -> err `shouldBe` e
+      Right t  -> show t `shouldBe` "an error"
