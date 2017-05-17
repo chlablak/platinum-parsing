@@ -34,7 +34,7 @@ commandArgs = LalrCmd <$> lalrArgs
       <$> strOption ( long "file"
         <> short 'f'
         <> metavar "FILENAME"
-        <> help "Input grammar (EBNF)" )
+        <> help "Input file" )
       <*> switch ( long "collection"
         <> help "Print the items sets collection" )
       <*> option auto ( long "set"
@@ -50,61 +50,64 @@ commandArgs = LalrCmd <$> lalrArgs
         <> help "Test the table on a source file" )
 
 -- |Command dispatch
-dispatch :: Args -> IO ()
-dispatch (Args (CommonArgs verbose)
-               (LalrCmd (LalrArgs grammar collection set table testWith))) = do
-
-  -- Compute common things
-  input <- readFile grammar
+dispatch :: Args -> Log.Logger
+dispatch (Args _ (LalrCmd args)) = do
+  Log.pushTag "lalr"
+  input <- Log.io $ readFile $ lalrFile args
   case PP.parseAst input :: (PP.To Ebnf.Syntax) of
     Left err -> do
-      putStrLn $ "error in file '" ++ grammar ++ "':"
-      print err
+      Log.err $ "error in file '" ++ lalrFile args ++ "':"
+      Log.err $ show err
+      Log.abort
     Right ast -> do
-      Log.msg verbose 0 "LALR" "compute rules"
-      r <- PP.rules' ast
+      r <- Log.io $ PP.rules' ast
       case r of
-        Left err -> putStrLn $ "cannot make rules: " ++ err
+        Left err ->  do
+          Log.err $ "cannot make rules: " ++ err
+          Log.abort
         Right rules ->
           case PP.extend rules of
             Left err -> do
-              putStrLn "cannot extend the input grammar:"
-              print err
+              Log.err "cannot extend the input grammar:"
+              Log.err err
             Right g' -> do
               let rs = PP.ruleSet g'
               let (errors, warnings) = PP.check rs
+              mapM_ Log.warn warnings
               if errors /= [] then do
-                putStrLn "errors found in rules:"
-                mapM_ putStrLn errors
+                Log.err "errors found in rules:"
+                mapM_ Log.err errors
+                Log.abort
               else do
                 let fs = PP.firstSet rs
-                c <- Log.task verbose "compute collection" (\() ->
-                  PP.collection rs fs :: PP.LrCollection Lalr.LalrItem)
+                Log.pushTask "compute collection and table"
+                let c = PP.collection rs fs :: PP.LrCollection Lalr.LalrItem
 
                 -- Flag '--collection'
-                when collection $ do
-                  Log.msg verbose 0 "LALR" "collection:"
+                when (showCollection args) $
                   printCollection c
 
                 -- Flag '--set'
-                when (set /= (-1)) $
-                  printSet set $ c Vector.! set
+                when (showSetI args /= (-1)) $
+                  printSet (showSetI args) $ c Vector.! showSetI args
 
-                t <- Log.task verbose "compute table" (\() -> PP.table c)
+                let t = PP.table c
                 case t of
                   Left err -> do
-                    putStrLn "grammar is not LALR:"
-                    mapM_ putStrLn err
+                    Log.err "grammar is not LALR:"
+                    mapM_ Log.err err
+                    Log.abort
                   Right t -> do
+                    Log.popTask
 
                     -- Flag '--table'
-                    when table $ do
-                      Log.msg verbose 0 "LALR" "table:"
+                    when (showTable args) $ do
+                      Log.info "table:"
                       printTable t
 
                     -- Flag '--test-with'
-                    when (testWith /= "") $ do
-                      source <- readFile testWith
+                    when (testWith args /= "") $ do
+                      source <- Log.io $ readFile $ testWith args
                       let cfg = PP.parse' t $ PP.config t source :: [Lr.LrConfig]
                       printCfg cfg
 
@@ -112,29 +115,27 @@ dispatch (Args (CommonArgs verbose)
   return ()
 
 -- |Pretty print for collection
-printCollection :: PP.LrCollection Lalr.LalrItem -> IO ()
-printCollection = Vector.imapM_ printCollection'
-  where
-    printCollection' i is = do
-      printSet i is
-      putStrLn ""
+printCollection :: PP.LrCollection Lalr.LalrItem -> Log.Logger
+printCollection c = do
+  Log.info "collection:"
+  Vector.imapM_ printSet c
 
 -- |Pretty print for set
-printSet :: Int -> PP.LrSet Lalr.LalrItem -> IO()
+printSet :: Int -> PP.LrSet Lalr.LalrItem -> Log.Logger
 printSet i is = do
-  putStrLn $ "items set " ++ show i ++ ":"
-  mapM_ print $ Set.toList is
+  Log.info $ "items set " ++ show i ++ ":"
+  mapM_ (Log.out . show) $ Set.toList is
 
 -- |Pretty print for table
-printTable :: PP.LrTable -> IO ()
-printTable = putStrLn . Map.showTree
+printTable :: PP.LrTable -> Log.Logger
+printTable = Log.out . Map.showTree
 
 -- |Pretty print for configuration
-printCfg :: [Lr.LrConfig] -> IO ()
+printCfg :: [Lr.LrConfig] -> Log.Logger
 printCfg = printCfg' . head
   where
     printCfg' (Lr.LrConfig c _ a i) = do
-      putStr $ "after " ++ show c ++ " iterations: "
+      Log.info $ "after " ++ show c ++ " iterations: "
       case a of
-        PP.LrAccept -> putStrLn "input accepted"
-        _           -> putStrLn $ "error at " ++ show (take 20 i)
+        PP.LrAccept -> Log.info "input accepted"
+        _           -> Log.err $ "error at " ++ show (take 20 i)

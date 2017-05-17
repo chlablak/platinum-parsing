@@ -22,7 +22,7 @@ data Args = Args CommonArgs CommandArgs
 
 -- |Common arguments
 newtype CommonArgs = CommonArgs
-  { verbose :: Bool -- ^Verbose output
+  { setLevel :: Int -- ^Verbosity level
   }
     deriving Show
 
@@ -30,24 +30,24 @@ newtype CommonArgs = CommonArgs
 data CommandArgs
   = EbnfCmd EbnfArgs -- ^EBNF command
   | LalrCmd LalrArgs -- ^LALR command
-  deriving Show
+    deriving Show
 
 -- |EBNF command arguments
 data EbnfArgs = EbnfArgs
-  { file   :: String   -- ^Input file
-  , minify :: Bool     -- ^Print the minified grammar to output
-  , rules  :: Bool     -- ^Print the obtained rules
-  , first  :: Bool     -- ^Print the first set
-  , check  :: Bool     -- ^Search for errors in grammar
+  { ebnfFile     :: String   -- ^Input file
+  , showMinified :: Bool     -- ^Print the minified grammar to output
+  , showRules    :: Bool     -- ^Print the obtained rules
+  , showFirstSet :: Bool     -- ^Print the first set
+  , doCheck      :: Bool     -- ^Search for errors in grammar
   }
     deriving Show
 
 -- |LALR command arguments
 data LalrArgs = LalrArgs
-  { grammar    :: String  -- ^Input grammar (file)
-  , collection :: Bool    -- ^Print the items sets collection
-  , set        :: Int     -- ^Print a specific items set
-  , table      :: Bool    -- ^Print the LALR table
-  , testWith   :: String  -- ^Test the LALR table on a source file
+  { lalrFile       :: String   -- ^Input file
+  , showCollection :: Bool    -- ^Print the items sets collection
+  , showSetI       :: Int     -- ^Print a specific items set
+  , showTable      :: Bool    -- ^Print the LALR table
+  , testWith       :: String  -- ^Test the LALR table on a source file
   }
     deriving Show

@@ -27,7 +27,9 @@ commandArgs :: Parser CommandArgs
 commandArgs = EbnfCmd <$> ebnfArgs
   where
     ebnfArgs = EbnfArgs
-      <$> strOption ( long "file" <> short 'f' <> metavar "FILENAME"
+      <$> strOption ( long "file"
+        <> short 'f'
+        <> metavar "FILENAME"
         <> help "Input file" )
       <*> switch ( long "minify"
         <> help "Print the minified grammar" )
@@ -39,51 +41,54 @@ commandArgs = EbnfCmd <$> ebnfArgs
         <> help "Search for errors" )
 
 -- |Command dispatch
-dispatch :: Args -> IO ()
-dispatch (Args (CommonArgs verbose)
-               (EbnfCmd (EbnfArgs file minify rules first check))) = do
-
-  input <- readFile file
+dispatch :: Args -> Log.Logger
+dispatch (Args _ (EbnfCmd args)) = do
+  Log.pushTag "ebnf"
+  input <- Log.io $ readFile $ ebnfFile args
   case PP.parseAst input :: (PP.To Ebnf.Syntax) of
     Left err -> do
-      putStrLn $ "error in file '" ++ file ++ "':"
-      print err
+      Log.err $ "error in file '" ++ ebnfFile args ++ "':"
+      Log.err $ show err
+      Log.abort
     Right ast -> do
       -- Flag `--minify`
-      when minify $ do
-        Log.msg verbose 0 "EBNF" "minified:"
-        putStrLn (PP.stringify ast)
+      when (showMinified args) $ do
+        Log.info "minified:"
+        Log.out $ PP.stringify ast
 
-      r <- PP.rules' ast
+      r <- Log.io $ PP.rules' ast
       case r of
-        Left err -> putStrLn $ "cannot make rules: " ++ err
+        Left err -> do
+          Log.err $ "cannot make rules: " ++ err
+          Log.abort
         Right r ->
           case PP.extend r of
             Left err -> do
-              putStrLn "cannot extend the input grammar:"
-              print err
+              Log.err "cannot extend the input grammar:"
+              Log.err err
+              Log.abort
             Right g' -> do
               let rs = PP.ruleSet g'
               let fs = PP.firstSet rs
 
               -- Flag `--rules`
-              when rules $ do
-                Log.msg verbose 0 "EBNF" "rules:"
-                mapM_ print g'
+              when (showRules args) $ do
+                Log.info "rules:"
+                mapM_ (Log.out . show) g'
 
               -- Flag `--first`
-              when first $ do
-                Log.msg verbose 0 "EBNF" "first set:"
-                mapM_ print $ Map.toList fs
+              when (showFirstSet args) $ do
+                Log.info "first set:"
+                mapM_ (Log.out . show) $ Map.toList fs
 
               -- Flag `--check`
-              when check $ do
+              when (doCheck args) $ do
                 let (err, warn) = PP.check rs
-                Log.msg verbose 0 "EBNF" "check:"
-                Log.msg verbose 0 "EBNF" "errors:"
-                mapM_ putStrLn err
-                Log.msg verbose 0 "EBNF" "warnings:"
-                mapM_ putStrLn warn
+                Log.pushTag "check"
+                Log.info "errors:"
+                mapM_ Log.info err
+                Log.info "warnings:"
+                mapM_ Log.info warn
 
   -- End
   return ()
