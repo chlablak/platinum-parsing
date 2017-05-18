@@ -96,9 +96,12 @@ specs = describe "PPTest.Rule" $ do
     let e = ([], ["unused non-terminal: C"])
     check (ruleSet r) `shouldBe` e
 
-  it "should check a rules set for left recursion" $ do
+  it "should check a rules set for direct left recursion" $ do
     let r = [Rule "__start" [NonTerm "A", Empty],
              Rule "A" [NonTerm "B", Empty],
              Rule "B" [NonTerm "B", Term 'b', Empty]]
     let e = (["direct left-recusion: B"], [])
     check (ruleSet r) `shouldBe` e
+
+  it "should check a rules set for indirect left recursion" $
+    pendingWith "not impl. yet"

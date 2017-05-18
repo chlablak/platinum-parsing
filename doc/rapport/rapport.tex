@@ -13,7 +13,11 @@
 \usepackage{longtable}
 \usepackage{minted}
 \usepackage{caption}
+\usepackage{dirtree}
+\usepackage{tikz}
+\usepackage{forest}
 
+\usetikzlibrary{shapes,arrows,positioning,shadows,matrix,automata}
 \pagestyle{fancy}
 
 % Entêtes et pieds de page
@@ -574,14 +578,14 @@
 			Actuellement la seule commande disponible donne le résultat suivant:
 			\begin{minted}{console}
 				prompt$ pp ebnf -f doc/grammars/ebnf.ebnf --minify
-			\end{minted}
-			\begin{minted}{console}
 				<syntax>=<syntax rule>,{<syntax rule>};
 				<syntax rule>=<meta identifier>,"=",<definitions list>,";";
 				<definitions list>=<single definition>,{"|",<single definition>};
 				...
 			\end{minted}
+			\captionof{listing}{Première commande du CLI}
 			
+			\paragraph{}
 			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
 			
 	\section{Génération de la table LALR}		
@@ -596,7 +600,7 @@
 			\subitem (on utilise le type \hs{Either} car la fonction peut échouer)
 			
 			\item générer les collections d'items LR(1) canonique pour la grammaire
-			\subitem soit une fonction \hs{collection :: LrBuilder item => RuleSet -> LrCollection item}
+			\subitem soit une fonction \hs{collection :: LrBuilder item => RuleSet -> FirstSet -> LrCollection item}
 			\subitem avec \hs{type LrCollection item = Vector (LrSet item)} 
 			\subitem et \hs{type LrSet item = Set item}
 			\subitem et \hs{data Lr1Item = Lr1Item Rule Int Rule}
@@ -646,7 +650,7 @@
 		Pour finir, la construction de la table de \textit{parsing} LALR se trouve dans \hs{PP.Builders.Lalr}. Ce qui nous amène à l'API suivante (continuation du code ci-dessus):
 		\begin{minted}{haskell}
 			-- Construct the LALR items set collection
-			let c = collection rs :: LrCollection LalrItem
+			let c = collection rs fs :: LrCollection LalrItem
 			
 			-- Construct the final LALR table
 			let t = table c
@@ -659,7 +663,7 @@
 		\paragraph{}
 		L'implémentation ci-dessus se base sur le Dragon Book \cite{dragonbook}, chapitres 4.7 à 4.7.4. Les chapitres suivants proposent une construction plus efficace (en terme de mémoire notamment) de la table LALR, cela pourrait faire l'objet d'une amélioration pour plus tard.\\
 		
-		Notons que la table n'est pas stockée comme un tableau à deux dimensions. En effet, une bonne partie de la table est positionnée à \hs{LrError}, il ne sert à rien de stocker cela. Nous utilisons donc une \hs{Data.Map.Strict} à la place.
+		Notons que la table n'est pas stockée comme un tableau à deux dimensions. En effet, une bonne partie de la table est positionnée à \hs{LrError}, il ne sert à rien de stocker cela. Nous utilisons donc une \hs{Data.Map.Strict} à la place: \url{http://hackage.haskell.org/package/containers-0.5.10.2/docs/Data-Map-Strict.html}.
 		
 		\subsection{Test avec une grammaire simple}
 			Les tests ont utilisés la grammaire suivantes:
@@ -673,8 +677,6 @@
 			L'intégration au CLI se fait dans le module \hs{Cmd.Lalr}, les différentes options sont:
 			\begin{minted}{console}
 				prompt$ pp lalr --help
-			\end{minted}
-			\begin{minted}{console}
 				Usage: pp lalr (-g|--grammar FILENAME) [--collection] [--set I] [--table]
 					Generate LALR parsing table
 				
@@ -685,36 +687,209 @@
 					--table                  Print the LALR parsing table
 					-h,--help                Show this help text
 			\end{minted}
+			\captionof{listing}{Aide de la commande LALR du CLI}
 			
+			\paragraph{}
 			L'affichage de la table LALR (flag \texttt{--table}) s'affiche encore comme la \hs{Map} qui contient la table, cela fera l'objet d'une amélioration future.
 			
 	\section{Définition de la grammaire du langage ISO CNC}
-		\todo{ok mais à test}
-	
-		\subsection{Écriture d'un petit programme en ISO CNC}
-			\todo{fourni}
+		À présent que nous avons un générateur de table LALR, et avant d'implémenter le \textit{parser} LALR même, nous allons définir la grammaire EBNF du langage ISO CNC \cite{gcode}. Cela nous permettra d'avoir une base pour les tests à venir.\\
+		
+		Pour écrire cette grammaire, celle-ci n'étant pas trouvable sur Internet, nous partons d'un programme écrit en ISO CNC et on en extrait des règles de production. Nous pouvons procéder ainsi car nous avons seulement besoin d'une grammaire pour les tests, pas une grammaire exacte du langage ISO CNC.\\
+		
+		Le programme se trouve dans le dossier \texttt{trials/iso-cnc-prog/}, la grammaire quant à elle dans le fichier \texttt{doc/grammars/iso-cnc.ebnf}. Pour le moment cela n'est qu'un premier jet, nous avons besoin d'implémenter la partie suivante (test des grammaires) pour la vérifier et éventuellement la corriger. Nous reviendrons donc dessus à la fin de la prochaine section.
 		
 	\section{Test d'une grammaire à partir d'un texte en entrée}
-		\todo{parser lr}
-	
-		\subsection{Analyse de la validité de la grammaire}
-			\todo{check, conflits}
+		Dans cette section nous nous intéressons aux tests possibles sur une grammaire, afin de la valider. Commençons par isoler les différentes erreurs possibles dans notre cas:
+		\begin{enumerate}
+			\item Syntaxe de la grammaire fausse
+			\item Transformation en règles canoniques impossible
+			\item Impossible d'augmenter la grammaire
+			\item Non-terminal manquant
+			\item Récursion à gauche (directe et indirecte)
+			\item Grammaire non-LALR
+			\item Grammaire invalide pour le langage voulu\\
+		\end{enumerate} 
 		
-		\subsection{Aide à la correction des erreurs de grammaire}
-			\todo{liste des erreurs trouvables, iso cnc}
+		Les points 1 à 3 sont actuellement déjà géré par PP. Nous allons donc commencer par les points 4 et 5, qui peuvent être détectés directement au niveau des règles canoniques. Nous ajoutons donc une fonction dans \hs{PP.Rule}:
+		\begin{minted}{haskell}
+			check :: RuleSet -> ([String], [String])
+		\end{minted}
+		\captionof{listing}{Signature de la fonction \hs{PP.Rule.check}}
 		
-		\subsection{Test avec des grammaires ambiguës simples}
-			\todo{PPTest}
+		\paragraph{}
+		Celle-ci prend un ensemble de règles canoniques, et retourne une paire \hs{(errors, warnings)} avec \hs{errors} une liste de non-terminaux manquants et/ou ayant une récursion à gauche (uniquement directe pour le moment), et \hs{warnings} une liste des non-terminaux inutilisés. Cette approche nous permet d'ajouter d'autres types d'erreurs et/ou \textit{warnings} sans avoir à toucher une autre partie du code.\\
+		
+		Passons maintenant au point 6, une grammaire est non-LALR si, lors de la génération de la table, des conflits \textit{shift/reduce} et/ou \textit{reduce/reduce} apparaissent. Ces conflits sont ignorés par la fonction de génération actuelle, cependant ajouter leur détection est très simple:
+		\begin{minted}{haskell}
+			-- Ancienne version 
+			table :: LrCollection item -> LrTable
+			
+			-- Nouvelle version avec détection des conflits
+			table :: LrCollection item -> Either [String] LrTable
+		\end{minted}
+		\captionof{listing}{Modification de \hs{PP.Builder.table} pour détecter les conflits}
+		
+		\paragraph{}
+		Pour finir penchons-nous sur le point 7. Pour celui-ci nous avons une table LALR générée correctement, et on souhaite valider si cette table \textit{parse} effectivement le langage défini par la grammaire. Cela nécessite l'implémentation d'un \textit{parser} LR:
+		\begin{figure}[H]
+			\centering
+			\begin{tikzpicture}
+				\draw (3,4) rectangle (5,5) node[pos=.5] {Input};
+				\draw (0,2) rectangle (2,3) node[pos=.5] {State stack};
+				\draw (3,2) rectangle (5,3) node[pos=.5] {Parser LR};
+				\draw (6,2) rectangle (8,3) node[pos=.5] {Output};
+				\draw (3,0) rectangle (5,1) node[pos=.5] {LALR table};
+				
+				\draw[->] (3,2.5) -- (2,2.5);
+				\draw[->] (5,2.5) -- (6,2.5);
+				\draw[->] (4,3) -- (4,4);
+				\draw[->] (4,2) -- (4,1);
+			\end{tikzpicture}
+			\caption{Schéma d'un analyseur syntaxique (\textit{parser})}
+		\end{figure}
+		
+		Que nous allons mettre dans les modules suivants:
+		\begin{figure}[H]
+			\centering
+			\begin{tabular}{ll}
+				\hs{PP.Parser} & Classe de type pour les \textit{parsers}\\
+				\hs{PP.Parsers.Lr} & Implémentation du \textit{parser} LR\\
+			\end{tabular}
+		\end{figure}
+		
+		L'implémentation minimale d'un \textit{parser} LR se trouve dans la classe de type:
+		\begin{minted}{haskell}
+			class LrParser config where
+				config :: LrTable -> String -> config
+				next :: LrTable -> config -> config
+				hasNext :: LrTable -> config -> Bool
+		\end{minted}
+		\captionof{listing}{Classe de type (minimale) \hs{PP.Parser.LrParser}}
+		
+		\paragraph{}
+		\hs{config} prend la chaîne en entrée et la place dans une configuration de départ. \hs{next} effectue une itération du \textit{parser} et \hs{hasNext} vérifie si il reste une itération à effectuer, ce qui n'est plus le cas lorsque une erreur est rencontrée, ou lorsque l'entrée a été acceptée. La classe de type est complétée par une fonction \hs{parse :: LrTable -> config -> config} qui effectue le \textit{parsing} complet. Notons qu'il y a aussi une fonction \hs{parse' :: LrTable -> config -> [config]} qui fait la même chose que \hs{parse}, mais en gardant toutes les configurations intermédiaires.\\
+		
+		La configuration pour notre \textit{parser} LR est la suivante:
+		\begin{minted}{haskell}
+			-- |Configuration for LR parser
+			data LrConfig = LrConfig
+				{ lrCount  :: Int        -- ^Counter
+				, lrStack  :: [Int]      -- ^State stack
+				, lrAction :: LrAction   -- ^Action to do
+				, lrInput  :: String     -- ^Input
+				} deriving (Eq, Show)
+		\end{minted}
+		\captionof{listing}{Configuration d'un \textit{parser} LR}
+		
+		\paragraph{}
+		Grâce à cette fonction \hs{parse'} nous pouvons, au niveau du CLI,  afficher toutes les configurations de l'analyse syntaxique ayant pu amener à une erreur. L'objectif du point 7 est donc rempli. \\
+		
+		Les tests ont été ajoutés aux modules suivants:
+		\begin{figure}[H]
+			\centering
+			\begin{tabular}{ll}
+				\hs{PPTest.Rule} & \textit{should check a rules set for missing non-terminals}\\
+				& \textit{should check a rules set for unused non-terminals}\\
+				& \textit{should check a rules set for direct left recursion}\\
+				\hs{PPTest.Builders.Lalr} & \textit{should detect conflicts during the table generation}\\
+				\hs{PPTest.Parsers.Lr} & \textit{should build the first configuration}\\
+				& \textit{should parse a simple grammar correctly}\\
+				& \textit{should detect an error in input}\\
+			\end{tabular}
+		\end{figure}
 		
 		\subsection{Intégration au CLI}
-			\todo{--test-with, --check}
+		\label{subsec:test-grammaire-integration-au-cli}
+			L'intégration au CLI est très simple et vient en l'ajout de deux nouveaux arguments: \texttt{--check} et \texttt{--test-with}. Afin de mettre en évidence leur utilisation et la détection correcte des erreurs (en plus des tests unitaires), nous avons mis dans le dossier \texttt{doc/grammars/wrong} des grammaires fausses mettant en évidence les différents problèmes possibles.\\
 			
-		\subsection{Test avec la grammaire ISO CNC}
-			\todo{}
+			Comme exemples:
+			\begin{minted}{console}
+				prompt$ pp ebnf -f doc/grammars/wrong/03-direct-left-recursion.ebnf --check
+				[PP][INFO] starting...
+				[PP][INFO] verbosity: 30
+				[PP][EBNF][CHECK][INFO] errors:
+				[PP][EBNF][CHECK][INFO] direct left-recusion: A
+				[PP][EBNF][CHECK][INFO] warnings:
+				
+				prompt$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
+				[PP][INFO] starting...
+				[PP][INFO] verbosity: 30
+				[PP][LALR][TASK][START] compute collection and table
+				[PP][LALR][TASK][END] in 5ms, compute collection and table
+				[PP][LALR][INFO] after 32 iterations: 
+				[PP][LALR][INFO] input accepted
+				
+				prompt$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
+				[PP][INFO] starting...
+				[PP][INFO] verbosity: 30
+				[PP][LALR][TASK][START] compute collection and table
+				[PP][LALR][TASK][END] in 2ms, compute collection and table
+				[PP][LALR][INFO] after 44 iterations: 
+				[PP][LALR][ERROR] error at ")+x)\n"
+			\end{minted}
+			\captionof{listing}{Exemples de tests avec le CLI}
+			
+			\subsubsection{\textit{Refactoring} du CLI}
+				Si l'intégration au CLI était simple, cela a mis en évidence un problème d'organisation du CLI. En effet le \hs{Main} redirigeait les arguments à la bonne commande, et celle-ci utilisait ceux-ci directement:
+				\begin{minted}{haskell}
+					-- |Dispatch arguments to commands (Main)
+					dispatch :: Args -> IO ()
+					dispatch a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
+					dispatch a@(Args _ (LalrCmd _)) = Cmd.Lalr.dispatch a
+					
+					-- |Command dispatch (Cmd.Lalr)
+					dispatch :: Args -> IO ()
+					dispatch (Args (CommonArgs verbose) (LalrCmd (LalrArgs {- ... -}))) = do
+						-- ... 
+						when verbose $ -- ...
+						-- ...
+						
+					-- |Command dispatch (Cmd.Ebnf)
+					dispatch :: Args -> IO ()
+					dispatch (Args (CommonArgs verbose) (EbnfCmd (EbnfArgs {- ... -}))) = do
+						-- ... 
+						when verbose $ -- ...
+						-- ...
+				\end{minted} 
+				\captionof{listing}{Première version de l'organisation du CLI}
+				
+				\paragraph{}
+				Le principal problème, entre autre, de cette approche, est que la gestion de la \textit{verbosity level} était propre à chaque commande, amenant à du code difficile à maintenir. Nous avons donc ajouter un module \hs{Log} qui s'occupera de tout ce qui est IO, ainsi les fonctions seront plus claires et l'affichage sera uniforme pour toutes les commandes.\\
+				
+				Le \hs{Main} devient donc un peu plus compliqué, cependant cette approche sépare mieux les responsabilités entre les modules et la maintenance devient plus aisée:
+				\begin{minted}{haskell}
+					-- |Dispatch arguments to commands (Main)
+					dispatch :: Args -> Log.Logger
+					dispatch args@(Args (CommonArgs l) _) = do
+						Log.start l "pp"
+						Log.autoFlush True
+						Log.info "starting..."
+						Log.info $ "verbosity: " ++ show l
+						dispatch' args
+							where
+								dispatch' :: Args -> Log.Logger
+								dispatch' a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
+								dispatch' a@(Args _ (LalrCmd _)) = Cmd.Lalr.dispatch a
+								
+					-- |Command dispatch (Ebnf)
+					dispatch :: Args -> Log.Logger
+					dispatch (Args _ (EbnfCmd args)) = do
+						Log.pushTag "ebnf"
+						-- tout est gere par `Log` 
+				\end{minted}
+				\captionof{listing}{Nouvelle version de l'organisation du CLI}
+				
+				\paragraph{}
+				Un exemple de la nouvelle sortie (avec les tags) peut être vu dans les exemples de la \autoref{subsec:test-grammaire-integration-au-cli}.
+			
+		\subsection{Validation de la grammaire ISO CNC}
+			\todo{\\}
 			
 	\section{TODO}
 		\todo{organisation du dossier du projet\\}
 		\todo{modules finaux de PP\\}
+		\todo{état actuel de PP, futur...\\}
 
 	\section{Conclusion}
 		\todo{à faire à la fin}

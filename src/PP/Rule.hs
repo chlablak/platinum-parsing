@@ -54,6 +54,7 @@ instance Show Rule where
   show (Concat xs) = "Concat " ++ show xs
 
 -- |Uniformize a list of rules
+-- `uniformize = sort . nub . concatMap (flatten . clean)`
 uniformize :: [Rule] -> [Rule]
 uniformize = sort . nub . concatMap (flatten . clean)
 

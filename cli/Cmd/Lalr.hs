@@ -70,6 +70,7 @@ dispatch (Args _ (LalrCmd args)) = do
             Left err -> do
               Log.err "cannot extend the input grammar:"
               Log.err err
+              Log.abort
             Right g' -> do
               let rs = PP.ruleSet g'
               let (errors, warnings) = PP.check rs

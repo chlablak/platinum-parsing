@@ -1,0 +1,2 @@
+A = "a", A | B; (* missing a start rule *)
+B = "b";
