@@ -1,0 +1,9 @@
+STATE $length(lr.states)$
+TERM $length(lr.terms)$
+$lr.terms:{term|$if(term.isEmpty)$EMPTY$else$$term.symbol$$endif$
+}$NONTERM $length(lr.nonTerms)$
+$lr.nonTerms:{nonTerm|$nonTerm.name$
+}$TABLE $lr.table.total$
+ROW $length(lr.table.rows)$
+$lr.table.rows:{row|$row.state.id$ $if(row.isTerm)$TERM $if(row.term.isEmpty)$EMPTY$else$$row.term.symbol$$endif$$else$NONTERM $row.nonTerm.name$$endif$ $if(row.action.isReduce)$REDUCE $row.action.reduce.name$ $row.action.reduce.length$$elseif(row.action.isShift)$SHIFT $row.action.shift$$elseif(row.action.isGoto)$GOTO $row.action.goto$$elseif(row.action.isError)$ERROR$else$ACCEPT$endif$
+}$

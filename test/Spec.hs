@@ -5,6 +5,7 @@ import qualified PPTest.Builders.Lr1
 import qualified PPTest.Grammars.Ebnf
 import qualified PPTest.Parsers.Lr
 import qualified PPTest.Rule
+import qualified PPTest.Templates.Lr
 import           Test.Hspec
 
 main :: IO ()
@@ -15,3 +16,4 @@ main = hspec $
     PPTest.Builders.Lr1.specs
     PPTest.Builders.Lalr.specs
     PPTest.Parsers.Lr.specs
+    PPTest.Templates.Lr.specs

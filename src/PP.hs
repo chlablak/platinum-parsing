@@ -16,9 +16,11 @@ module PP
     , module PP.Grammar
     , module PP.Parser
     , module PP.Rule
+    , module PP.Template
     ) where
 
 import           PP.Builder
 import           PP.Grammar
 import           PP.Parser
 import           PP.Rule
+import           PP.Template

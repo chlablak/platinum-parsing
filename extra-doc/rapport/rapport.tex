@@ -29,7 +29,7 @@
 \rfoot{}
 
 % Commands
-\newcommand{\todo}[1]{\textcolor{red}{TODO\ifthenelse{\equal{#1}{}}{}{:} #1}}
+\newcommand{\todo}[1]{\textcolor{red}{TODO\ifthenelse{\equal{#1}{}}{}{:} #1}\\}
 \newcommand{\hs}[1]{\mintinline{haskell}{#1}}
 
 % No subsubsection in tableofcontent
@@ -485,7 +485,7 @@
 		\subsection{Définition de l'AST pour la grammaire choisie}
 			À présent que le langage pour la grammaire a été choisi (EBNF), nous devons spécifier sa propre grammaire pour implémenter le parser. La norme ISO/IEC 14977:1996 nous donne cela, réécrit ci-après:
 			
-			\inputminted{ebnf}{../grammars/ebnf.ebnf}
+			\inputminted{ebnf}{../../doc/grammars/ebnf.ebnf}
 			\captionof{listing}{EBNF utilisé pour se définir lui-même}
 			
 			\paragraph{}
@@ -884,8 +884,79 @@
 				Un exemple de la nouvelle sortie (avec les tags) peut être vu dans les exemples de la \autoref{subsec:test-grammaire-integration-au-cli}.
 			
 		\subsection{Validation de la grammaire ISO CNC}
-			\todo{\\}
+			\todo{}
 			
+		\subsection{Test sur une grammaire C modifiée}
+			\todo{}
+			
+	\section{Génération des tables dans un langage cible}
+		Maintenant que les tests ont été réalisés, nous pouvons nous pencher sur la génération de la table LALR dans un langage autre que Haskell. Pour cela nous avons besoin de deux choses: un modèle (\textit{template}) sur lequel se baser, et donc un moteur de \textit{template}.\\
+		
+		Il existe plusieurs bibliothèques pour cela (\url{https://stackoverflow.com/questions/5770168/templating-packages-for-haskell}), nos choix sont \texttt{heterocephalus} \cite{heterocephalus} qui propose une syntaxe simple avec l'interpolation de variables, ainsi que des structures de contrôles (\texttt{if}, \texttt{forall}, ...) qui seront nécessaires dans notre cas, et \texttt{HStringTemplate} \cite{hstringtemplate} qui propose à peu près la même chose.\\
+		
+		Pour le choix final entre ces deux moteurs, nous allons mettre en évidence certaines de leurs caractéristiques par rapport à nos besoins:
+		\begin{figure}[H]
+			\centering
+			\begin{tabular}{l|cc}
+				\textbf{Caractéristique} & \textbf{\texttt{heterocephalus}} & \textbf{\texttt{HStringTemplate}}\\
+				\hline
+				Modèle pré-compilé & Oui & \textbf{Non}\\
+				Interpolation typé & \textbf{Oui} & Non\\
+				Interpolation de variable & \textbf{Oui} & \textbf{Oui}\\
+				Structure conditionnelle & \textbf{Oui} & \textbf{Oui}\\
+				Structure de boucle & \textbf{Oui} & \textbf{Oui}\\
+				Langage extensible & \textbf{Oui} & Non\\
+			\end{tabular}
+			\caption{Choix du \textit{template engine}}
+		\end{figure}
+		
+		Cette table montre que \texttt{heterocephalus} est plus riche que \texttt{HStringTemplate}, cela est principalement du au fait que le \textit{template} de l'utilisateur est compilé à la compilation et pas à l'exécution. Cependant cette méthode oblige à recompiler le CLI à chaque fois qu'on créer un nouveau \textit{template}, ce qui n'est pas notre objectif. Nous allons donc utiliser \texttt{HStringTemplate}, ses faiblesses au niveau du langage devront cependant être compensées par plus de variables \textit{interpolables}.\\
+		
+		Une autre option serait de créer notre propre moteur qui répondrait parfaitement à nos besoins. Néanmoins cela demanderait d'avantage d'heures de travail que celles à disposition. Nous laissons donc cette possibilité comme une éventuelle amélioration future.\\
+				
+		Le \textit{template engine} étant choisi, il nous reste encore à définir quelles variables seront nécessaires pour la génération des tables du côté de la personne voulant écrire un \textit{template} pour un langage cible:
+		\begin{itemize}
+			\item table LALR
+			\subitem (subdivisée par type d'actions ?)
+			\item nombre/liste des états
+			\item nombre/liste des terminaux
+			\item nombre/liste des non-terminaux
+			\item nombre d'états à réduire pour chaque non-terminal
+			\item nom de la règle associée pour chaque état\\
+		\end{itemize}
+		
+		Ces variables seront placées dans un module \hs{PP.Templates.Lr}, les comportements communs seront quant à eux placés dans \hs{PP.Template}:
+		\begin{minted}{haskell}
+			-- dans `PP.Template`:
+			class Template context where
+				-- |Put the context into StringTemplate attributes
+				attributes :: context -> StringTemplate String -> StringTemplate String
+				-- |Compile a template with a given context
+				compile :: context -> String -> String
+				compile c t = render $ attributes c $ newSTMP t
+				
+			-- dans `PP.Templates.Lr`:
+			newtype LrContext = LrContext Int -- exemple
+			
+			-- |Construct the context for LR table
+			context :: Int -> LrContext
+			context = LrContext
+			
+			instance Template LrContext where
+				attributes (LrContext x) = setAttribute "x" x
+		\end{minted}
+		\captionof{listing}{Approche pour la partie \textit{template}}
+		
+		\paragraph{}
+		Cette approche est extensible et sépare les différentes responsabilités. Le code \hs{compile (context 3) "it's the number $x$"} donnera en sortie: \texttt{"it's the number 3"}.\\
+		
+		\todo{}
+		
+		\todo{documenter variables interpolables}
+		
+		\subsection{Intégration au CLI}
+			\todo{}	
+		
 	\section{TODO}
 		\todo{organisation du dossier du projet\\}
 		\todo{modules finaux de PP\\}
@@ -1037,6 +1108,12 @@
 						
 					\bibitem{ebnftobnf} EBNF to BNF,\\
 						\url{http://lampwww.epfl.ch/teaching/archive/compilation-ssc/2000/part4/parsing/node3.html}\\
+						
+					\bibitem{heterocephalus} Heterocephalus, A type-safe template engine for working with popular front end development tools,\\
+						\url{https://hackage.haskell.org/package/heterocephalus}\\
+						
+					\bibitem{hstringtemplate} HStringTemplate, A port of the Java library by Terrence Parr,\\
+						\url{http://hackage.haskell.org/package/HStringTemplate}\\
 						
 				\end{thebibliography}
 			\endgroup
