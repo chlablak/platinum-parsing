@@ -22,9 +22,10 @@ import qualified Data.Vector         as Vector
 import qualified Log
 import           Options.Applicative
 import qualified PP
-import qualified PP.Builders.Lalr    as Lalr
-import qualified PP.Grammars.Ebnf    as Ebnf
-import qualified PP.Parsers.Lr       as Lr
+import qualified PP.Builders.Lalr    as Builder
+import qualified PP.Grammars.Ebnf    as Grammar
+import qualified PP.Parsers.Lr       as Parser
+import qualified PP.Templates.Lr     as Template
 
 -- |Command arguments
 commandArgs :: Parser CommandArgs
@@ -48,13 +49,17 @@ commandArgs = LalrCmd <$> lalrArgs
         <> metavar "FILENAME"
         <> value ""
         <> help "Test the table on a source file" )
+      <*> strOption ( long "template"
+        <> metavar "FILENAME"
+        <> value ""
+        <> help "Specify a template file to use" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
 dispatch (Args _ (LalrCmd args)) = do
   Log.pushTag "lalr"
   input <- Log.io $ readFile $ lalrFile args
-  case PP.parseAst input :: (PP.To Ebnf.Syntax) of
+  case PP.parseAst input :: (PP.To Grammar.Syntax) of
     Left err -> do
       Log.err $ "error in file '" ++ lalrFile args ++ "':"
       Log.err $ show err
@@ -82,7 +87,7 @@ dispatch (Args _ (LalrCmd args)) = do
               else do
                 let fs = PP.firstSet rs
                 Log.pushTask "compute collection and table"
-                let c = PP.collection rs fs :: PP.LrCollection Lalr.LalrItem
+                let c = PP.collection rs fs :: PP.LrCollection Builder.LalrItem
 
                 -- Flag '--collection'
                 when (showCollection args) $
@@ -109,20 +114,27 @@ dispatch (Args _ (LalrCmd args)) = do
                     -- Flag '--test-with'
                     when (testWith args /= "") $ do
                       source <- Log.io $ readFile $ testWith args
-                      let cfg = PP.parse' t $ PP.config t source :: [Lr.LrConfig]
+                      let cfg = PP.parse' t $ PP.config t source :: [Parser.LrConfig]
                       printCfg cfg
+
+                    -- Flag '--template'
+                    when (template args /= "") $ do
+                      te <- Log.io $ readFile $ template args
+                      let compiled = PP.compile (Template.context t) te
+                      Log.info "compiled template:"
+                      Log.out compiled
 
   -- End
   return ()
 
 -- |Pretty print for collection
-printCollection :: PP.LrCollection Lalr.LalrItem -> Log.Logger
+printCollection :: PP.LrCollection Builder.LalrItem -> Log.Logger
 printCollection c = do
   Log.info "collection:"
   Vector.imapM_ printSet c
 
 -- |Pretty print for set
-printSet :: Int -> PP.LrSet Lalr.LalrItem -> Log.Logger
+printSet :: Int -> PP.LrSet Builder.LalrItem -> Log.Logger
 printSet i is = do
   Log.info $ "items set " ++ show i ++ ":"
   mapM_ (Log.out . show) $ Set.toList is
@@ -132,10 +144,10 @@ printTable :: PP.LrTable -> Log.Logger
 printTable = Log.out . Map.showTree
 
 -- |Pretty print for configuration
-printCfg :: [Lr.LrConfig] -> Log.Logger
+printCfg :: [Parser.LrConfig] -> Log.Logger
 printCfg = printCfg' . head
   where
-    printCfg' (Lr.LrConfig c _ a i) = do
+    printCfg' (Parser.LrConfig c _ a i) = do
       Log.info $ "after " ++ show c ++ " iterations: "
       case a of
         PP.LrAccept -> Log.info "input accepted"

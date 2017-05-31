@@ -11,7 +11,7 @@ module Log
     ( Logger
     -- ** High-API
     , start
-    , setLevel
+    --, setLevel
     , flushAll
     , pushTag
     , popTag
@@ -23,7 +23,7 @@ module Log
     , pushOut
     -- **Shortcuts
     , io
-    , off
+    --, off
     , fatal
     , err
     , warn

@@ -21,8 +21,9 @@ data Args = Args CommonArgs CommandArgs
   deriving Show
 
 -- |Common arguments
-newtype CommonArgs = CommonArgs
-  { setLevel :: Int -- ^Verbosity level
+data CommonArgs = CommonArgs
+  { setLevel :: Int   -- ^Verbosity level
+  , silent   :: Bool  -- ^Verbosity off
   }
     deriving Show
 
@@ -44,10 +45,11 @@ data EbnfArgs = EbnfArgs
 
 -- |LALR command arguments
 data LalrArgs = LalrArgs
-  { lalrFile       :: String   -- ^Input file
+  { lalrFile       :: String  -- ^Input file
   , showCollection :: Bool    -- ^Print the items sets collection
   , showSetI       :: Int     -- ^Print a specific items set
   , showTable      :: Bool    -- ^Print the LALR table
   , testWith       :: String  -- ^Test the LALR table on a source file
+  , template       :: String  -- ^Specify a template
   }
     deriving Show

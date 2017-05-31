@@ -35,8 +35,8 @@ main = do
 
 -- |Dispatch arguments to commands
 dispatch :: Args -> Log.Logger
-dispatch args@(Args (CommonArgs l) _) = do
-  Log.start l "pp"
+dispatch args@(Args (CommonArgs l s) _) = do
+  Log.start (if s then 1000000 else l) "pp"
   Log.autoFlush True
   Log.info "starting..."
   Log.info $ "verbosity: " ++ show l
@@ -58,6 +58,9 @@ commonArgs = CommonArgs
     <> metavar "LEVEL"
     <> value 30
     <> help "Set verbosity level" )
+  <*> switch ( long "silent"
+    <> short 's'
+    <> help "Verbosity off" )
 
 -- |Commands arguments
 commandArgs :: Parser CommandArgs
