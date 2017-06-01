@@ -1,5 +1,8 @@
 ﻿namespace csharp_engine.lr_engine
 {
+    /**
+     * LR action
+     */
     public class LrAction
     {
         public enum Type { Shift, Reduce, Goto, Accept, Error }

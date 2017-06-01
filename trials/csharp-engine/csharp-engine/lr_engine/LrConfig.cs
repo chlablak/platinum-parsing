@@ -2,6 +2,9 @@
 
 namespace csharp_engine.lr_engine
 {
+    /**
+     * LR parser configuration
+     */
     class LrConfig
     {
         public int count { get; set; }
