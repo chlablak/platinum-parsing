@@ -39,8 +39,8 @@ namespace /* INSERT NAMESPACE */
             error = new LrAction(LrAction.Type.Error);
             actions = new Dictionary<Tuple<int, char>, LrAction>()
             {
-                $lr.table.rows:{row|$if(row.isTerm)$$if(row.term.isEmpty)$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, EMPTY), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
-                $elseif(row.action.isShift)${ Tuple.Create($row.state.id$, EMPTY), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
+                $lr.table.rows:{row|$if(row.isTerm)$$if(row.term.isEmpty)$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
+                $elseif(row.action.isShift)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
                 $endif$$else$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
                 $elseif(row.action.isShift)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
                 $elseif(row.action.isAccept)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Accept) },
