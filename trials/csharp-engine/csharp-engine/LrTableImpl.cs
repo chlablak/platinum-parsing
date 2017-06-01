@@ -6,9 +6,9 @@
 
 using System;
 using System.Collections.Generic;
-using /* INSERT LR ENGINE */;
+using csharp_engine.lr_engine;
 
-namespace /* INSERT NAMESPACE */
+namespace csharp_engine
 {
     class LrTableImpl : LrTable
     {
