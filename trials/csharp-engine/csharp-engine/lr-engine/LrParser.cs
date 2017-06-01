@@ -20,7 +20,7 @@ namespace csharp_engine.lr_engine
         public LrParser(LrTable table, string input)
         {
             this.table = table;
-            LrAction action = table.action(0, input[0]);
+            LrAction action = table.action(0, input.Length > 0 ? input[0] : table.Empty());
             this.config = new LrConfig(0, new Stack<int>(), action, input);
             this.config.stack.Push(0);
             this.ast = new LrAst();
@@ -45,9 +45,14 @@ namespace csharp_engine.lr_engine
                 case LrAction.Type.Shift:
                     config.count += 1;
                     config.stack.Push(config.action.value);
-                    config.action = table.action(config.action.value, config.input[1]);
-                    ast.Shift(config.input[1]);
-                    config.input = config.input.Substring(1);
+                    if(config.input.Length > 1)
+                    {
+                        config.action = table.action(config.action.value, config.input[1]);
+                        ast.Shift(config.input[1]);
+                        config.input = config.input.Substring(1);
+                    }
+                    else
+                        config.action = table.action(config.action.value, table.Empty());
                     break;
 
                 case LrAction.Type.Reduce:

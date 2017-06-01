@@ -6,6 +6,11 @@
     interface LrTable
     {
         /**
+         * Return the EMPTY term ($)
+         */
+        char Empty();
+
+        /**
          * Return the associated action (action table)
          */
         LrAction action(int state, char term);

@@ -42,11 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="lr_engine\LrAction.cs" />
-    <Compile Include="lr_engine\LrAst.cs" />
-    <Compile Include="lr_engine\LrConfig.cs" />
-    <Compile Include="lr_engine\LrParser.cs" />
-    <Compile Include="lr_engine\LrTable.cs" />
+    <Compile Include="lr-engine\LrAction.cs" />
+    <Compile Include="lr-engine\LrAst.cs" />
+    <Compile Include="lr-engine\LrConfig.cs" />
+    <Compile Include="lr-engine\LrParser.cs" />
+    <Compile Include="lr-engine\LrTable.cs" />
+    <Compile Include="LrTableImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
