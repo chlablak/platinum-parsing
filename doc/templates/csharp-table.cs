@@ -18,7 +18,7 @@ namespace /* INSERT NAMESPACE */
 
         public char Empty()
         {
-            return (char)0;
+            return /* INSERT EMPTY SYMBOL */;
         }
 
         /* ACTION table */
