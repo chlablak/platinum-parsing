@@ -45,14 +45,13 @@ namespace csharp_engine.lr_engine
                 case LrAction.Type.Shift:
                     config.count += 1;
                     config.stack.Push(config.action.value);
-                    if(config.input.Length > 1)
+                    config.action = table.action(config.action.value, 
+                        config.input.Length > 1 ? config.input[1] : table.Empty());
+                    if (config.input.Length > 0)
                     {
-                        config.action = table.action(config.action.value, config.input[1]);
-                        ast.Shift(config.input[1]);
+                        ast.Shift(config.input[0]);
                         config.input = config.input.Substring(1);
                     }
-                    else
-                        config.action = table.action(config.action.value, table.Empty());
                     break;
 
                 case LrAction.Type.Reduce:
@@ -66,7 +65,8 @@ namespace csharp_engine.lr_engine
                 case LrAction.Type.Goto:
                     config.count += 1;
                     config.stack.Push(config.action.value);
-                    config.action = table.action(config.action.value, config.input[0]);
+                    config.action = table.action(config.action.value, 
+                        config.input.Length > 0 ? config.input[0] : table.Empty());
                     break;
 
                 // for Error and Accept -> do nothing

@@ -6,9 +6,9 @@
 
 using System;
 using System.Collections.Generic;
-using /* INSERT LR ENGINE */;
+using csharp_engine.lr_engine;
 
-namespace /* INSERT NAMESPACE */
+namespace csharp_engine
 {
     class LrTableImpl : LrTable
     {
@@ -18,7 +18,7 @@ namespace /* INSERT NAMESPACE */
 
         public char Empty()
         {
-            return /* INSERT EMPTY SYMBOL */;
+            return (char)0;
         }
 
         /* ACTION table */

@@ -24,6 +24,20 @@ namespace csharp_engine.lr_engine
                 this.value = value;
                 this.children = new List<Node>();
             }
+
+            public override string ToString()
+            {
+                return ToString(this, 0);
+            }
+
+            private string ToString(Node node, int level)
+            {
+                string str = new string('|', level);
+                str += "- " + node.value + '\n';
+                foreach (Node child in node.children)
+                    str += ToString(child, level + 1);
+                return str;
+            }
         }
 
         /**
@@ -96,16 +110,7 @@ namespace csharp_engine.lr_engine
          */
         public override string ToString()
         {
-            return ToString(root, 0);
-        }
-
-        private string ToString(Node node, int level)
-        {
-            string str = new string('|', level);
-            str += "- " + node.value + '\n';
-            foreach (Node child in node.children)
-                str += ToString(child, level + 1);
-            return str;
+            return root.ToString();
         }
     }
 }

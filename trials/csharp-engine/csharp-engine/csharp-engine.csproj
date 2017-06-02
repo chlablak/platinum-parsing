@@ -45,6 +45,7 @@
     <Compile Include="lr-engine\LrAction.cs" />
     <Compile Include="lr-engine\LrAst.cs" />
     <Compile Include="lr-engine\LrConfig.cs" />
+    <Compile Include="lr-engine\LrEvaluate.cs" />
     <Compile Include="lr-engine\LrParser.cs" />
     <Compile Include="lr-engine\LrTable.cs" />
     <Compile Include="LrTableImpl.cs" />
