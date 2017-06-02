@@ -987,17 +987,7 @@
 		\end{figure}
 		
 		Ces champs nous offre toutes les informations dont nous avions besoin pour l'écriture d'un \textit{template}. Nous avons ci-dessous le premier modèle, qui génère simplement la table LR:
-		\begin{minted}{text}
-			STATE $length(lr.states)$
-			TERM $length(lr.terms)$
-			$lr.terms:{term|$if(term.isEmpty)$EMPTY$else$$term.symbol$$endif$
-			}$NONTERM $length(lr.nonTerms)$
-			$lr.nonTerms:{nonTerm|$nonTerm.name$
-			}$TABLE $lr.table.total$
-			ROW $length(lr.table.rows)$
-			$lr.table.rows:{row|$row.state.id$ $if(row.isTerm)$TERM $if(row.term.isEmpty)$EMPTY$else$$row.term.symbol$$endif$$else$NONTERM $row.nonTerm.name$$endif$ $if(row.action.isReduce)$REDUCE $row.action.reduce.name$ $row.action.reduce.length$$elseif(row.action.isShift)$SHIFT $row.action.shift$$elseif(row.action.isGoto)$GOTO $row.action.goto$$elseif(row.action.isError)$ERROR$else$ACCEPT$endif$
-			}$
-		\end{minted}
+		\inputminted{text}{../../doc/templates/lr-table}
 		\captionof{listing}{Template générant la table LR simplement}
 		
 		\paragraph{}
@@ -1092,6 +1082,7 @@
 					\texttt{engine/LrAction.cs} & Définition des actions\\
 					\texttt{engine/LrAst.cs} & Définition d'un AST dynamique\\
 					\texttt{engine/LrConfig.cs} & Configuration du \textit{parser} LR\\
+					\texttt{engine/LrEvaluate.cs} & Attache de \textit{callback}\\
 					\texttt{engine/LrParser.cs} & \textit{Parser} LR\\
 					\texttt{engine/LrTable.cs} & Interface pour la table LR\\
 				\end{tabular}
@@ -1102,64 +1093,7 @@
 		
 		\subsection{Écriture du \textit{template} pour l'\textit{engine}}
 			Comme mentionné à la fin de la partie précédente, le \textit{template} doit dériver l'interface \texttt{LrTable} pour être utilisable par le moteur:
-			\begin{minted}{csharp}
-				/**
-				* LR table template for platinum-parsing
-				* Author: Patrick Champion
-				* Date: 2017.06.01
-				*/
-				
-				using System;
-				using System.Collections.Generic;
-				using /* INSERT LR ENGINE */;
-				
-				namespace /* INSERT NAMESPACE */
-				{
-					class LrTableImpl : LrTable
-					{
-						private LrAction value, error;
-						private Dictionary<Tuple<int, char>, LrAction> actions;
-						private Dictionary<Tuple<int, string>, LrAction> gotos;
-						
-						public char Empty()
-						{
-							return /* INSERT EMPTY SYMBOL */;
-						}
-						
-						/* ACTION table */
-						public LrAction action(int state, char term)
-						{
-							return actions.TryGetValue(Tuple.Create(state, term), out value) ? value : error;
-						}
-						
-						/* GOTO table */
-						public LrAction action(int state, string nonTerm)
-						{
-							return gotos.TryGetValue(Tuple.Create(state, nonTerm), out value) ? value : error;
-						}
-						
-						public LrTableImpl()
-						{
-							value = null;
-							error = new LrAction(LrAction.Type.Error);
-							actions = new Dictionary<Tuple<int, char>, LrAction>()
-							{
-								$lr.table.rows:{row|$if(row.isTerm)$$if(row.term.isEmpty)$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
-								$elseif(row.action.isShift)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
-								$endif$$else$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
-								$elseif(row.action.isShift)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
-								$elseif(row.action.isAccept)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Accept) },
-								$endif$$endif$$endif$}$
-							};
-							gotos = new Dictionary<Tuple<int, string>, LrAction>()
-							{
-								$lr.table.rows:{row|$if(!row.isTerm)$$if(row.action.isGoto)${ Tuple.Create($row.state.id$, "$row.nonTerm.name$"), new LrAction(LrAction.Type.Goto, $row.action.goto$) },
-								$endif$$endif$}$
-							};
-						}
-					}
-				}
-			\end{minted}
+			\inputminted{csharp}{../../doc/templates/csharp-table.cs}
 			\captionof{listing}{\textit{template} pour l'\textit{engine} C\# (fichier \texttt{doc/templates/csharp-table.cs})}
 			
 			\paragraph{}
@@ -1183,6 +1117,71 @@
 					};
 				}
 			\end{minted}
+			
+		\subsection{Validation du \textit{pipeline}}
+			Avant de faire la démonstration en ISO CNC, qui possède un code assez conséquent, nous allons valider la solution avec un exemple plus simple.\\
+			
+			Partons donc d'une grammaire simple:
+			\inputminted{ebnf}{../../doc/grammars/test.ebnf}
+			\captionof{listing}{Grammaire EBNF simple}
+			
+			\paragraph{}
+			Compilons-la avec notre \textit{template}:
+			\begin{minted}{text}
+				prompt$ pp -s lalr -f simple.ebnf --template csharp.cs > LrTableImpl.cs
+				prompt$
+			\end{minted}
+			\captionof{listing}{Compilation d'une table LALR avec un \textit{template}}
+			
+			\paragraph{} 
+			Maintenant que nous avons notre fichier \texttt{LrTableImpl.cs}, et que nous avons corrigé son contenu (les \texttt{/* INSERT ... */}), nous pouvons écrire un interpréteur simple (notons la ligne 14 qui utilise \texttt{LrTableImpl.cs}):
+			\inputminted{csharp}{../../trials/csharp-engine/csharp-engine/Program.cs}
+			\captionof{listing}{Utilisation de l'\textit{engine} C\#}
+			
+			\paragraph{}
+			À l'exécution, on obtient:
+			\begin{minted}{text}
+				success, AST:
+				-
+				|- statement
+				||- expression
+				|||- term
+				||||- factor
+				|||||- digit
+				||||||- 2
+				|||-  
+				|||- expression
+				||||- term
+				|||||- factor
+				||||||- digit
+				|||||||- 3
+				|||||- *
+				|||||- term
+				||||||- factor
+				|||||||- (
+				|||||||- expression
+				||||||||- term
+				|||||||||- factor
+				||||||||||- digit
+				|||||||||||- 1
+				||||||||-  
+				||||||||- expression
+				|||||||||- term
+				||||||||||- factor
+				|||||||||||- digit
+				||||||||||||- 3
+				|||||||- )
+				
+				result:
+				-
+				|- 14
+				
+				press a key to quit...
+			\end{minted}
+			\captionof{listing}{Sortie de l'\textit{engine} C\# pour un exemple simple}
+			
+			\paragraph{}
+			Le \textit{pipeline} fonctionne !
 		
 		\subsection{Démonstration finale}
 			\todo{pipeline, Program.cs}

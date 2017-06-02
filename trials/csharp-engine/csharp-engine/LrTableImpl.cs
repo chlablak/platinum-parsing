@@ -22,13 +22,13 @@ namespace csharp_engine
         }
 
         /* ACTION table */
-        public LrAction action(int state, char term)
+        public LrAction Action(int state, char term)
         {
             return actions.TryGetValue(Tuple.Create(state, term), out value) ? value : error;
         }
 
         /* GOTO table */
-        public LrAction action(int state, string nonTerm)
+        public LrAction Action(int state, string nonTerm)
         {
             return gotos.TryGetValue(Tuple.Create(state, nonTerm), out value) ? value : error;
         }
@@ -146,7 +146,7 @@ namespace csharp_engine
                 { Tuple.Create(22, ')'), new LrAction(LrAction.Type.Reduce, 3, "term") },
                 { Tuple.Create(22, '+'), new LrAction(LrAction.Type.Reduce, 3, "term") },
                 { Tuple.Create(22, Empty()), new LrAction(LrAction.Type.Reduce, 3, "term") },
-                
+
             };
             gotos = new Dictionary<Tuple<int, string>, LrAction>()
             {
@@ -166,7 +166,7 @@ namespace csharp_engine
                 { Tuple.Create(19, "digit"), new LrAction(LrAction.Type.Goto, 13) },
                 { Tuple.Create(19, "factor"), new LrAction(LrAction.Type.Goto, 16) },
                 { Tuple.Create(19, "term"), new LrAction(LrAction.Type.Goto, 22) },
-                
+
             };
         }
     }

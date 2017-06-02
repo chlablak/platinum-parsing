@@ -13,11 +13,11 @@
         /**
          * Return the associated action (action table)
          */
-        LrAction action(int state, char term);
+        LrAction Action(int state, char term);
 
         /**
          * Return the associated action (goto table)
          */
-        LrAction action(int state, string nonTerm);
+        LrAction Action(int state, string nonTerm);
     }
 }

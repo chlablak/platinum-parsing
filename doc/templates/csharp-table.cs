@@ -10,7 +10,7 @@ using /* INSERT LR ENGINE */;
 
 namespace /* INSERT NAMESPACE */
 {
-    class LrTableImpl : LrTable
+    class /* INSERT CLASS NAME */ : LrTable
     {
         private LrAction value, error;
         private Dictionary<Tuple<int, char>, LrAction> actions;
@@ -22,18 +22,18 @@ namespace /* INSERT NAMESPACE */
         }
 
         /* ACTION table */
-        public LrAction action(int state, char term)
+        public LrAction Action(int state, char term)
         {
             return actions.TryGetValue(Tuple.Create(state, term), out value) ? value : error;
         }
 
         /* GOTO table */
-        public LrAction action(int state, string nonTerm)
+        public LrAction Action(int state, string nonTerm)
         {
             return gotos.TryGetValue(Tuple.Create(state, nonTerm), out value) ? value : error;
         }
 
-        public LrTableImpl()
+        public /* INSERT CLASS NAME */()
         {
             value = null;
             error = new LrAction(LrAction.Type.Error);

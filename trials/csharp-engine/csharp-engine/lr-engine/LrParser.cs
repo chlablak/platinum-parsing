@@ -20,7 +20,7 @@ namespace csharp_engine.lr_engine
         public LrParser(LrTable table, string input)
         {
             this.table = table;
-            LrAction action = table.action(0, input.Length > 0 ? input[0] : table.Empty());
+            LrAction action = table.Action(0, input.Length > 0 ? input[0] : table.Empty());
             this.config = new LrConfig(0, new Stack<int>(), action, input);
             this.config.stack.Push(0);
             this.ast = new LrAst();
@@ -29,23 +29,23 @@ namespace csharp_engine.lr_engine
         /**
          * Check if there is an iteration left
          */
-        public bool hasNext()
+        public bool HasNext()
         {
             LrAction.Type type = config.action.type;
             return type != LrAction.Type.Error && type != LrAction.Type.Accept;
         }
 
         /**
-         * Compute the next iteration (config and AST will evolve)
+         * Compute the Next iteration (config and AST will evolve)
          */
-        public void next()
+        public void Next()
         {
             switch (config.action.type)
             {
                 case LrAction.Type.Shift:
                     config.count += 1;
                     config.stack.Push(config.action.value);
-                    config.action = table.action(config.action.value, 
+                    config.action = table.Action(config.action.value,
                         config.input.Length > 1 ? config.input[1] : table.Empty());
                     if (config.input.Length > 0)
                     {
@@ -59,13 +59,13 @@ namespace csharp_engine.lr_engine
                     for (int i = 0; i < config.action.value; ++i)
                         config.stack.Pop();
                     ast.Reduce(config.action.name, config.action.value);
-                    config.action = table.action(config.stack.Peek(), config.action.name);
+                    config.action = table.Action(config.stack.Peek(), config.action.name);
                     break;
 
                 case LrAction.Type.Goto:
                     config.count += 1;
                     config.stack.Push(config.action.value);
-                    config.action = table.action(config.action.value, 
+                    config.action = table.Action(config.action.value,
                         config.input.Length > 0 ? config.input[0] : table.Empty());
                     break;
 
@@ -76,10 +76,10 @@ namespace csharp_engine.lr_engine
         /**
          * Compute all iterations and merge the resulting AST
          */
-        public void parse()
+        public void Parse()
         {
-            while (hasNext())
-                next();
+            while (HasNext())
+                Next();
             ast.Merge();
         }
     }

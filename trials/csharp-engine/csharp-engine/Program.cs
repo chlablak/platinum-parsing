@@ -12,7 +12,7 @@ namespace csharp_engine
 
             // Parsing
             LrParser parser = new LrParser(new LrTableImpl(), input);
-            parser.parse();
+            parser.Parse();
 
             // Check success
             if (parser.config.action.type == LrAction.Type.Accept)
