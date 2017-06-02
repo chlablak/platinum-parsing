@@ -100,6 +100,7 @@ dispatch (Args _ (LalrCmd args)) = do
                 let t = PP.table c
                 case t of
                   Left err -> do
+                    Log.popTask
                     Log.err "grammar is not LALR:"
                     mapM_ Log.err err
                     Log.abort

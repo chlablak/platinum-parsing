@@ -39,7 +39,7 @@ dispatch args@(Args (CommonArgs l s) _) = do
   Log.start (if s then 1000000 else l) "pp"
   Log.autoFlush True
   Log.info "starting..."
-  Log.info $ "verbosity: " ++ show l
+  Log.info $ "verbosity: " ++ (if l == 0 then "all" else show l)
   dispatch' args
   where
     dispatch' :: Args -> Log.Logger
