@@ -50,6 +50,7 @@ namespace /* INSERT NAMESPACE */
                 { Tuple.Create(0, '7'), new LrAction(LrAction.Type.Shift, 9) },
                 { Tuple.Create(0, '8'), new LrAction(LrAction.Type.Shift, 10) },
                 { Tuple.Create(0, '9'), new LrAction(LrAction.Type.Shift, 11) },
+                { Tuple.Create(1, Empty()), new LrAction(LrAction.Type.Accept) },
                 { Tuple.Create(2, ')'), new LrAction(LrAction.Type.Reduce, 1, "digit") },
                 { Tuple.Create(2, '*'), new LrAction(LrAction.Type.Reduce, 1, "digit") },
                 { Tuple.Create(2, '+'), new LrAction(LrAction.Type.Reduce, 1, "digit") },

@@ -41,9 +41,9 @@ namespace /* INSERT NAMESPACE */
             {
                 $lr.table.rows:{row|$if(row.isTerm)$$if(row.term.isEmpty)$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
                 $elseif(row.action.isShift)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
+                $elseif(row.action.isAccept)${ Tuple.Create($row.state.id$, Empty()), new LrAction(LrAction.Type.Accept) },
                 $endif$$else$$if(row.action.isReduce)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Reduce, $row.action.reduce.length$, "$row.action.reduce.name$") },
                 $elseif(row.action.isShift)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Shift, $row.action.shift$) },
-                $elseif(row.action.isAccept)${ Tuple.Create($row.state.id$, '$row.term.symbol$'), new LrAction(LrAction.Type.Accept) },
                 $endif$$endif$$endif$}$
             };
             gotos = new Dictionary<Tuple<int, string>, LrAction>()
