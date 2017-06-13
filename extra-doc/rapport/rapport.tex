@@ -59,7 +59,7 @@
 	\vspace{6cm}
 	\begin{figure}[H]
 		\centering
-		\todo{inclure logo ici}
+		\includegraphics[width=0.6\textwidth]{../logo/logo.png}
 	\end{figure}
 	\thispagestyle{empty}
 	\newpage
@@ -76,27 +76,28 @@
 	\section*{Table des abréviations}
 		Dans l'ordre alphabétique:\\
 		\begin{itemize}
-			\item \textbf{AST} \cite{ast} $\rightarrow$ Abstract Syntax Tree
-			\item \textbf{BNF} \cite{bnf} $\rightarrow$ Backus-Naur Form
-			\item \textbf{CLI} $\rightarrow$ Command Line Interface
-			\item \textbf{EBNF} \cite{ebnf} $\rightarrow$ Extended Backus-Naur Form
-			\item \textbf{GOLD} \cite{goldparser} $\rightarrow$ GOLD Parser System
-			\item \textbf{LALR} \cite{lalr} $\rightarrow$ Look-Ahead LR parser
-			\item \textbf{PP} $\rightarrow$ Platinum Parsing
+			\item \textbf{AST} \cite{ast} $\rightarrow$ \textit{Abstract Syntax Tree}
+			\item \textbf{BNF} \cite{bnf} $\rightarrow$ \textit{Backus-Naur Form}
+			\item \textbf{CLI} $\rightarrow$ \textit{Command Line Interface}
+			\item \textbf{EBNF} \cite{ebnf} $\rightarrow$ \textit{Extended Backus-Naur Form}
+			\item \textbf{GOLD} \cite{goldparser} $\rightarrow$ \textit{GOLD Parser System}
+			\item \textbf{IDE} $\rightarrow$ \textit{Integrated development environment}
+			\item \textbf{LALR} \cite{lalr} $\rightarrow$ \textit{Look-Ahead LR parser}
+			\item \textbf{LR} \cite{lr} $\rightarrow$ \textit{LR parser}
+			\item \textbf{PP} $\rightarrow$ \textit{Platinum Parsing}
 			\item \textbf{TB} $\rightarrow$ Travail de Bachelor
 		\end{itemize}
-		\todo{vérifier le rapport pour d'autres abréviations}
 	\newpage
 		
-	\section{Cadre du projet}
+	\section{Définition du cadre du projet}
 		Dans cette section, nous allons mettre les documents fournis au début du projet. Ainsi un lecteur pourra connaître les spécifications initiales.
 		
 		\subsection{Énoncé original}
 			Pour faciliter l'écriture de compilateurs, ce travail de diplôme vise à réaliser un outil complet avec un environnement de développement intégré, permettant :
 			\begin{itemize}
-				\item d'éditer une grammaire selon une syntaxe de type BNF
-				\item d'analyser automatiquement cette BNF, de détecter les erreurs de syntaxe, incohérences et conflits de règles.
-				\item de générer dans n'importe quel langage de programmation cible, sur la base d'un template textuel fourni par l'utilisateur, les tables pour le lexer et le parser LALR.\\
+				\item D'éditer une grammaire selon une syntaxe de type BNF
+				\item D'analyser automatiquement cette BNF, de détecter les erreurs de syntaxe, incohérences et conflits de règles.
+				\item De générer dans n'importe quel langage de programmation cible, sur la base d'un template textuel fourni par l'utilisateur, les tables pour le lexer et le parser LALR.\\
 			\end{itemize}
 			
 			Ce travail de diplôme vise à développer un outil capable de remplacer "Gold Parsing System", un outil libre intéressant, mais malheureusement fortement pénalisé par des bugs récurrents. L'IDE sera réalisé sous la forme d'un plugin du logiciel oStudio d'Objectis, avec les technologies très en vogue C\# et WPF. Le générateur de compilateurs sera mis en ligne sur Internet en libre accès, permettant à la communauté Internet de bénéficier gratuitement de cette technologie. 
@@ -119,10 +120,10 @@
 	
 		Afin d'analyser les fonctionnalités nécessaires de PP, nous allons utiliser une approche par cas d'utilisation. La première étape de cette analyse est de définir quels seront les acteurs qui auront besoin d'utiliser notre outil:
 		\begin{itemize}
-			\item le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
-			\item le \textbf{développeur} de compilateur veut pouvoir se baser sur une grammaire EBNF pour construire facilement les règles de production. Il souhaite également avoir le contrôle sur la sortie produite, cela à l'aide d'un langage riche
-			\item le \textbf{mainteneur} du compilateur veut pouvoir implémenter un parser en se basant sur des tables pré-générées, cela dans n'importe quel langage
-			\item l'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle
+			\item Le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
+			\item Le \textbf{développeur} de compilateur veut pouvoir se baser sur une grammaire EBNF pour construire facilement les règles de production. Il souhaite également avoir le contrôle sur la sortie produite, cela à l'aide d'un langage riche
+			\item Le \textbf{mainteneur} du compilateur veut pouvoir implémenter un parser en se basant sur des tables pré-générées, cela dans n'importe quel langage
+			\item L'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle
 		\end{itemize}
 		
 		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
@@ -133,44 +134,43 @@
 		\end{figure}
 		
 		\subsection{Cahier des charges}
+		\label{subsec:cahier-des-charges}
 			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section les fonctionnalités utilisant \textit{doit} sont obligatoires, celles utilisant \textit{devrait} sont optionnelles:
 			
-			\begin{figure}[H]
+			\begin{table}[H]
 				\centering
-				\begin{longtable}{p{0.05\textwidth}p{0.8\textwidth}|p{0.05\textwidth}}
+				\begin{longtable}{p{0.05\textwidth}p{0.75\textwidth}|p{0.1\textwidth}}
 					\# & & Statut\\
 					\hline\hline
 					&&\\
 					& Platinum Parsing: & \\
-					10.10 & \textbf{doit} être un outil fournissant des fonctionnalités similaires à \textit{Gold Parsing System} & \\
-					10.20 & \textbf{doit} être développé à l'aide de briques technologiques efficaces pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage & \\
+					10.10 & \textbf{doit} être un outil fournissant des fonctionnalités similaires à \textit{Gold Parsing System} & \autoref{sec:architecture-du-projet} \\
+					10.20 & \textbf{doit} être développé à l'aide de briques technologiques efficaces pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage & \autoref{sec:choix-des-technologies}\\
 					10.30 & devrait être pensée pour avoir une approche générique du problème de la compilation & \\
 					10.40 & devrait fournir une documentation complète de la solution & \\
 					&&\\
 					& Le module d'analyse de grammaire EBNF: & \\
-					20.10 & \textbf{doit} lire et comprendre une grammaire selon la syntaxe EBNF & \\
-					20.20 & \textbf{doit} analyser la validité d'une grammaire définie & \\
-					20.30 & \textbf{doit} aider à la correction des erreurs de grammaire & \\
-					20.40 & \textbf{doit} permettre de tester une grammaire pour la reconnaissance d'un texte en entrée & \\
+					20.10 & \textbf{doit} lire et comprendre une grammaire selon la syntaxe EBNF & \autoref{sec:creation-d-un-parser-pour-la-grammaire}\\
+					20.20 & \textbf{doit} analyser la validité d'une grammaire définie & \autoref{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}\\
+					20.30 & \textbf{doit} aider à la correction des erreurs de grammaire & \autoref{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}\\
+					20.40 & \textbf{doit} permettre de tester une grammaire pour la reconnaissance d'un texte en entrée & \autoref{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}\\
 					&&\\
 					& Le module de génération de tables LALR: & \\
-					30.10 & \textbf{doit} générer les tables selon une grammaire EBNF donnée & \\
-					30.20 & \textbf{doit} être capable de traduire les tables selon un modèle fourni par l'utilisateur & \\
+					30.10 & \textbf{doit} générer les tables selon une grammaire EBNF donnée & \autoref{sec:generation-de-la-table-lalr}\\
+					30.20 & \textbf{doit} être capable de traduire les tables selon un modèle fourni par l'utilisateur & \autoref{sec:generation-des-tables-dans-un-langage-cible}\\
 					30.30 & devrait fournir une documentation pour l'utilisation des tables générées & \\
 					&&\\
 					& L'arbre abstrait syntaxique: & \\
-					40.10 & \textbf{doit} permettre d'attacher un \textit{callback} à ses noeuds & \\
+					40.10 & \textbf{doit} permettre d'attacher un \textit{callback} à ses noeuds & \autoref{sec:demonstration-en-csharp}\\
 					&&\\
 					& L'environnement de développement: & \\
 					50.10 & devrait soit être un IDE dédié ou un plugin pour un environnement existant & \\
 					50.20 & devrait intégrer l'ensemble des fonctionnalités de Platinum Parsing pour en faciliter l'usage & \\
 					&&\\
 					& La solution finale: & \\
-					60.10 & \textbf{doit} fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC & \\
+					60.10 & \textbf{doit} fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC & \autoref{sec:demonstration-en-csharp}\\
 				\end{longtable}
-			\end{figure}
-			
-			\todo{mettre à jour les statuts}
+			\end{table}
 
 	\section{Architecture du projet}
 	\label{sec:architecture-du-projet}
@@ -188,8 +188,8 @@
 			
 			L'utilisation de GOLD se décompose en 2 étapes distinctes:
 			\begin{enumerate}
-				\item le développeur écrit la grammaire de son langage et utilise le \textit{Builder} pour générer une grammaire compilée (.cgt), constituée principalement des tables (LALR, ...) du langage en question. À partir de là, le \textit{Builder} n'est plus nécessaire
-				\item le développeur implémente un \textit{Engine} (dans n'importe quel langage) qui s'occupe de charger la grammaire compilée et d'effectuer le \textit{parsing} des fichiers sources 
+				\item Le développeur écrit la grammaire de son langage et utilise le \textit{Builder} pour générer une grammaire compilée (.cgt), constituée principalement des tables (LALR, ...) du langage en question. À partir de là, le \textit{Builder} n'est plus nécessaire
+				\item Le développeur implémente un \textit{Engine} (dans n'importe quel langage) qui s'occupe de charger la grammaire compilée et d'effectuer le \textit{parsing} des fichiers sources 
 			\end{enumerate}
 			
 			Une des forces de GOLD est que de nombreuses personnes ont fournies une implémentation d'\textit{Engine} dans des langages de programmation différents. Ces \textit{Engine} étaient donc prêts a être utilisés, cela implique que le format du fichier .cgt doit être normalisé.\\
@@ -206,9 +206,9 @@
 			
 			Si nous partons du plus interne au plus externe, nous avons:
 			\begin{itemize}
-				\item le \textbf{framework}, qui n'est rien d'autre qu'un cadre de développement pour la création de compilateur. On peut le voir comme une collection de briques pré-créées extensible 
-				\item le \textbf{CLI}, pour \textbf{C}ommand \textbf{L}ine \textbf{I}nterface, qui aide à l'utilisation du framework et qui propose d'autres outils spécifiques
-				\item l'\textbf{IDE} (ou plugin pour un IDE existant), qui utilise principalement le CLI et qui connaît le framework pour offrir une meilleure expérience de développement\\
+				\item Le \textbf{framework}, qui n'est rien d'autre qu'un cadre de développement pour la création de compilateur. On peut le voir comme une collection de briques pré-créées extensible 
+				\item Le \textbf{CLI}, pour \textbf{C}ommand \textbf{L}ine \textbf{I}nterface, qui aide à l'utilisation du framework et qui propose d'autres outils spécifiques
+				\item L'\textbf{IDE} (ou plugin pour un IDE existant), qui utilise principalement le CLI et qui connaît le framework pour offrir une meilleure expérience de développement\\
 			\end{itemize}
 			
 			Ces explications sont encore assez abstraites et méritent d'être approfondies, cela sera fait dans les prochaines sections. Cependant nous préférons les introduire dès maintenant pour simplifier la lecture et la compréhension.
@@ -234,14 +234,14 @@
 			
 			On voit ici apparaître le framework ainsi que le CLI, comment cela fonctionne:
 			\begin{enumerate}
-				\item le concepteur crée sa grammaire EBNF
-				\item le développeur utilise une fonctionnalité du CLI pour transformer la grammaire EBNF dans une grammaire compréhensible par le framework, les \textit{Rules}
-				\item le développeur utilise les briques du framework et/ou crée ses propres briques
+				\item Le concepteur crée sa grammaire EBNF
+				\item Le développeur utilise une fonctionnalité du CLI pour transformer la grammaire EBNF dans une grammaire compréhensible par le framework, les \textit{Rules}
+				\item Le développeur utilise les briques du framework et/ou crée ses propres briques
 				\begin{itemize}
-					\item c'est typiquement ici que la sortie sera décidée (interprétation, transpilation, etc.)
+					\item C'est typiquement ici que la sortie sera décidée (interprétation, transpilation, etc.)
 				\end{itemize}
-				\item le développeur utilise le CLI pour créer l'exécutable final
-				\item l'utilisateur utilise l'exécutable final\\
+				\item Le développeur utilise le CLI pour créer l'exécutable final
+				\item L'utilisateur utilise l'exécutable final\\
 			\end{enumerate}
 			
 			Si l'on met les deux schémas précédents ensemble, nous obtenons:
@@ -260,24 +260,24 @@
 			
 			Nous avons déjà vu une séparation grâce aux précédents schémas, le reste est vu dans les cas ci-dessous:
 			\begin{itemize}
-				\item le \textbf{framework}:
+				\item Le \textbf{framework}:
 				\begin{itemize}
-					\item fourni un pipeline de développement pour tout le processus
-					\item fourni un ou des \textit{builder}/\textit{engine} pré-définis
-					\item fourni la gestion des options en ligne de commande
+					\item Fourni un pipeline de développement pour tout le processus
+					\item Fourni un ou des \textit{builder}/\textit{engine} pré-définis
+					\item Fourni la gestion des options en ligne de commande
 					\item est extensible pour permettre le changement de son comportement
 				\end{itemize}
-				\item le \textbf{CLI}:
+				\item Le \textbf{CLI}:
 				\begin{itemize}
-					\item fourni des outils pour gérer les fichiers ainsi que l'arborescence dans un projet utilisant le framework
-					\item exécute la chaîne de compilation complète du framework
-					\item fourni des outils relatifs à l'élaboration d'une grammaire EBNF:
+					\item Fourni des outils pour gérer les fichiers ainsi que l'arborescence dans un projet utilisant le framework
+					\item Exécute la chaîne de compilation complète du framework
+					\item Fourni des outils relatifs à l'élaboration d'une grammaire EBNF:
 					\begin{itemize}
-						\item transformation en \textit{Rules} compréhensibles par le framework
-						\item vérification de la grammaire (cohérence, conflit, etc.)
-						\item vérification de la grammaire en se basant sur des fichiers sources de ladite grammaire 
+						\item Transformation en \textit{Rules} compréhensibles par le framework
+						\item Vérification de la grammaire (cohérence, conflit, etc.)
+						\item Vérification de la grammaire en se basant sur des fichiers sources de ladite grammaire 
 					\end{itemize}
-					\item fourni un outil pour transformer une EBNF directement en tables (comme GOLD)
+					\item Fourni un outil pour transformer une EBNF directement en tables (comme GOLD)
 				\end{itemize}
 			\end{itemize}
 			
@@ -291,18 +291,18 @@
 				
 				On y retrouve les éléments des schémas précédents:
 				\begin{enumerate}
-					\item on définit notre grammaire, ce sont les \textit{Rules}
-					\item le \textit{Builder}, à l'image de celui de GOLD, créer les tables (LALR, ...) en se basant sur les \textit{Rules}
-					\item ces tables sont envoyés à l'\textit{Engine}, ainsi que les fichiers sources à traiter selon ces tables
-					\item l'\textit{Engine} génère une sortie\\
+					\item On définit notre grammaire, ce sont les \textit{Rules}
+					\item Le \textit{Builder}, à l'image de celui de GOLD, créer les tables (LALR, ...) en se basant sur les \textit{Rules}
+					\item Ces tables sont envoyés à l'\textit{Engine}, ainsi que les fichiers sources à traiter selon ces tables
+					\item L'\textit{Engine} génère une sortie\\
 				\end{enumerate}
 				
 				Le framework fourni un squelette pour que le développeur puisse faire ce qu'il veut dans l'\textit{Engine} sans avoir à se soucier de certain détails (le \textit{parser} typiquement).\\
 				
 				Si l'on revient sur notre cas:
 				\begin{enumerate}
-					\item on définit la grammaire Lua
-					\item on implémente un \textit{Engine} pour interpréter Lua\\
+					\item On définit la grammaire Lua
+					\item On implémente un \textit{Engine} pour interpréter Lua\\
 				\end{enumerate}
 				
 				Et c'est tout! On compile et on peut utiliser notre exécutable.
@@ -310,8 +310,8 @@
 			\subsubsection{Cas 2: transformation d'une grammaire EBNF en grammaire BNF}
 				Ce cas ressemble beaucoup au cas précédent:
 				\begin{enumerate}
-					\item on définit la grammaire EBNF
-					\item on implémente un \textit{Engine} pour transformer en BNF
+					\item On définit la grammaire EBNF
+					\item On implémente un \textit{Engine} pour transformer en BNF
 				\end{enumerate}
 			
 			\subsubsection{Cas 3: transformation d'une grammaire EBNF en tables}
@@ -323,8 +323,8 @@
 				\end{figure}
 				
 				\begin{enumerate}
-					\item on définit la grammaire EBNF
-					\item on implémente un \textit{Engine} qui sérialise les tables dans un fichier (.cgt pour faire la comparaison avec GOLD)\\
+					\item On définit la grammaire EBNF
+					\item On implémente un \textit{Engine} qui sérialise les tables dans un fichier (.cgt pour faire la comparaison avec GOLD)\\
 				\end{enumerate}
 				
 				Ce cas étant une fonctionnalité nécessaire au projet, nous pouvons l'inclure au CLI.
@@ -332,14 +332,15 @@
 			\subsubsection{Cas 4: transformation d'une grammaire EBNF en tables, puis implémentation d'un \textit{engine} en Python}
 				Ce cas est une utilisation typique de GOLD, voyons comment cela est fait avec PP:
 				\begin{enumerate}
-					\item on définit notre grammaire en EBNF
-					\item on utilise le CLI pour créer les tables correspondantes (voir cas 3)
-					\item on implémente un \textit{Engine} en Python qui utilise les tables\\
+					\item On définit notre grammaire en EBNF
+					\item On utilise le CLI pour créer les tables correspondantes (voir cas 3)
+					\item On implémente un \textit{Engine} en Python qui utilise les tables\\
 				\end{enumerate}
 				
 				On voit ici que le framework est très général, ainsi les fonctionnalités de GOLD plus spécifiques doivent être implémentées à part (à l'aide du framework) et être intégrées au CLI.
 
-	\section{Technologies}
+	\section{Choix des technologies}
+	\label{sec:choix-des-technologies}
 	
 		\subsection{État de l'art}
 			La génération de parser est un domaine qui possède déjà nombre d'outils. Le lien suivant propose une liste de ceux-ci avec leurs spécificités: \url{https://en.wikipedia.org/wiki/Comparison_of_parser_generators}\\
@@ -362,7 +363,7 @@
 			\end{itemize}
 			
 			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les critères fondamentaux sont éliminatifs, c'est-à-dire qu'un langage qui ne répondrait pas à l'un de ces critères est d'emblée supprimé: 
-			\begin{figure}[H]
+			\begin{table}[H]
 				\centering
 				\begin{tabular}{|c|l|c|c|c|}
 					\hline
@@ -378,7 +379,7 @@
 					\hline
 				\end{tabular}
 				\caption{Critères pour le choix du langage et résultats}
-			\end{figure}
+			\end{table}
 			
 			Les détails des critères testés se trouvent dans l'annexe \ref{subsec:criteres-testes-pour-le-choix-du-langage}.\\
 			
@@ -422,14 +423,14 @@
 		
 		Rappelons donc les objectifs principaux:
 		\begin{itemize}
-			\item lire et comprendre une grammaire selon la syntaxe EBNF
-			\item analyser la validité d'une grammaire définie
-			\item aider à la correction des erreurs de grammaire
-			\item permettre de tester la grammaire pour la reconnaissance d'un texte en entrée
-			\item générer les tables selon une grammaire EBNF donnée
-			\item être capable de traduire les tables selon un modèle fourni par l'utilisateur
-			\item permettre d'attacher un \textit{callback} aux noeuds de l'AST
-			\item fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC\\
+			\item Lire et comprendre une grammaire selon la syntaxe EBNF
+			\item Analyser la validité d'une grammaire définie
+			\item Aider à la correction des erreurs de grammaire
+			\item Permettre de tester la grammaire pour la reconnaissance d'un texte en entrée
+			\item Générer les tables selon une grammaire EBNF donnée
+			\item Être capable de traduire les tables selon un modèle fourni par l'utilisateur
+			\item Permettre d'attacher un \textit{callback} aux noeuds de l'AST
+			\item Fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC\\
 		\end{itemize}
 		
 		À partir de cette liste, nous pouvons organiser le développement en phases successives:
@@ -517,7 +518,7 @@
 	\label{sec:creation-d-un-parser-pour-la-grammaire}
 		%+ Donnant en sortie l'AST correspondant
 		Maintenant que nous avons notre grammaire ainsi que l'AST correspondant, nous pouvons implémenter un parser à l'aide de Parsec. Commençons par poser les premiers modules (fichiers Haskell) que nous allons utiliser: 
-		\begin{figure}[H]
+		\begin{table}[H]
 			\centering
 			\begin{tabular}{ll}
 				\hs{PP} & Import global des fonctionnalités de PP\\
@@ -525,7 +526,7 @@
 				\hs{PP.Grammars.Ebnf} & Définition de la grammaire EBNF (AST, \textit{parsers}, instances)\\
 			\end{tabular}
 			\caption{Premiers modules de PP}
-		\end{figure}
+		\end{table}
 		
 		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage.\\
 		
@@ -539,14 +540,14 @@
 			Cela nous permet d'automatiser les tests. Ainsi si nous devons modifier ultérieurement le \textit{parser}, nous pourrons relancer directement les tests.\\
 			
 			Nous allons utiliser des modules avec une hiérarchie proche de PP pour avoir un projet homogène:
-			\begin{figure}[H]
+			\begin{table}[H]
 				\centering
 				\begin{tabular}{ll}
 					\hs{Spec} & Regroupement des différents tests\\
 					\hs{PPTest.Grammars.Ebnf} & Tests pour la grammaire EBNF\\
 				\end{tabular}
 				\caption{Premiers modules de test}
-			\end{figure}  
+			\end{table}  
 			
 			Ces tests nous ont révéler certains problèmes du \textit{parser}, cependant ceux-ci sont mineurs et nous allons donc simplement ouvrir des tickets pour les corriger plus tard:
 			\begin{itemize}
@@ -557,15 +558,15 @@
 		\subsection{Intégration au CLI}
 			Le CLI a trois tâches principales:
 			\begin{enumerate}
-				\item récupérer et comprendre les arguments passés au programme
-				\item envoyer ces arguments à la bonne commande
-				\item exécuter la commande correctement\\
+				\item Récupérer et comprendre les arguments passés au programme
+				\item Envoyer ces arguments à la bonne commande
+				\item Exécuter la commande correctement\\
 			\end{enumerate}
 			
 			Pour parser les options de la ligne de commande, Haskell possède plusieurs bibliothèques pour nous simplifier la vie: \url{https://wiki.haskell.org/Command_line_option_parsers}. Parmi ces possibilités, nous allons choisir \texttt{optparse-applicative} \cite{optparse} car elle est moderne, populaire, et elle répond à nos besoins.\\
 			
 			L'organisation des modules du CLI se fait assez simplement à partir des tâches listées ci-dessus:
-			\begin{figure}[H]
+			\begin{table}[H]
 				\centering
 				\begin{tabular}{ll}
 					\hs{Main} & Traitement des arguments et délégation à la bonne commande\\
@@ -573,11 +574,11 @@
 					\hs{Cmd.Ebnf} & Implémentation des fonctionnalités de la commande \texttt{pp ebnf}\\
 				\end{tabular}
 				\caption{Premiers modules du CLI}
-			\end{figure} 
+			\end{table} 
 			
 			Actuellement la seule commande disponible donne le résultat suivant:
 			\begin{minted}{console}
-				prompt$ pp ebnf -f doc/grammars/ebnf.ebnf --minify
+				$ pp ebnf -f doc/grammars/ebnf.ebnf --minify
 				<syntax>=<syntax rule>,{<syntax rule>};
 				<syntax rule>=<meta identifier>,"=",<definitions list>,";";
 				<definitions list>=<single definition>,{"|",<single definition>};
@@ -589,32 +590,33 @@
 			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
 			
 	\section{Génération de la table LALR}
+	\label{sec:generation-de-la-table-lalr}
 		\todo{plus de détails sur les sous-tâches}		
 		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
 		\begin{enumerate}
-			\item transformation des règles EBNF en règles canoniques
-			\subitem soit une fonction \hs{rules :: InputGrammar ast => ast -> [Rule]} 
-			\subitem avec \hs{data Rule = Rule String [Rule] | NonTerm String | Term Char | Empty} 
+			\item Transformation des règles EBNF en règles canoniques
+			\subitem Soit une fonction \hs{rules :: InputGrammar ast => ast -> [Rule]} 
+			\subitem Avec \hs{data Rule = Rule String [Rule] | NonTerm String | Term Char | Empty} 
 			
-			\item augmenter la grammaire (\hs{[Rule]}) pour avoir la grammaire augmentée
-			\subitem soit une fonction \hs{extend :: [Rule] -> Either String [Rule]}
+			\item Augmenter la grammaire (\hs{[Rule]}) pour avoir la grammaire augmentée
+			\subitem Soit une fonction \hs{extend :: [Rule] -> Either String [Rule]}
 			\subitem (on utilise le type \hs{Either} car la fonction peut échouer)
 			
-			\item générer les collections d'items LR(1) canonique pour la grammaire
-			\subitem soit une fonction \hs{collection :: LrBuilder item => RuleSet -> FirstSet -> LrCollection item}
-			\subitem avec \hs{type LrCollection item = Vector (LrSet item)} 
-			\subitem et \hs{type LrSet item = Set item}
-			\subitem et \hs{data Lr1Item = Lr1Item Rule Int Rule}
-			\subitem et qui aura besoin des fonctions suivantes: \hs{closure}, \hs{goto} et \hs{first}
+			\item Générer les collections d'items LR(1) canonique pour la grammaire
+			\subitem Soit une fonction \hs{collection :: LrBuilder item => RuleSet -> FirstSet -> LrCollection item}
+			\subitem Avec \hs{type LrCollection item = Vector (LrSet item)} 
+			\subitem Et \hs{type LrSet item = Set item}
+			\subitem Et \hs{data Lr1Item = Lr1Item Rule Int Rule}
+			\subitem Et qui aura besoin des fonctions suivantes: \hs{closure}, \hs{goto} et \hs{first}
 			
-			\item fusion de la collection LR(1) pour avoir une collection LALR(1) de plus petite taille
-			\subitem soit une fonction \hs{fusion :: LrCollection Lr1Item -> LrCollection LalrItem}
-			\subitem avec \hs{data LalrItem = LalrItem Rule Int Rule}
+			\item Fusion de la collection LR(1) pour avoir une collection LALR(1) de plus petite taille
+			\subitem Soit une fonction \hs{fusion :: LrCollection Lr1Item -> LrCollection LalrItem}
+			\subitem Avec \hs{data LalrItem = LalrItem Rule Int Rule}
 			
-			\item génération de la table LALR proprement dite
-			\subitem soit une fonction \hs{table :: LrBuilder item => LrCollection item -> LrTable}
-			\subitem avec \hs{type LrTable = Map (Int, Rule) LrAction}
-			\subitem et \hs{data LrAction = LrShift ... | LrReduce ... | ...}\\
+			\item Génération de la table LALR proprement dite
+			\subitem Soit une fonction \hs{table :: LrBuilder item => LrCollection item -> LrTable}
+			\subitem Avec \hs{type LrTable = Map (Int, Rule) LrAction}
+			\subitem Et \hs{data LrAction = LrShift ... | LrReduce ... | ...}\\
 		\end{enumerate}
 		
 		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \hs{rules}, \hs{extend}, \hs{first}, \hs{closure}, \hs{goto}, \hs{collection}, \hs{fusion} et pour finir \hs{table}.\\
@@ -677,7 +679,7 @@
 		\subsection{Intégration au CLI}
 			L'intégration au CLI se fait dans le module \hs{Cmd.Lalr}, les différentes options sont:
 			\begin{minted}{console}
-				prompt$ pp lalr --help
+				$ pp lalr --help
 				Usage: pp lalr (-g|--grammar FILENAME) [--collection] [--set I] [--table]
 					Generate LALR parsing table
 				
@@ -701,6 +703,7 @@
 		Le programme se trouve dans le dossier \texttt{trials/iso-cnc-prog/}, la grammaire quant à elle dans le fichier \texttt{doc/grammars/iso-cnc.ebnf}. Pour le moment cela n'est qu'un premier jet, nous avons besoin d'implémenter la partie suivante (test des grammaires) pour la vérifier et éventuellement la corriger. Nous reviendrons donc dessus à la fin de la prochaine section.
 		
 	\section{Test d'une grammaire à partir d'un texte en entrée}
+	\label{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}
 		Dans cette section nous nous intéressons aux tests possibles sur une grammaire, afin de la valider. Commençons par isoler les différentes erreurs possibles dans notre cas:
 		\begin{enumerate}
 			\item Syntaxe de la grammaire fausse
@@ -751,13 +754,13 @@
 		\end{figure}
 		
 		Que nous allons mettre dans les modules suivants:
-		\begin{figure}[H]
+		\begin{table}[H]
 			\centering
 			\begin{tabular}{ll}
 				\hs{PP.Parser} & Classe de type pour les \textit{parsers}\\
 				\hs{PP.Parsers.Lr} & Implémentation du \textit{parser} LR\\
 			\end{tabular}
-		\end{figure}
+		\end{table}
 		
 		L'implémentation minimale d'un \textit{parser} LR se trouve dans la classe de type:
 		\begin{minted}{haskell}
@@ -787,7 +790,7 @@
 		Grâce à cette fonction \hs{parse'} nous pouvons, au niveau du CLI,  afficher toutes les configurations de l'analyse syntaxique ayant pu amener à une erreur. L'objectif du point 7 est donc rempli. \\
 		
 		Les tests ont été ajoutés aux modules suivants:
-		\begin{figure}[H]
+		\begin{table}[H]
 			\centering
 			\begin{tabular}{ll}
 				\hs{PPTest.Rule} & \textit{should check a rules set for missing non-terminals}\\
@@ -798,7 +801,7 @@
 				& \textit{should parse a simple grammar correctly}\\
 				& \textit{should detect an error in input}\\
 			\end{tabular}
-		\end{figure}
+		\end{table}
 		
 		\subsection{Intégration au CLI}
 		\label{subsec:test-grammaire-integration-au-cli}
@@ -806,14 +809,14 @@
 			
 			Comme exemples:
 			\begin{minted}{console}
-				prompt$ pp ebnf -f doc/grammars/wrong/03-direct-left-recursion.ebnf --check
+				$ pp ebnf -f doc/grammars/wrong/03-direct-left-recursion.ebnf --check
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][EBNF][CHECK][INFO] errors:
 				[PP][EBNF][CHECK][INFO] direct left-recusion: A
 				[PP][EBNF][CHECK][INFO] warnings:
 				
-				prompt$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
+				$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][LALR][TASK][START] compute collection and table
@@ -821,7 +824,7 @@
 				[PP][LALR][INFO] after 32 iterations: 
 				[PP][LALR][INFO] input accepted
 				
-				prompt$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
+				$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][LALR][TASK][START] compute collection and table
@@ -891,12 +894,13 @@
 			\todo{}
 			
 	\section{Génération des tables dans un langage cible}
+	\label{sec:generation-des-tables-dans-un-langage-cible}
 		Maintenant que les tests ont été réalisés, nous pouvons nous pencher sur la génération de la table LALR dans un langage autre que Haskell. Pour cela nous avons besoin de deux choses: un modèle (\textit{template}) sur lequel se baser, et donc un moteur de \textit{template}.\\
 		
 		Il existe plusieurs bibliothèques pour cela (\url{https://stackoverflow.com/questions/5770168/templating-packages-for-haskell}), nos choix sont \texttt{heterocephalus} \cite{heterocephalus} qui propose une syntaxe simple avec l'interpolation de variables, ainsi que des structures de contrôles (\texttt{if}, \texttt{forall}, ...) qui seront nécessaires dans notre cas, et \texttt{HStringTemplate} \cite{hstringtemplate} qui propose à peu près la même chose.\\
 		
 		Pour le choix final entre ces deux moteurs, nous allons mettre en évidence certaines de leurs caractéristiques par rapport à nos besoins:
-		\begin{figure}[H]
+		\begin{table}[H]
 			\centering
 			\begin{tabular}{l|cc}
 				\textbf{Caractéristique} & \textbf{\texttt{heterocephalus}} & \textbf{\texttt{HStringTemplate}}\\
@@ -909,7 +913,7 @@
 				Langage extensible & \textbf{Oui} & Non\\
 			\end{tabular}
 			\caption{Choix du \textit{template engine}}
-		\end{figure}
+		\end{table}
 		
 		Cette table montre que \texttt{heterocephalus} est plus riche que \texttt{HStringTemplate}, cela est principalement du au fait que le \textit{template} de l'utilisateur est compilé à la compilation et pas à l'exécution. Cependant cette méthode oblige à recompiler le CLI à chaque fois qu'on créer un nouveau \textit{template}, ce qui n'est pas notre objectif. Nous allons donc utiliser \texttt{HStringTemplate}, ses faiblesses au niveau du langage devront cependant être compensées par plus de variables \textit{interpolables}.\\
 		
@@ -917,13 +921,13 @@
 				
 		Le \textit{template engine} étant choisi, il nous reste encore à définir quelles variables seront nécessaires pour la génération des tables du côté de la personne voulant écrire un \textit{template} pour un langage cible:
 		\begin{itemize}
-			\item table LALR
+			\item Table LALR
 			\subitem (subdivisée par type d'actions ?)
-			\item nombre/liste des états
-			\item nombre/liste des terminaux
-			\item nombre/liste des non-terminaux
-			\item nombre d'états à réduire pour chaque non-terminal
-			\item nom de la règle associée pour chaque état\\
+			\item Nombre/liste des états
+			\item Nombre/liste des terminaux
+			\item Nombre/liste des non-terminaux
+			\item Nombre d'états à réduire pour chaque non-terminal
+			\item Nom de la règle associée pour chaque état\\
 		\end{itemize}
 		
 		Ces variables seront placées dans un module \hs{PP.Templates.Lr}, les comportements communs seront quant à eux placés dans \hs{PP.Template}:
@@ -952,39 +956,39 @@
 		Cette approche est extensible et sépare les différentes responsabilités. Le code \hs{compile (context 3) "it's the number $x$"} donnera en sortie: \texttt{"it's the number 3"}.\\
 		
 		Le contexte ici pour la table LR est plus complexe. Le tableau suivant résume les différentes variables disponibles ainsi que leurs champs:
-		\begin{figure}[H]
+		\begin{table}[H]
 			\centering
 			\begin{tabular}{llll}
 				\textbf{Type} & \textbf{Champ} & \textbf{Type du champ} & \textbf{Commentaires}\\
 				\hline
-				LrContext & states & [LrContextState] & States informations\\
-				 & terms & [LrContextTerm] & Terminals informations\\
-				 & nonTerms & [LrContextNonTerm] & Non-terminals informations (without length)\\
-				 & table & LrContextTable & LR table informations\\
-				LrContextState & id & Int & State ID\\
-				 & alt & LrContextNonTerm & Associated non-terminal (not impl. yet)\\
-				LrContextTerm & symbol & Char & Terminal symbol\\
-				 & isEmpty & Bool & It's the EMPTY symbol?\\
-				LrContextNonTerm & name & String & Non-terminal name\\
-				 & length & Int & Rule length (right side)\\
-				LrContextTable & rows & [LrContextTableRow] & Table flatten in rows only\\
-				 & total & Int & Total rows (with errors)\\
-				LrContextTableRow & state & LrContextState & Row state\\
-				 & isTerm & Bool & Row state is associated with ?\\
-				 & term & LrContextTerm & Row is associated with terminal\\
-				 & nonTerm & LrContextNonTerm & Row is associated with non-terminal\\
-				 & action & LrContextAction & Associated action\\
-				LrContextAction & isReduce & Bool & Is action reduce?\\
-				 & isShift & Bool & Is action shift?\\
-				 & isGoto & Bool & Is action goto?\\
-				 & isError & Bool & Is action error?\\
-				 & isAccept & Bool & Is action accept?\\
-				 & shift & Int & Shift value\\
-				 & goto & Int & Goto value\\
-				 & reduce & LrContextNonTerm & Reduce associated non-terminal (with length)\\
+				\hs{LrContext} & \hs{states} & \hs{[LrContextState]} & \textit{States informations}\\
+				 & \hs{terms} & \hs{[LrContextTerm]} & \textit{Terminals informations}\\
+				 & \hs{nonTerms} & \hs{[LrContextNonTerm]} & \textit{Non-terminals informations (without length)}\\
+				 & \hs{table} & \hs{LrContextTable} & \textit{LR table informations}\\
+				\hs{LrContextState} & \hs{id} & \hs{Int} & \textit{State ID}\\
+				 & \hs{alt} & \hs{LrContextNonTerm} & \textit{Associated non-terminal (not impl. yet)}\\
+				\hs{LrContextTerm} & \hs{symbol} & \hs{Char} & \textit{Terminal symbol}\\
+				 & \hs{isEmpty} & \hs{Bool} & \textit{It's the EMPTY symbol?}\\
+				\hs{LrContextNonTerm} & \hs{name} & \hs{String} & \textit{Non-terminal name}\\
+				 & \hs{length} & \hs{Int} & \textit{Rule length (right side)}\\
+				\hs{LrContextTable} & \hs{rows} & \hs{[LrContextTableRow]} & \textit{Table flatten in rows only}\\
+				 & \hs{total} & \hs{Int} & \textit{Total rows (with errors)}\\
+				\hs{LrContextTableRow} & \hs{state} & \hs{LrContextState} & \textit{Row state}\\
+				 & \hs{isTerm} & \hs{Bool} & \textit{Row state is associated with ?}\\
+				 & \hs{term} & \hs{LrContextTerm} & \textit{Row is associated with terminal}\\
+				 & \hs{nonTerm} & \hs{LrContextNonTerm} & \textit{Row is associated with non-terminal}\\
+				 & \hs{action} & \hs{LrContextAction} & \textit{Associated action}\\
+				\hs{LrContextAction} & \hs{isReduce} & \hs{Bool} & \textit{Is action reduce?}\\
+				 & \hs{isShift} & \hs{Bool} & \textit{Is action shift?}\\
+				 & \hs{isGoto} & \hs{Bool} & \textit{Is action goto?}\\
+				 & \hs{isError} & \hs{Bool} & \textit{Is action error?}\\
+				 & \hs{isAccept} & \hs{Bool} & \textit{Is action accept?}\\
+				 & \hs{shift} & \hs{Int} & \textit{Shift value}\\
+				 & \hs{goto} & \hs{Int} & \textit{Goto value}\\
+				 & \hs{reduce} & \hs{LrContextNonTerm} & \textit{Reduce associated non-terminal (with length)}\\
 			\end{tabular}
 			\caption{Variables interpolables pour le \textit{template} LR}
-		\end{figure}
+		\end{table}
 		
 		Ces champs nous offre toutes les informations dont nous avions besoin pour l'écriture d'un \textit{template}. Nous avons ci-dessous le premier modèle, qui génère simplement la table LR:
 		\inputminted{text}{../../doc/templates/lr-table}
@@ -1055,10 +1059,11 @@
 		\subsection{Intégration au CLI}
 			L'intégration au CLI consiste à simplement ajouter une option \texttt{--template FILENAME} à la sous-commande \texttt{lalr}. Le CLI compile ensuite le fichier modèle avec la table générée:
 			\begin{minted}{console}
-				prompt$ pp -s lalr -f grammar.ebnf --template template.foo > output.foo
+				$ pp -s lalr -f grammar.ebnf --template template.foo > output.foo
 			\end{minted}
 			
 	\section{Démonstration en C\#}
+	\label{sec:demonstration-en-csharp}
 		PP est désormais capable de lire une grammaire EBNF, de générer la table LALR correspondante, et de compiler un fichier \textit{template}. Dans cette section nous allons utiliser tout cela, pour démontrer le fonctionnement global ainsi que l'accomplissement des objectifs principaux du cahier des charges.\\
 		
 		La démonstration se sépare en plusieurs parties:
@@ -1075,7 +1080,7 @@
 		
 		\subsection{Écriture de l'\textit{engine} C\#}
 			Le moteur en C\# consiste principalement en un \textit{parser} LR, qui donne en sortie l'AST parsé. Nous avons donc repris le fonctionnement du \textit{parser} LR en Haskell pour le transposer en C\#. L'implémentation se trouve dans le dossier \texttt{trials/csharp-engine/}, en résumé:
-			\begin{figure}[H]
+			\begin{table}[H]
 				\centering
 				\begin{tabular}{ll}
 					\texttt{Program.cs} & \textit{Main}\\
@@ -1087,7 +1092,7 @@
 					\texttt{engine/LrTable.cs} & Interface pour la table LR\\
 				\end{tabular}
 				\caption{Structure de l'\textit{engine} C\#}
-			\end{figure}
+			\end{table}
 			
 			Le point important à noter est \texttt{LrTable}. Grâce à cette approche, l'écriture du \textit{template} n'aura qu'à dériver cette interface pour fonctionner avec l'\textit{engine}. Nous verrons cela dans la partie suivante.
 		
@@ -1128,8 +1133,8 @@
 			\paragraph{}
 			Compilons-la avec notre \textit{template}:
 			\begin{minted}{text}
-				prompt$ pp -s lalr -f simple.ebnf --template csharp.cs > LrTableImpl.cs
-				prompt$
+				$ pp -s lalr -f simple.ebnf --template csharp.cs > LrTableImpl.cs
+				$
 			\end{minted}
 			\captionof{listing}{Compilation d'une table LALR avec un \textit{template}}
 			
@@ -1186,7 +1191,41 @@
 		\subsection{Démonstration finale}
 			\todo{pipeline, Program.cs}
 			
-	\section{TODO}
+	\section{Planification de la phase III}		
+		Comme on a pu le voir dans la section précédente, \textit{platinum parsing} réponds désormais à tous les objectifs que nous nous avions fixé pour la phase II (phase minimale). Nous pouvons à présent penser aux prochaines étapes, plusieurs choix sont possibles:
+		\begin{itemize}
+			\item Ajout de l'analyse lexicale (\textit{lexer})
+			\subitem En plus de l'analyseur syntaxique déjà présent (\textit{parser})
+			\item Intégration à un éditeur de texte
+			\subitem Soit un IDE dédié, soit un plugin pour un éditeur existant
+			\item Peaufinages en général
+			\subitem Corrections des \textit{issues}, ajout de nouvelles fonctionnalités, etc.
+			\item Mise en ligne
+			\subitem \textit{Landing page}, documentation \textit{github}, etc.\\
+		\end{itemize}
+		
+		Si tous ces choix sont pertinents, il est cependant difficile de savoir si tous seront réalisables dans le temps imparti à la phase III. Nous devons donc choisir l'ordre dans lequel nous voulons attaquer ces différentes étapes.\\
+		
+		La principale question est entre le \textit{lexer} ou l'intégration à un éditeur. Concrètement nous allons privilégier le \textit{lexer} si les gains (performances, fonctionnalités) associés sont conséquents. Pour savoir cela nous allons donc commencer par une étape d'analyse qui consistera à quantifier ces gains, et ainsi nous pourrons choisir quelle étape réaliser en premier.\\
+		
+		Voici donc la planification pour les 6 dernières semaines:
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{c|c|l}
+				\textbf{Ordre} & \textbf{Durée} & \textbf{Tâche}\\
+				\hline
+				1 & 1 semaine & Analyse des gains du \textit{lexer}\\
+				2 ou 3 & 2 semaines & Ajout du \textit{lexer}\\
+				2 ou 3 & 1 semaine & Intégration à un éditeur\\
+				4 & 1 semaine & Mise en ligne, peaufinages\\
+				& 1 semaine & Semaine tampon\\
+			\end{tabular}
+			\caption{Planification de la phase III}
+		\end{table}
+		
+		Nous affectons une semaine tampon dans le cas où l'une des tâches prendrait plus de temps que prévu.
+			
+	\section{TODO} 
 		\todo{organisation du dossier du projet}
 		\todo{modules finaux de PP}
 		\todo{état actuel de PP, futur...}
@@ -1195,13 +1234,19 @@
 	
 	\section{Annexes}
 			
-		\subsection{Table des figures et tableaux}
+		\subsection{Liste des figures}
 			\begingroup
 				\renewcommand{\section}[2]{}
 				\listoffigures
 			\endgroup
 			
-		\subsection{Table des listings}
+		\subsection{Liste des tables}
+			\begingroup
+				\renewcommand{\section}[2]{}
+				\listoftables
+			\endgroup
+			
+		\subsection{Liste des codes}
 			\begingroup
 				\renewcommand{\section}[2]{}
 				\listoflistings
@@ -1228,13 +1273,13 @@
 			
 			Pour simplification, nous avons uniquement:
 			\begin{itemize}
-				\item la définition de règle avec \texttt{=} : \texttt{<rule>=<expr>;}
-				\item la concaténation avec \texttt{,} : \texttt{<a>,<b>}
-				\item le choix avec \texttt{|} : \texttt{<a>|<b>}
-				\item les terminaux entourés par des guillemets simples: \texttt{'a'}
-				\item les non-terminaux entourés par \texttt{<>} ou pas
-				\item pas de gestion des espaces, tabulations, ...
-				\item pas de gestion de la priorité des opérateurs, ni des parenthèses\\
+				\item La définition de règle avec \texttt{=} : \texttt{<rule>=<expr>;}
+				\item La concaténation avec \texttt{,} : \texttt{<a>,<b>}
+				\item Le choix avec \texttt{|} : \texttt{<a>|<b>}
+				\item Les terminaux entourés par des guillemets simples: \texttt{'a'}
+				\item Les non-terminaux entourés par \texttt{<>} ou pas
+				\item Pas de gestion des espaces, tabulations, ...
+				\item Pas de gestion de la priorité des opérateurs, ni des parenthèses\\
 			\end{itemize}
 			
 			Le parser doit pouvoir sortir l'AST correspondant.
@@ -1342,6 +1387,9 @@
 						
 					\bibitem{hstringtemplate} HStringTemplate, A port of the Java library by Terrence Parr,\\
 						\url{http://hackage.haskell.org/package/HStringTemplate}\\
+						
+					\bibitem{lr} LR Parser,\\
+						\url{https://en.wikipedia.org/wiki/LR_parser}\\
 						
 				\end{thebibliography}
 			\endgroup

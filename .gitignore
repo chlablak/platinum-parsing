@@ -12,6 +12,7 @@ pp.*
 **/*.toc
 **/*.lol
 **/_minted*
+**/*.lot
 
 # OpenOffice
 **/.~lock*
