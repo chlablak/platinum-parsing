@@ -1,0 +1,20 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "Grammaire" as grammar
+rectangle "Entrée\n<b>2+3*(1+3)</b>" as input
+rectangle "<i>Template</i> C#" as template
+rectangle "Table LALR C#" as table
+rectangle "Platinum Parsing CLI" as cli
+rectangle "<i>Engine</i> C#" as engine
+rectangle "Sortie\n<b>14</b>" as output
+
+grammar --> cli
+template --> cli
+cli -> table
+table --> engine
+input -> engine
+engine -> output
+
+@enduml

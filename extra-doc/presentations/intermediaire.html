@@ -309,9 +309,10 @@ Le contexte contient toutes les variables interpolables nécessaires :
 - Liste des états
 - Liste des terminaux et des non-terminaux
 - Table LALR et ses actions
+- Organisation hiérachique
 
 ```stringtemplate
-STATE $length(lr.states)$
+STATE $length(`lr`.states)$
 TERM $length(lr.terms)$
 $lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
 }...
@@ -330,14 +331,14 @@ $lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
 ]
 .right-column[
 ```stringtemplate
-STATE $length(lr.states)$
+STATE `$length(lr.states)$`
 TERM $length(lr.terms)$
 $lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
 }...
 ```
 
 ```text
-STATE 7
+STATE `7`
 TERM 3
 EMPTY
 c
@@ -368,7 +369,14 @@ ROW 18
 ### Fil rouge
 ]
 .right-column[
-TODO
+Le but est de _parser_ et d'évaluer une expression :
+```haskell
+2+3*(1+3)
+```
+
+En utilisant un _engine_ C# et le CLI
+
+![exemple de pipeline](exemple-pipeline.svg)
 ]
 
 ---
@@ -380,7 +388,22 @@ TODO
 ### CLI
 ]
 .right-column[
-TODO
+#### Expose les fonctionnalités du _framework_
+```text
+$ `pp --help`
+tools for helping PP projects
+
+Usage: pp [-v|--verbosity LEVEL] [-s|--silent] COMMAND
+  Platinum Parsing CLI
+
+Available options:
+  -v,--verbosity LEVEL     Set verbosity level
+  -s,--silent              Verbosity off
+  -h,--help                Show this help text
+
+Available commands:
+  ebnf                     Manipulate EBNF grammars
+  lalr                     Generate LALR parsing table```
 ]
 
 ---
@@ -393,7 +416,20 @@ TODO
 ### Grammaire
 ]
 .right-column[
-TODO
+_input.txt_ :
+```haskell
+2+3*(1+3)
+```
+
+_grammar.ebnf_ :
+```ebnf
+statement = expression;
+expression = term, "+", expression | term;
+term = factor, "*", term | factor;
+factor = "(", expression, ")" | digit;
+digit = "0" | "1" | "2" | "3" | "4"
+      | "5" | "6" | "7" | "8" | "9";
+```
 ]
 
 ---
@@ -407,7 +443,20 @@ TODO
 ### Tests
 ]
 .right-column[
-TODO
+```console
+$ pp ebnf -f grammar.ebnf --check
+```
+- Syntaxe de la grammaire fausse
+- Transformation en règles canoniques impossible
+- Impossible d’augmenter la grammaire
+- Non-terminal manquant
+- Récursion à gauche (directe et indirecte)
+
+```console
+$ pp lalr -f grammar.ebnf --test-with input.txt
+```
+- Grammaire non-LALR
+- Grammaire invalide pour le langage voulu
 ]
 
 ---
@@ -422,7 +471,19 @@ TODO
 ### Génération
 ]
 .right-column[
-TODO
+```console
+$ pp -s lalr -f grammar.ebnf --template csharp.cs > Table.cs
+```
+
+_csharp.cs_ :
+```csharp
+// template pour l'engine C#
+```
+
+_Table.cs_ :
+```csharp
+// template compilé pour notre grammaire
+```
 ]
 
 ---
@@ -438,7 +499,12 @@ TODO
 ### Utilisation
 ]
 .right-column[
-TODO
+![exemple de pipeline](exemple-pipeline.svg)
+
+On utilise l'_engine_ C# avec _Table.cs_ :
+1. Pour _parser_ l'entrée **`2+3*(1+3)`**
+  - En construisant l'AST correspondant
+2. Pour évaluer l'AST obtenu, ce qui donne : **`14`**
 ]
 
 ---
@@ -446,10 +512,18 @@ TODO
 ## Évolutions futures de Platinum Parsing
 
 .left-column[
-### Déjà fait
+### État actuel
 ]
 .right-column[
-TODO
+- Lire et comprendre une grammaire EBNF
+
+- Tester et valider une grammaire EBNF
+
+- Générer la table d'analyse syntaxique LALR
+
+- Tester la table LALR sur une entrée
+
+- Compiler un _template_ dans un langage cible
 ]
 
 ---
@@ -457,11 +531,21 @@ TODO
 ## Évolutions futures de Platinum Parsing
 
 .left-column[
-### Déjà fait
-### À faire
+### État actuel
+### Prochainement
 ]
 .right-column[
-TODO
+- Ajout de l’analyse lexicale
+
+- Intégration à un éditeur de texte
+
+- Peaufinages en général
+
+- Mise en ligne
+
+.img-60[
+![architecture de pp](architecture-pp.svg)
+]
 ]
 
 ---
@@ -469,13 +553,16 @@ TODO
 ## Évolutions futures de Platinum Parsing
 
 .left-column[
-### Déjà fait
-### À faire
+### État actuel
+### Prochainement
 ### Plus loin
 ]
 .right-column[
-TODO
+#### Conception complète d'un compilateur
+Avec plus d'options disponibles pour le développeur
 ]
+
+![unités d'un compilateur](compiler-units.svg)
 
 ---
 
@@ -484,7 +571,7 @@ class: center, middle
 # Platinum Parsing
 ## Aide aux développement de compilateur
 
-TODO
+![exemple de pipeline](exemple-pipeline.svg)
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
