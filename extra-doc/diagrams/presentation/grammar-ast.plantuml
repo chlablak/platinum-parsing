@@ -1,0 +1,36 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "AST" as ast
+rectangle "Rule" as rule1
+rectangle "Identifier\n<i><b>S</b></i>" as id1
+rectangle "List" as list1
+rectangle "Definition" as def11
+rectangle "NonTerm\n<i><b>C</b></i>" as nt111
+rectangle "NonTerm\n<i><b>C</b></i>" as nt112
+rectangle "Rule" as rule2
+rectangle "Identifier\n<i><b>C</b></i>" as id2
+rectangle "List" as list2
+rectangle "Definition" as def21
+rectangle "Definition" as def22
+rectangle "Term\n<i><b>c</b></i>" as t211
+rectangle "NonTerm\n<i><b>C</b></i>" as nt211
+rectangle "Term\n<i><b>d</b></i>" as t221
+
+ast -- rule1
+rule1 -- id1
+rule1 -- list1
+list1 -- def11
+def11 -- nt111
+def11 -- nt112
+ast -- rule2
+rule2 -- id2
+rule2 -- list2
+list2 -- def21
+def21 -- t211
+def21 -- nt211
+list2 -- def22
+def22 -- t221
+
+@enduml

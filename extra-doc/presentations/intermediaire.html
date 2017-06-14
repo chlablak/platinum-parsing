@@ -30,6 +30,52 @@
         float: right;
         padding-top: 1em;
       }
+
+      /* Position */
+      .push-bottom {
+        position: fixed;
+        bottom: 10%;
+      }
+      .push-bottom-right {
+        position: fixed;
+        right: 10%;
+        bottom: 10%;
+      }
+
+      /* Img */
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      .img-90 { max-width: 90%; }
+      .img-80 { max-width: 80%; }
+      .img-70 { max-width: 70%; }
+      .img-60 { max-width: 60%; }
+      .img-50 { max-width: 50%; }
+      .img-40 { max-width: 40%; }
+      .img-30 { max-width: 30%; }
+      .img-20 { max-width: 20%; }
+      .img-10 { max-width: 10%; }
+
+      /* Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td {
+        text-align: center;
+      }
+      td, th {
+        padding: 1%;
+      }
+      table, td, th {
+        border: 1px solid black;
+      }
+
+      /* Text */
+      .mini {
+        font-size: medium;
+      }
     </style>
   </head>
   <body>
@@ -49,7 +95,7 @@ Patrick Champion
 
 1. Présentation de Platinum Parsing
 
-2. Génération des tables LALR
+2. Génération des tables d'analyse syntaxique
 
 3. Utilisation dans un langage cible
 
@@ -67,7 +113,15 @@ Patrick Champion
 ### Demande
 ]
 .right-column[
-TODO
+- Faciliter l'écriture de compilateurs
+
+- Remplacer _Gold Parsing System_
+]
+
+.push-bottom[
+.img-90[
+![unités d'un compilateur](compiler-units.svg)
+]
 ]
 
 ---
@@ -79,7 +133,19 @@ TODO
 ### Objectifs
 ]
 .right-column[
-TODO
+- Analyser une grammaire EBNF
+
+- Générer la table LALR correspondante
+
+![analyseur syntaxique](compiler-parser.svg)
+
+.mini[
+EBNF = _Extended Backus-Naur Form_
+
+LALR = _Look-Ahead LR parser_
+
+AST = _Abstract Syntax Tree_
+]
 ]
 
 ---
@@ -92,7 +158,9 @@ TODO
 ### Architecture
 ]
 .right-column[
-TODO
+#### 3 blocs distincts :
+
+![architecture de pp](architecture-pp.svg)
 ]
 
 ---
@@ -106,7 +174,9 @@ TODO
 ### Technologies
 ]
 .right-column[
-TODO
+.img-80[
+![technologies](technologies.png)
+]
 ]
 
 ---
@@ -117,7 +187,16 @@ TODO
 ### Grammaire
 ]
 .right-column[
-TODO
+```ebnf
+S = C, C ;
+C = "c", C | "d" ;
+```
+
+Valide les chaînes: _dd_, _cdd_, _cccdcd_, _ccc..cdcc...cd_, etc.
+
+.img-70[
+![AST simplifié de la grammaire](grammar-ast.svg)
+]
 ]
 
 ---
@@ -129,7 +208,23 @@ TODO
 ### Règles
 ]
 .right-column[
-TODO
+```ebnf
+S = C, C ;
+C = "c", C | "d" ;
+```
+
+Grammaire augmentée canonique à partir de l'AST :
+```haskell
+[Rule "__start" [NonTerm "S", Empty],
+ Rule "S" [NonTerm "C", NonTerm "C", Empty],
+ Rule "C" [Term 'c', NonTerm "C", Empty],
+ Rule "C" [Term 'd', Empty]]
+```
+
+- **Symbole de départ** ajouté
+- Règles uniquement composées de :
+  - **Terminaux**
+  - **Non-terminaux**
 ]
 
 ---
@@ -142,7 +237,9 @@ TODO
 ### Génération
 ]
 .right-column[
-TODO
+#### Processus de génération de la table LALR
+
+![TODO](étapes de la génération)
 ]
 
 ---
@@ -156,7 +253,23 @@ TODO
 ### Table
 ]
 .right-column[
-TODO
+#### Exemple d'une table LALR générée :
+
+|       | `'c'` | `'d'` | `'$'` | `S` | `C` |
+| ----- | ----- | ----- | ----- | --- | --- |
+| **0** | s1    | s2    |       | 4   | 3   |
+| **1** | s1    | s2    |       |     | 5   |
+| **2** | r3    | r3    | r3    |     |     |
+| **3** | s1    | s2    |       |     | 6   |
+| **4** |       |       | acc   |     |     |
+| **5** | r2    | r2    | r2    |     |     |
+| **6** |       |       | r1    |     |     |
+
+.mini[
+r = _reduce_, s = _shift_, chiffre seul = _goto_
+
+acc = _accept_, vide = _error_
+]
 ]
 
 ---
@@ -167,7 +280,19 @@ TODO
 ### _Template_
 ]
 .right-column[
-TODO
+#### Utilisation d'un langage de _template_
+- Interpolation de variables : `$name$`
+- Structure de contrôle : `$if(test)$`
+- Structure de boucle : `$rows:{row|$row$}$`
+- Fonctions : `$length(rows)$`
+
+#### Le développeur peut créer le _template_ pour ses besoins
+- Platinum Parsing est un outil **générique**
+- La communauté peut développer des _engines_
+
+.mini[
+_engine_ = analyseur syntaxique LR
+]
 ]
 
 ---
@@ -179,7 +304,18 @@ TODO
 ### Variables
 ]
 .right-column[
-TODO
+#### Un _template_ se compile avec un **contexte** propre
+Le contexte contient toutes les variables interpolables nécessaires :
+- Liste des états
+- Liste des terminaux et des non-terminaux
+- Table LALR et ses actions
+
+```stringtemplate
+STATE $length(lr.states)$
+TERM $length(lr.terms)$
+$lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
+}...
+```
 ]
 
 
@@ -193,7 +329,35 @@ TODO
 ### Exemple
 ]
 .right-column[
-TODO
+```stringtemplate
+STATE $length(lr.states)$
+TERM $length(lr.terms)$
+$lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
+}...
+```
+
+```text
+STATE 7
+TERM 3
+EMPTY
+c
+d
+NONTERM 2
+C
+S
+TABLE 35
+ROW 18
+0 NONTERM C GOTO 3
+0 NONTERM S GOTO 4
+0 TERM c SHIFT 1
+0 TERM d SHIFT 2
+1 NONTERM C GOTO 5
+...
+```
+]
+
+.push-bottom-right[
+![compilation de template](template.svg)
 ]
 
 ---
@@ -327,7 +491,6 @@ TODO
     </script>
     <script type="text/javascript">
       var slideshow = remark.create({
-        highlightLanguage: 'haskell',
         highlightLines: true,
         highlightSpans: true
       });

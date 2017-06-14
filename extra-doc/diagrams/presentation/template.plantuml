@@ -1,0 +1,16 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "Table LALR" as table
+rectangle "Contexte" as context
+rectangle "Compilation" as compile
+rectangle "<i>Template</i>" as template
+rectangle "Sortie" as output
+
+table -- context
+context --> compile
+template -> compile
+compile -> output
+
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "Environnement de développement" as ide
+rectangle "Interface en ligne de commande" as cli
+rectangle "Framework" as fw
+rectangle "Builder" as b
+rectangle "Grammar" as g
+rectangle "Parser" as p
+rectangle "..." as o
+
+
+ide --> cli
+cli --> fw
+fw -- b
+fw -- g
+fw -- p 
+fw -- o
+
+@enduml

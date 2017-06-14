@@ -1,0 +1,29 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "Compilateur" as compiler
+
+rectangle "Partie frontale" as frontend
+rectangle "Optimiseur" as optimizer
+rectangle "Partie finale" as backend
+
+rectangle "Analyseur lexical" as lexer
+rectangle "Analyseur syntaxique" as parser
+rectangle "Analyseur sémantique" as seman
+rectangle "Générateur de code intermédiaire" as gen
+
+compiler -- frontend
+compiler -- backend
+
+frontend -> optimizer
+optimizer -> backend
+
+frontend -- lexer
+frontend -- gen
+
+lexer -> parser
+parser -> seman
+seman -> gen
+
+@enduml
