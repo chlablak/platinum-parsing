@@ -1,0 +1,21 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "Grammaire" as grammar
+rectangle "AST" as ast
+rectangle "Règles" as rules
+rectangle "PREMIER" as first
+rectangle "Collection LR(1)" as lr1
+rectangle "Collection LALR" as lalr
+rectangle "Table LALR" as table
+
+grammar -> ast : <i>parser</i>
+ast --> rules : <i>transformation</i>
+first <- rules : <i>construction</i>
+rules --> lr1 : <i>génération</i>
+first --> lr1
+lr1 --> lalr : <i>fusion</i>
+lalr -> table : <i>construction</i>
+
+@enduml
