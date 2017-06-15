@@ -85,9 +85,21 @@ class: center, middle
 
 # Platinum Parsing
 
+### Travail de Bachelor
+
 HEIG-VD, 16 juin 2017
 
 Patrick Champion
+
+Prof. François Birling
+
+???
+
+Bonjour à tous
+
+Je m'appelle ...
+
+J'ai le plaisir de vous présenter ...
 
 ---
 
@@ -105,12 +117,14 @@ Patrick Champion
 
 6. Conclusion et questions
 
+???
+
 ---
 
 ## Platinum Parsing, un projet d'aide aux développeurs
 
 .left-column[
-### Demande
+### Besoin
 ]
 .right-column[
 - Faciliter l'écriture de compilateurs
@@ -124,12 +138,14 @@ Patrick Champion
 ]
 ]
 
+???
+
 ---
 
 ## Platinum Parsing, un projet d'aide aux développeurs
 
 .left-column[
-### Demande
+### Besoin
 ### Objectifs
 ]
 .right-column[
@@ -148,27 +164,37 @@ AST = _Abstract Syntax Tree_
 ]
 ]
 
+???
+
+Objectifs concrets du TB
+
 ---
 
 ## Platinum Parsing, un projet d'aide aux développeurs
 
 .left-column[
-### Demande
+### Besoin
 ### Objectifs
 ### Architecture
 ]
 .right-column[
-#### 3 blocs distincts :
+#### 3 blocs distincts, réutilisables :
 
 ![architecture de pp](architecture-pp.svg)
 ]
+
+???
+
+Le CLI expose les fonctionnalité du Framework
+
+Dépendance de haut en bas -> réutilisation
 
 ---
 
 ## Platinum Parsing, un projet d'aide aux développeurs
 
 .left-column[
-### Demande
+### Besoin
 ### Objectifs
 ### Architecture
 ### Technologies
@@ -178,6 +204,24 @@ AST = _Abstract Syntax Tree_
 ![technologies](technologies.png)
 ]
 ]
+
+???
+
+Haskell est un langage fonctionnel
+
++ Transformation des données
+
++ Très expressif
+
+Stack pour gérer et partager un projet Haskell
+
++ Uniformité dans l'écosystème
+
+Git est un gestionnaire de version
+
++ Suivi des _issues_
+
+Technologies actuelles, à la pointe
 
 ---
 
@@ -198,6 +242,12 @@ Valide les chaînes: _dd_, _cdd_, _cccdcd_, _ccc..cdcc...cd_, etc.
 ![AST simplifié de la grammaire](grammar-ast.svg)
 ]
 ]
+
+???
+
+AST compréhensible par un programme
+
++ Ici simplifié
 
 ---
 
@@ -227,6 +277,12 @@ Grammaire augmentée canonique à partir de l'AST :
   - **Non-terminaux**
 ]
 
+???
+
+AST trop complexe
+
+Applatissement des règles (~ BNF)
+
 ---
 
 ## Génération de table LALR à partir d'une grammaire
@@ -237,10 +293,15 @@ Grammaire augmentée canonique à partir de l'AST :
 ### Génération
 ]
 .right-column[
-#### Processus de génération de la table LALR
 
 ![processus de génération](generation-process.svg)
 ]
+
+???
+
+Suite de transformation
+
+1000 états LR(1) -> ~ 100 états LALR
 
 ---
 
@@ -272,6 +333,10 @@ acc = _accept_, vide = _error_
 ]
 ]
 
+???
+
+Utilisable par un _Parser LR_
+
 ---
 
 ## Utilisation avec le langage de notre choix
@@ -281,10 +346,12 @@ acc = _accept_, vide = _error_
 ]
 .right-column[
 #### Utilisation d'un langage de _template_
-- Interpolation de variables : `$name$`
-- Structure de contrôle : `$if(test)$`
-- Structure de boucle : `$rows:{row|$row$}$`
-- Fonctions : `$length(rows)$`
+```stringtemplate
+ `$name$`             // Interpolation de variables
+ `$if(test)$`         // Structure de contrôle
+ `$rows:{row|$row$}$` // Structure de boucle
+ `$length(rows)$`     // Fonctions
+```
 
 #### Le développeur peut créer le _template_ pour ses besoins
 - Platinum Parsing est un outil **générique**
@@ -294,6 +361,10 @@ acc = _accept_, vide = _error_
 _engine_ = analyseur syntaxique LR
 ]
 ]
+
+???
+
+Le développeur peut faire un _engine_ sur mesure
 
 ---
 
@@ -319,6 +390,7 @@ $lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
 ```
 ]
 
+???
 
 ---
 
@@ -361,6 +433,10 @@ ROW 18
 ![compilation de template](template.svg)
 ]
 
+???
+
+On voit la hiéarchie `lr -> terms -> term -> isEmpty` etc.
+
 ---
 
 ## Un _pipeline_ complet simple à utiliser
@@ -402,8 +478,8 @@ Available options:
   -h,--help                Show this help text
 
 Available commands:
-  ebnf                     Manipulate EBNF grammars
-  lalr                     Generate LALR parsing table```
+*  ebnf                     Manipulate EBNF grammars
+*  lalr                     Generate LALR parsing table```
 ]
 
 ---
@@ -446,11 +522,14 @@ digit = "0" | "1" | "2" | "3" | "4"
 ```console
 $ pp ebnf -f grammar.ebnf --check
 ```
-- Syntaxe de la grammaire fausse
-- Transformation en règles canoniques impossible
-- Impossible d’augmenter la grammaire
-- Non-terminal manquant
-- Récursion à gauche (directe et indirecte)
+```ebnf
+A = { "a" ` `;        (* Syntaxe de la grammaire fausse *)
+B = letter `- "b"`;   (* Règles canoniques impossible *)
+C = E, "c", `F`;      (* Non-terminal manquant *)
+D = `D`, "d";         (* Récursion à gauche directe *)
+E = `C`;              (* Récursion à gauche indirecte *)
+(* + Impossible d’augmenter la grammaire (2 versions) *)
+```
 
 ```console
 $ pp lalr -f grammar.ebnf --test-with input.txt
@@ -458,6 +537,14 @@ $ pp lalr -f grammar.ebnf --test-with input.txt
 - Grammaire non-LALR
 - Grammaire invalide pour le langage voulu
 ]
+
+???
+
+Récusion à gauche indirecte pas encore impl.
+
+Non-LALR -> conflits à la construction
+
+`--test-with` -> _Parsing LR_
 
 ---
 
@@ -486,6 +573,8 @@ _Table.cs_ :
 ```
 ]
 
+???
+
 ---
 
 ## Un _pipeline_ complet simple à utiliser
@@ -507,6 +596,8 @@ On utilise l'_engine_ C# avec _Table.cs_ :
 2. Pour évaluer l'AST obtenu, ce qui donne : **`14`**
 ]
 
+???
+
 ---
 
 ## Évolutions futures de Platinum Parsing
@@ -515,16 +606,18 @@ On utilise l'_engine_ C# avec _Table.cs_ :
 ### État actuel
 ]
 .right-column[
-- Lire et comprendre une grammaire EBNF
+- Lire et comprendre une **grammaire EBNF**
 
-- Tester et valider une grammaire EBNF
+- **Tester et valider** une grammaire EBNF
 
-- Générer la table d'analyse syntaxique LALR
+- Générer la **table d'analyse syntaxique LALR**
 
-- Tester la table LALR sur une entrée
+- Tester la table LALR **sur une entrée**
 
-- Compiler un _template_ dans un langage cible
+- Compiler un **_template_** dans un langage cible
 ]
+
+???
 
 ---
 
@@ -548,6 +641,20 @@ On utilise l'_engine_ C# avec _Table.cs_ :
 ]
 ]
 
+???
+
+Peaufinages:
+
++ Correction/impl. des _issues_
+
+Mise en ligne:
+
++ _Landing page_
+
++ Documentation
+
++ `hackage` avec Stack
+
 ---
 
 ## Évolutions futures de Platinum Parsing
@@ -564,6 +671,14 @@ Avec plus d'options disponibles pour le développeur
 
 ![unités d'un compilateur](compiler-units.svg)
 
+???
+
+D'autres blocs (_lexer_, interpréteur, etc.)
+
+D'autres choix (_parser_, _builder_, etc.)
+
+Etc.
+
 ---
 
 class: center, middle
@@ -572,6 +687,12 @@ class: center, middle
 ## Aide aux développement de compilateur
 
 ![exemple de pipeline](exemple-pipeline.svg)
+
+???
+
+On a vu que PP est ...
+
+Je peux répondre à présent à vos questions ...
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">

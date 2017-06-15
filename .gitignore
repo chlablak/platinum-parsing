@@ -2,6 +2,7 @@
 **/*.pdf
 ignored/
 pp.*
+**/*.zip
 
 # LaTeX
 **/*.aux
