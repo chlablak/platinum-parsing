@@ -316,15 +316,15 @@ Suite de transformation
 .right-column[
 #### Exemple d'une table LALR générée :
 
-|       | `'c'` | `'d'` | `'$'` | `S` | `C` |
-| ----- | ----- | ----- | ----- | --- | --- |
-| **0** | s1    | s2    |       | 4   | 3   |
-| **1** | s1    | s2    |       |     | 5   |
-| **2** | r3    | r3    | r3    |     |     |
-| **3** | s1    | s2    |       |     | 6   |
-| **4** |       |       | acc   |     |     |
-| **5** | r2    | r2    | r2    |     |     |
-| **6** |       |       | r1    |     |     |
+| **État** | | **c**   | **d** | **$** | | **S** | **C** |
+| -------- | | ------- | ----- | ----- | | ----- | ----- |
+| **0**    | | _s1_    | _s2_  |       | | _4_   | _3_   |
+| **1**    | | _s1_    | _s2_  |       | |       | _5_   |
+| **2**    | | _r3_    | _r3_  | _r3_  | |       |       |
+| **3**    | | _s1_    | _s2_  |       | |       | _6_   |
+| **4**    | |         |       | _acc_ | |       |       |
+| **5**    | | _r2_    | _r2_  | _r2_  | |       |       |
+| **6**    | |         |       | _r1_  | |       |       |
 
 .mini[
 r = _reduce_, s = _shift_, chiffre seul = _goto_
@@ -347,10 +347,10 @@ Utilisable par un _Parser LR_
 .right-column[
 #### Utilisation d'un langage de _template_
 ```stringtemplate
- `$name$`             // Interpolation de variables
- `$if(test)$`         // Structure de contrôle
- `$rows:{row|$row$}$` // Structure de boucle
- `$length(rows)$`     // Fonctions
+$name$             // Interpolation de variables
+$if(test)$         // Structure de contrôle
+$rows:{row|$row$}$ // Structure de boucle
+$length(rows)$     // Fonctions
 ```
 
 #### Le développeur peut créer le _template_ pour ses besoins

@@ -20,12 +20,10 @@ lalr -> table : <i>construction</i>
 
 note right of lr1
   items set 0:
-    C => * c C $ | c
-    C => * c C $ | d
-    C => * d $ | c
-    C => * d $ | d
-    S => * C C $ | $
-    __start => * S $ | $
+    C => * c C $, c / d
+    C => * d $, c / d
+    S => * C C $, $
+    __start => * S $, $
 end note
 
 @enduml

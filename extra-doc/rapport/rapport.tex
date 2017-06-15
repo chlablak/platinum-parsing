@@ -200,7 +200,7 @@
 			Avant de passer à la section suivante, qui explique comment PP sera organisé, nous allons rapidement définir à un niveau plus large quelles seront les différentes parties de PP:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth,trim={3cm 3cm 3cm 3cm},clip]{../diagrams/pipeline/pipeline-parts}
+				\includegraphics[width=0.6\textwidth]{../diagrams/misc/architecture-pp}
 				\caption{Sous-projets de PP}
 			\end{figure}
 			
@@ -590,8 +590,7 @@
 			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
 			
 	\section{Génération de la table LALR}
-	\label{sec:generation-de-la-table-lalr}
-		\todo{plus de détails sur les sous-tâches}		
+	\label{sec:generation-de-la-table-lalr}	
 		À présent que nous avons l'AST d'une grammaire, nous pouvons nous attaquer à la génération de la table LALR correspondante. Ce processus est assez complexe, nous allons donc d'abord séparer les différentes fonctions utiles et structures de données utilisées:
 		\begin{enumerate}
 			\item Transformation des règles EBNF en règles canoniques
@@ -620,6 +619,12 @@
 		\end{enumerate}
 		
 		Si on prend en compte les dépendances entre les fonctions, nous obtenons l'ordre dans lequel nous devons implémenter chacune: \hs{rules}, \hs{extend}, \hs{first}, \hs{closure}, \hs{goto}, \hs{collection}, \hs{fusion} et pour finir \hs{table}.\\
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.6\textwidth]{../diagrams/misc/generation-process}
+			\caption{Processus de génération de la table LALR}
+		\end{figure}
 		
 		Voyons donc en premier la fonction \hs{rules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \hs{Rule} dans \hs{PP.Rule}, et nous ajoutons une fonction \hs{rules :: ast -> [Rule]} à la classe de type \hs{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \hs{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \hs{PPTest.Grammars.Ebnf} naturellement.\\
 		
@@ -888,10 +893,10 @@
 				Un exemple de la nouvelle sortie (avec les tags) peut être vu dans les exemples de la \autoref{subsec:test-grammaire-integration-au-cli}.
 			
 		\subsection{Validation de la grammaire ISO CNC}
-			\todo{}
+			\todo{reporté car finalement pas urgent}
 			
 		\subsection{Test sur une grammaire C modifiée}
-			\todo{}
+			\todo{reporté pour des tests en phase III}
 			
 	\section{Génération des tables dans un langage cible}
 	\label{sec:generation-des-tables-dans-un-langage-cible}
@@ -929,6 +934,12 @@
 			\item Nombre d'états à réduire pour chaque non-terminal
 			\item Nom de la règle associée pour chaque état\\
 		\end{itemize}
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.5\textwidth]{../diagrams/misc/template}
+			\caption{Processus de compilation d'un \textit{template} avec un contexte}
+		\end{figure}
 		
 		Ces variables seront placées dans un module \hs{PP.Templates.Lr}, les comportements communs seront quant à eux placés dans \hs{PP.Template}:
 		\begin{minted}{haskell}
@@ -1186,10 +1197,16 @@
 			\captionof{listing}{Sortie de l'\textit{engine} C\# pour un exemple simple}
 			
 			\paragraph{}
-			Le \textit{pipeline} fonctionne !
-		
-		\subsection{Démonstration finale}
-			\todo{pipeline, Program.cs}
+			Le \textit{pipeline} fonctionne !\\
+			
+			Il apparaît après cette démonstration qu'il n'est pas nécessaire de faire la même avec le langage ISO CNC, comme initialement prévu. En effet cela n'apporterait aucune valeur ajoutée.\\
+			
+			Nous pouvons résumer la démonstration ainsi:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.7\textwidth]{../diagrams/misc/exemple-pipeline}
+				\caption{\textit{Pipeline} de la démonstration}
+			\end{figure}
 			
 	\section{Planification de la phase III}		
 		Comme on a pu le voir dans la section précédente, \textit{platinum parsing} réponds désormais à tous les objectifs que nous nous avions fixé pour la phase II (phase minimale). Nous pouvons à présent penser aux prochaines étapes, plusieurs choix sont possibles:
@@ -1225,12 +1242,8 @@
 		
 		Nous affectons une semaine tampon dans le cas où l'une des tâches prendrait plus de temps que prévu.
 			
-	\section{TODO} 
-		\todo{organisation du dossier du projet}
-		\todo{modules finaux de PP}
-		\todo{état actuel de PP, futur...}
-		\todo{introduction / remerciements}
-		\todo{conclusion}
+	\section{TODO}
+		\todo{Ici s'arrête le rapport au 16 juin 2017, date du rendu intermédiaire. La suite (phase III) viendra avec le rapport et le rendu final.}
 	
 	\section{Annexes}
 			
