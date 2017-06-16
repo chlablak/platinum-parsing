@@ -121,7 +121,7 @@ J'ai le plaisir de vous présenter ...
 
 ---
 
-## Platinum Parsing, un projet d'aide aux développeurs
+## Platinum Parsing, un projet pour les développeurs
 
 .left-column[
 ### Besoin
@@ -142,7 +142,7 @@ J'ai le plaisir de vous présenter ...
 
 ---
 
-## Platinum Parsing, un projet d'aide aux développeurs
+## Platinum Parsing, un projet pour les développeurs
 
 .left-column[
 ### Besoin
@@ -152,6 +152,8 @@ J'ai le plaisir de vous présenter ...
 - Analyser une grammaire EBNF
 
 - Générer la table LALR correspondante
+
+- Exporter la table dans un langage cible
 
 ![analyseur syntaxique](compiler-parser.svg)
 
@@ -170,7 +172,7 @@ Objectifs concrets du TB
 
 ---
 
-## Platinum Parsing, un projet d'aide aux développeurs
+## Platinum Parsing, un projet pour les développeurs
 
 .left-column[
 ### Besoin
@@ -191,7 +193,7 @@ Dépendance de haut en bas -> réutilisation
 
 ---
 
-## Platinum Parsing, un projet d'aide aux développeurs
+## Platinum Parsing, un projet pour les développeurs
 
 .left-column[
 ### Besoin
@@ -225,7 +227,7 @@ Technologies actuelles, à la pointe
 
 ---
 
-## Génération de table LALR à partir d'une grammaire
+## Générateur de table LALR depuis une grammaire
 
 .left-column[
 ### Grammaire
@@ -251,7 +253,7 @@ AST compréhensible par un programme
 
 ---
 
-## Génération de table LALR à partir d'une grammaire
+## Générateur de table LALR depuis une grammaire
 
 .left-column[
 ### Grammaire
@@ -272,8 +274,11 @@ Grammaire augmentée canonique à partir de l'AST :
 ```
 
 - **Symbole de départ** ajouté
+
 - Règles uniquement composées de :
+
   - **Terminaux**
+
   - **Non-terminaux**
 ]
 
@@ -285,7 +290,7 @@ Applatissement des règles (~ BNF)
 
 ---
 
-## Génération de table LALR à partir d'une grammaire
+## Générateur de table LALR depuis une grammaire
 
 .left-column[
 ### Grammaire
@@ -303,9 +308,11 @@ Suite de transformation
 
 1000 états LR(1) -> ~ 100 états LALR
 
+Construction depuis LR(1) possible
+
 ---
 
-## Génération de table LALR à partir d'une grammaire
+## Générateur de table LALR depuis une grammaire
 
 .left-column[
 ### Grammaire
@@ -339,7 +346,32 @@ Utilisable par un _Parser LR_
 
 ---
 
-## Utilisation avec le langage de notre choix
+## Générateur de table LALR depuis une grammaire
+
+.left-column[
+### Grammaire
+### Règles
+### Génération
+### Table
+### _Parser_ LR
+]
+.right-column[
+| **État** | | **c**   | **d** | **$** | | **S** | **C** |
+| -------- | | ------- | ----- | ----- | | ----- | ----- |
+| **0**    | | _s1_    | _s2_  |       | | _4_   | _3_   |
+| **1**    | | _s1_    | _s2_  |       | |       | _5_   |
+| **2**    | | _r3_    | _r3_  | _r3_  | |       |       |
+
+![_parser_ LR](parser-lr.svg)
+]
+
+???
+
+Consomme l'entrée en utilisant la table pour savoir quoi faire
+
+---
+
+## Utilisable avec le langage de notre choix
 
 .left-column[
 ### _Template_
@@ -355,6 +387,7 @@ $length(rows)$     // Fonctions
 
 #### Le développeur peut créer le _template_ pour ses besoins
 - Platinum Parsing est un outil **générique**
+
 - La communauté peut développer des _engines_
 
 .mini[
@@ -368,7 +401,7 @@ Le développeur peut faire un _engine_ sur mesure
 
 ---
 
-## Utilisation avec le langage de notre choix
+## Utilisable avec le langage de notre choix
 
 .left-column[
 ### _Template_
@@ -378,9 +411,12 @@ Le développeur peut faire un _engine_ sur mesure
 #### Un _template_ se compile avec un **contexte** propre
 Le contexte contient toutes les variables interpolables nécessaires :
 - Liste des états
+
 - Liste des terminaux et des non-terminaux
+
 - Table LALR et ses actions
-- Organisation hiérachique
+
+Organisation hiérachique
 
 ```stringtemplate
 STATE $length(`lr`.states)$
@@ -392,9 +428,11 @@ $lr.terms:{term|$if(term.isEmpty)$EMPTY$else$...
 
 ???
 
+On voit la hiéarchie `lr -> terms -> term -> isEmpty` etc.
+
 ---
 
-## Utilisation avec le langage de notre choix
+## Utilisable avec le langage de notre choix
 
 .left-column[
 ### _Template_
@@ -435,8 +473,6 @@ ROW 18
 
 ???
 
-On voit la hiéarchie `lr -> terms -> term -> isEmpty` etc.
-
 ---
 
 ## Un _pipeline_ complet simple à utiliser
@@ -454,6 +490,8 @@ En utilisant un _engine_ C# et le CLI
 
 ![exemple de pipeline](exemple-pipeline.svg)
 ]
+
+???
 
 ---
 
@@ -482,6 +520,8 @@ Available commands:
 *  lalr                     Generate LALR parsing table```
 ]
 
+???
+
 ---
 
 ## Un _pipeline_ complet simple à utiliser
@@ -507,6 +547,8 @@ digit = "0" | "1" | "2" | "3" | "4"
       | "5" | "6" | "7" | "8" | "9";
 ```
 ]
+
+???
 
 ---
 
@@ -535,6 +577,7 @@ E = `C`;              (* Récursion à gauche indirecte *)
 $ pp lalr -f grammar.ebnf --test-with input.txt
 ```
 - Grammaire non-LALR
+
 - Grammaire invalide pour le langage voulu
 ]
 
@@ -592,7 +635,9 @@ _Table.cs_ :
 
 On utilise l'_engine_ C# avec _Table.cs_ :
 1. Pour _parser_ l'entrée **`2+3*(1+3)`**
+
   - En construisant l'AST correspondant
+
 2. Pour évaluer l'AST obtenu, ce qui donne : **`14`**
 ]
 
@@ -684,7 +729,7 @@ Etc.
 class: center, middle
 
 # Platinum Parsing
-## Aide aux développement de compilateur
+### Aide aux développement de compilateur
 
 ![exemple de pipeline](exemple-pipeline.svg)
 

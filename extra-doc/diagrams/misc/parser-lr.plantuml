@@ -1,0 +1,16 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "<i>Parser</i> LR" as parser
+rectangle "<i>State Stack</i>" as stack
+rectangle "Entrée" as input
+rectangle "Sortie" as output
+rectangle "Table LALR" as table
+
+table <-- parser
+input -> parser
+parser -> output
+parser --> stack
+
+@enduml
