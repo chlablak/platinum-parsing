@@ -1,0 +1,3 @@
+expr = number, { binop, number } ;
+binop = "+" | "-" ;
+number = (* tokenized *) ;
