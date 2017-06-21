@@ -70,7 +70,10 @@ closure is rs fs = case list is rs fs of
       _           -> ""
     term (Lr1Item (Rule _ xs) pos la) fs = case xs !! (pos + 1) of
       Empty -> first la fs
-      r     -> first r fs
+      r     -> let r' = first r fs in
+        if Empty `L.elem` r'
+          then L.nub $ r' ++ first la fs
+          else r'
 
 -- |Compute the GOTO of a items set for a given rule
 goto :: LrSet Lr1Item -> Rule -> RuleSet -> FirstSet -> LrSet Lr1Item
