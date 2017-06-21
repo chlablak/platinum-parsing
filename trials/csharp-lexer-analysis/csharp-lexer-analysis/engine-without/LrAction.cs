@@ -17,5 +17,10 @@
             this.value = value;
             this.name = name;
         }
+
+        public override string ToString()
+        {
+            return type.ToString() + " " + value + " " + name;
+        }
     }
 }

@@ -10,10 +10,12 @@ namespace csharp_lexer_analysis
             // Test cases
             Tuple<int, int>[] tests =
             {
+                //Tuple.Create(100000, 10),
                 Tuple.Create(10000, 100),
                 Tuple.Create(1000, 1000),
                 Tuple.Create(100, 10000),
                 Tuple.Create(10, 100000),
+                //Tuple.Create(3, 1000)
             };
 
             foreach(Tuple<int, int> test in tests)
@@ -23,6 +25,8 @@ namespace csharp_lexer_analysis
                 Console.Write("GENERATE DATA... ");
                 Tuple<string, int> data = GenerateData(test.Item1, test.Item2);
                 Console.WriteLine("OK");
+                int offset = data.Item1.Length > 30 ? 30 : data.Item1.Length;
+                Console.WriteLine("  PREVIEW: " + data.Item1.Substring(0, offset));
                 Console.WriteLine("  EXPECTED RESULT: " + data.Item2);
 
                 Console.Write("STARTING TEST WITHOUT LEXER... ");
@@ -65,8 +69,8 @@ namespace csharp_lexer_analysis
         static Tuple<string, int> GenerateData(int n, int max)
         {
             Random rand = new Random();
-            int result = 0;
-            string input = "0";
+            int result = 1;
+            string input = "1";
             for(int i = 0; i < n; i++)
             {
                 int current = rand.Next(1, max);
@@ -80,12 +84,42 @@ namespace csharp_lexer_analysis
 
         static string TestWithoutLexer(string input)
         {
-            /*engine_without.LrParser parser = new engine_without.LrParser(new TableWithout(), input);
+            engine_without.LrParser parser = new engine_without.LrParser(new TableWithout(), input);
             parser.Parse();
             engine_without.LrEvaluate evaluate = new engine_without.LrEvaluate(parser.ast);
+            evaluate.NonTerm("digit without zero", (node) => node.children[0]);
+            evaluate.NonTerm("digit", (node) => node.children[0]);
+            evaluate.NonTerm("{<digit>}", (node) => {
+                if (node.children.Count == 0)
+                    return new engine_without.LrAst.Node(engine_without.LrAst.Node.Type.Term, "IGNORE");
+                string concat = node.children[0].value;
+                if (node.children[1].value != "IGNORE")
+                    concat += node.children[1].value;
+                return new engine_without.LrAst.Node(engine_without.LrAst.Node.Type.Term, concat);
+            });
+            evaluate.NonTerm("number", (node) => {
+                string concat = node.children[0].value;
+                if (node.children[1].value != "IGNORE")
+                    concat += node.children[1].value;
+                return new engine_without.LrAst.Node(engine_without.LrAst.Node.Type.Term, concat);
+            });
+            evaluate.NonTerm("binop", (node) => node.children[0]);
+            evaluate.NonTerm("{<binop>,<number>}", (node) => {
+                if(node.children.Count == 0)
+                    return new engine_without.LrAst.Node(engine_without.LrAst.Node.Type.Term, "0");
+                string a = node.children[0].value + node.children[1].value;
+                string b = node.children[2].value;
+                string c = "" + (Int32.Parse(a) + Int32.Parse(b));
+                return new engine_without.LrAst.Node(engine_without.LrAst.Node.Type.Term, c);
+            });
+            evaluate.NonTerm("expr", (node) => {
+                string a = node.children[0].value;
+                string b = node.children[1].value;
+                string c = "" + (Int32.Parse(a) + Int32.Parse(b));
+                return new engine_without.LrAst.Node(engine_without.LrAst.Node.Type.Term, c);
+            });
             evaluate.Eval();
-            return parser.ast.root.children[0].value;*/
-            return "";
+            return parser.ast.root.children[0].value;
         }
 
         static string TestWithLexer(string input)

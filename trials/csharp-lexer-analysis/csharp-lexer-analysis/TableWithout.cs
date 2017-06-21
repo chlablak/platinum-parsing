@@ -6,11 +6,11 @@
 
 using System;
 using System.Collections.Generic;
-using /* INSERT LR ENGINE */;
+using csharp_lexer_analysis.engine_without;
 
-namespace /* INSERT NAMESPACE */
+namespace csharp_lexer_analysis
 {
-    class /* INSERT CLASS NAME */ : LrTable
+    class TableWithout : LrTable
     {
         private LrAction value, error;
         private Dictionary<Tuple<int, char>, LrAction> actions;
@@ -18,7 +18,7 @@ namespace /* INSERT NAMESPACE */
 
         public char Empty()
         {
-            return /* INSERT EMPTY SYMBOL */;
+            return (char)0;
         }
 
         /* ACTION table */
@@ -33,7 +33,7 @@ namespace /* INSERT NAMESPACE */
             return gotos.TryGetValue(Tuple.Create(state, nonTerm), out value) ? value : error;
         }
 
-        public /* INSERT CLASS NAME */()
+        public TableWithout()
         {
             value = null;
             error = new LrAction(LrAction.Type.Error);

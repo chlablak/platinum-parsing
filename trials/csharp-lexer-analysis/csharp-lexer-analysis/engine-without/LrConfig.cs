@@ -19,5 +19,10 @@ namespace csharp_lexer_analysis.engine_without
             this.action = action;
             this.input = input;
         }
+
+        public override string ToString()
+        {
+            return "[" + count + "; " + action + "; " + input + "]";
+        }
     }
 }
