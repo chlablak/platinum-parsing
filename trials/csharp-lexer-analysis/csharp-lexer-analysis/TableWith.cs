@@ -6,25 +6,25 @@
 
 using System;
 using System.Collections.Generic;
-using /* INSERT LR ENGINE */;
+using csharp_lexer_analysis.engine_with;
 
-namespace /* INSERT NAMESPACE */
+namespace csharp_lexer_analysis
 {
-    class /* INSERT CLASS NAME */ : LrTable
+    class TableWith : LrTable
     {
         private LrAction value, error;
-        private Dictionary<Tuple<int, char>, LrAction> actions;
+        private Dictionary<Tuple<int, string>, LrAction> actions;
         private Dictionary<Tuple<int, string>, LrAction> gotos;
 
-        public char Empty()
+        public Token Empty()
         {
-            return /* INSERT EMPTY SYMBOL */;
+            return new Token(null);
         }
 
         /* ACTION table */
-        public LrAction Action(int state, char term)
+        public LrAction Action(int state, Token term)
         {
-            return actions.TryGetValue(Tuple.Create(state, term), out value) ? value : error;
+            return actions.TryGetValue(Tuple.Create(state, term.type), out value) ? value : error;
         }
 
         /* GOTO table */
@@ -33,24 +33,25 @@ namespace /* INSERT NAMESPACE */
             return gotos.TryGetValue(Tuple.Create(state, nonTerm), out value) ? value : error;
         }
 
-        public /* INSERT CLASS NAME */()
+        public TableWith()
         {
             value = null;
             error = new LrAction(LrAction.Type.Error);
-            actions = new Dictionary<Tuple<int, char>, LrAction>()
+            string empty = Empty().type;
+            actions = new Dictionary<Tuple<int, string>, LrAction>()
             {
-                { Tuple.Create(0, '0'), new LrAction(LrAction.Type.Shift, 3) },
-                { Tuple.Create(1, Empty()), new LrAction(LrAction.Type.Accept) },
-                { Tuple.Create(2, '+'), new LrAction(LrAction.Type.Shift, 4) },
-                { Tuple.Create(2, Empty()), new LrAction(LrAction.Type.Reduce, 0, "{<binop>,<number>}") },
-                { Tuple.Create(3, '+'), new LrAction(LrAction.Type.Reduce, 1, "number") },
-                { Tuple.Create(3, Empty()), new LrAction(LrAction.Type.Reduce, 1, "number") },
-                { Tuple.Create(4, '0'), new LrAction(LrAction.Type.Reduce, 1, "binop") },
-                { Tuple.Create(5, Empty()), new LrAction(LrAction.Type.Reduce, 2, "expr") },
-                { Tuple.Create(6, '0'), new LrAction(LrAction.Type.Shift, 3) },
-                { Tuple.Create(7, '+'), new LrAction(LrAction.Type.Shift, 4) },
-                { Tuple.Create(7, Empty()), new LrAction(LrAction.Type.Reduce, 0, "{<binop>,<number>}") },
-                { Tuple.Create(8, Empty()), new LrAction(LrAction.Type.Reduce, 3, "{<binop>,<number>}") },
+                { Tuple.Create(0, "number"), new LrAction(LrAction.Type.Shift, 3) },
+                { Tuple.Create(1, empty), new LrAction(LrAction.Type.Accept) },
+                { Tuple.Create(2, "binop"), new LrAction(LrAction.Type.Shift, 4) },
+                { Tuple.Create(2, empty), new LrAction(LrAction.Type.Reduce, 0, "{<binop>,<number>}") },
+                { Tuple.Create(3, "binop"), new LrAction(LrAction.Type.Reduce, 1, "number") },
+                { Tuple.Create(3, empty), new LrAction(LrAction.Type.Reduce, 1, "number") },
+                { Tuple.Create(4, "number"), new LrAction(LrAction.Type.Reduce, 1, "binop") },
+                { Tuple.Create(5, empty), new LrAction(LrAction.Type.Reduce, 2, "expr") },
+                { Tuple.Create(6, "number"), new LrAction(LrAction.Type.Shift, 3) },
+                { Tuple.Create(7, "binop"), new LrAction(LrAction.Type.Shift, 4) },
+                { Tuple.Create(7, empty), new LrAction(LrAction.Type.Reduce, 0, "{<binop>,<number>}") },
+                { Tuple.Create(8, empty), new LrAction(LrAction.Type.Reduce, 3, "{<binop>,<number>}") },
                 
             };
             gotos = new Dictionary<Tuple<int, string>, LrAction>()

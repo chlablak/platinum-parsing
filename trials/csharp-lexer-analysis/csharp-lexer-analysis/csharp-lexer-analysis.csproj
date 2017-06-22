@@ -42,14 +42,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="engine-with\DedicatedLexer.cs" />
+    <Compile Include="engine-with\LrAction.cs" />
+    <Compile Include="engine-with\LrAst.cs" />
+    <Compile Include="engine-with\LrConfig.cs" />
+    <Compile Include="engine-with\LrEvaluate.cs" />
+    <Compile Include="engine-with\LrParser.cs" />
+    <Compile Include="engine-with\LrTable.cs" />
     <Compile Include="engine-without\LrAction.cs" />
     <Compile Include="engine-without\LrAst.cs" />
     <Compile Include="engine-without\LrConfig.cs" />
     <Compile Include="engine-without\LrEvaluate.cs" />
     <Compile Include="engine-without\LrParser.cs" />
     <Compile Include="engine-without\LrTable.cs" />
+    <Compile Include="engine-with\Token.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TableWith.cs" />
     <Compile Include="TableWithout.cs" />
   </ItemGroup>
   <ItemGroup>

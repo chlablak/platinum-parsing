@@ -10,12 +10,16 @@ namespace csharp_lexer_analysis
             // Test cases
             Tuple<int, int>[] tests =
             {
-                //Tuple.Create(100000, 10),
                 Tuple.Create(10000, 100),
                 Tuple.Create(1000, 1000),
                 Tuple.Create(100, 10000),
                 Tuple.Create(10, 100000),
-                //Tuple.Create(3, 1000)
+
+                Tuple.Create(10000, 10000), // big
+                Tuple.Create(10000, 1000000), // very big
+                Tuple.Create(10000, 100000000), // very very big
+                
+                //Tuple.Create(3, 1000), // test
             };
 
             foreach(Tuple<int, int> test in tests)
@@ -124,7 +128,28 @@ namespace csharp_lexer_analysis
 
         static string TestWithLexer(string input)
         {
-            return "";
+            engine_with.DedicatedLexer lexer = new engine_with.DedicatedLexer(input);
+            engine_with.LrParser parser = new engine_with.LrParser(new TableWith(), lexer.tokens);
+            parser.Parse();
+            engine_with.LrEvaluate evaluate = new engine_with.LrEvaluate(parser.ast);
+            evaluate.NonTerm("number", (node) => node.children[0]);
+            evaluate.NonTerm("binop", (node) => node.children[0]);
+            evaluate.NonTerm("{<binop>,<number>}", (node) => {
+                if (node.children.Count == 0)
+                    return new engine_with.LrAst.Node(engine_with.LrAst.Node.Type.Term, "0");
+                string a = node.children[0].value + node.children[1].value;
+                string b = node.children[2].value;
+                string c = "" + (Int32.Parse(a) + Int32.Parse(b));
+                return new engine_with.LrAst.Node(engine_with.LrAst.Node.Type.Term, c);
+            });
+            evaluate.NonTerm("expr", (node) => {
+                string a = node.children[0].value;
+                string b = node.children[1].value;
+                string c = "" + (Int32.Parse(a) + Int32.Parse(b));
+                return new engine_with.LrAst.Node(engine_with.LrAst.Node.Type.Term, c);
+            });
+            evaluate.Eval();
+            return parser.ast.root.children[0].value;
         }
     }
 }
