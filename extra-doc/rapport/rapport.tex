@@ -1241,9 +1241,102 @@
 		\end{table}
 		
 		Nous affectons une semaine tampon dans le cas où l'une des tâches prendrait plus de temps que prévu.
+		
+	\section{Analyse des gains de l'analyse lexicale}
+		Ici nous allons analyser les apports possibles avec l'ajout d'un \textit{lexer} (analyseur lexical). Plusieurs aspects sont à prendre en compte:
+		\begin{itemize}
+			\item Quels sont les gains en terme de performances ?
+			\item Quels sont les gains sur la chaîne de compilation ?
+			\item Quels sont les gains en terme de fonctionnalités ?
+			\item Quels sont les gains conceptuellement parlant ?\\
+		\end{itemize}
+		
+		Nous allons prendre ces différentes questions dans l'ordre.
+		
+		\subsection{Quels sont les gains en terme de performances ?}
+			Pour mesurer les performances, nous allons comparer les temps d'exécution de deux \textit{engine}: l'un sans \textit{lexer} et l'autre avec. Les grammaires sont simples:
+			\begin{minted}{ebnf}
+				(* Grammaire sans lexer *)
+				expr = number, { binop, number } ;
+				binop = "+" | "-" ;
+				number = digit without zero, { digit } ;
+				digit = "0" | digit without zero ;
+				digit without zero = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+				
+				(* Grammaire avec lexer *)
+				expr = number, { binop, number } ;
+				binop = (* tokenized *) ;
+				number = (* tokenized *) ;
+			\end{minted}
+			\captionof{listing}{Grammaires de test pour l'analyse des gains du \textit{lexer}}
+			
+			\paragraph{}
+			Ces grammaires lisent des nombres avec des plus et des moins entre deux, par exemple: \texttt{7382+83-8389-89+34}.\\
+			
+			Chaque \textit{engine} devra faire les étapes suivantes:
+			\begin{enumerate}
+				\item Lecture de l'entrée
+				\item Analyse syntaxique
+				\subitem + Analyse lexicale pour le deuxième \textit{engine}
+				\item Évaluation de l'AST obtenu\\
+			\end{enumerate}
+			
+			Ces étapes ont été mesurées avec une entrée de taille variable, avec $N$ le nombre de nombres, et $max$ la borne supérieure des nombres générés aléatoirement. Par exemple avec $N=3$ et $max=100$: \texttt{23-4+99}.\\
+			
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{l|l|l|l|l}
+					\textbf{$N$} & \textbf{$max$} & \textbf{\textit{Sans} [ms]} & \textbf{\textit{Avec} [ms]} & \textbf{Gain}\\
+					\hline
+					10000 & 100 & 441 & 230 & 1.92\\
+					1000 & 1000 & 21 & 5 & 4.20\\
+					100 & 10000 & 4 & 0 & -\\
+					10 & 100000 & 0 & 0 & -\\
+					10000 & 10000 & 933 & 256 & 3.64\\
+					10000 & 1000000 & 4911 & 297 & 16.54\\
+					10000 & 100000000 & 10294 & 251 & 41.01\\
+				\end{tabular}
+				\caption{Comparaison entre \textit{avec} et \textit{sans} \textit{lexer}}
+			\end{table}
+			
+			On constate aisément que quelque soit les paramètres d'entrées, la version avec \textit{lexer} est toujours meilleure que celle sans \textit{lexer}.
+		
+		\subsection{Quels sont les gains sur la chaîne de compilation ?}
+			Comme on a pu le voir, l'ajout du \textit{lexer} apporte un gain conséquent en terme de performances. Cela s'explique assez facilement, en effet la conséquence directe de cet ajout est que la table LALR est plus simple. Ce qui implique donc un AST plus simple/petit, donc plus rapidement construit et évalué.\\
+			
+			L'ajout de l'analyse lexicale en début de compilation apporte donc un grand plus sur toute la suite de la chaîne.
+		
+		\subsection{Quels sont les gains en terme de fonctionnalités ?}
+			Ici aussi l'analyse est assez simple. L'ajout du \textit{lexer} permet à l'utilisateur d'écrire des grammaires plus simples. En effet, certaines règles deviennent inutiles, et peuvent être réécrite à l'aide d'expressions régulières:
+			\begin{minted}{ebnf}
+				(* Grammaire sans lexer *)
+				number = digit without zero, { digit } ;
+				digit = "0" | digit without zero ;
+				digit without zero = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+				
+				(* Grammaire avec lexer *)
+				number = (* exemple: /[1-9][0-9]*/ *) ; 
+			\end{minted}
+			\captionof{listing}{Simplification d'une grammaire avec les expressions régulières}
+		
+		\subsection{Quels sont les gains conceptuellement parlant ?}
+			Le principal gain conceptuel est très important: la \textit{séparation des responsabilités}. Celui-ci apporte en plus la \textit{factorisation} du code ainsi qu'une meilleure \textit{extensibilité} de la chaîne de compilation.
+		
+		\subsection{Conclusion de l'analyse}			
+			On s'aperçoit tout de suite que l'analyse lexicale apporte beaucoup, et ce sur de multiple aspects. Nous concluons donc qu'il est plus pertinent d'effectuer cet ajout à PP en premier, puis nous pourrons attaquer la partie "intégration à un éditeur de texte".\\
+			
+			Pour clore cette section et appuyer notre décision, voici un extrait du \textit{Dragon Book} \cite{dragonbook}, page 103, partie 3.1.1:
+			\begin{quote}
+				La partie analyse du compilateur est en principe décomposée en une phase d'analyse lexicale et une phase d'analyse syntaxique pour de multiples raisons.
+				\begin{enumerate}
+					\item La simplicité de développement est l'aspect le plus important. La séparation entre analyse lexicale et analyse syntaxique permet souvent de simplifier au moins l'une de ces tâches. Par exemple, un analyseur syntaxique qui aurait à traiter blancs et commentaires comme des unités syntaxiques serait considérablement plus complexe qu'un autre qui considérerait que blancs et commentaires ont déjà été éliminés par un analyseur lexical.
+					\item Le compilateur est plus efficace. Un analyseur lexical séparé permet d'appliquer des techniques spécifiques qui ne servent qu'à l'analyse lexicale et non au travail de l'analyseur syntaxique. De plus, des techniques spécifiques de mise en mémoire tampon pour la lecture des caractères d'entrée peuvent accélérer significativement le compilateur.
+					\item La portabilité du compilateur est améliorée. En effet, les spécificités liées aux interfaces d'entrée peuvent être circonscrites à l'analyseur lexical.
+				\end{enumerate}
+			\end{quote} 
 			
 	\section{TODO}
-		\todo{Ici s'arrête le rapport au 16 juin 2017, date du rendu intermédiaire. La suite (phase III) viendra avec le rapport et le rendu final.}
+		\todo{}
 	
 	\section{Annexes}
 			
