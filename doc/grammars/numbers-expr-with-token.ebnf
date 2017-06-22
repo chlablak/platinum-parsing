@@ -1,3 +1,3 @@
 expr = number, { binop, number } ;
-binop = "+" | "-" ;
-number = (* tokenized *) ;
+binop = (* tokenized *) "+" ;
+number = (* tokenized *) "0" ;

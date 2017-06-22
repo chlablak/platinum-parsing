@@ -39,21 +39,16 @@ namespace /* INSERT NAMESPACE */
             error = new LrAction(LrAction.Type.Error);
             actions = new Dictionary<Tuple<int, char>, LrAction>()
             {
-                { Tuple.Create(0, '+'), new LrAction(LrAction.Type.Reduce, 0, "number") },
-                { Tuple.Create(0, '-'), new LrAction(LrAction.Type.Reduce, 0, "number") },
-                { Tuple.Create(0, Empty()), new LrAction(LrAction.Type.Reduce, 0, "number") },
+                { Tuple.Create(0, '0'), new LrAction(LrAction.Type.Shift, 3) },
                 { Tuple.Create(1, Empty()), new LrAction(LrAction.Type.Accept) },
-                { Tuple.Create(2, '+'), new LrAction(LrAction.Type.Shift, 3) },
-                { Tuple.Create(2, '-'), new LrAction(LrAction.Type.Shift, 4) },
+                { Tuple.Create(2, '+'), new LrAction(LrAction.Type.Shift, 4) },
                 { Tuple.Create(2, Empty()), new LrAction(LrAction.Type.Reduce, 0, "{<binop>,<number>}") },
-                { Tuple.Create(3, Empty()), new LrAction(LrAction.Type.Reduce, 1, "binop") },
-                { Tuple.Create(4, Empty()), new LrAction(LrAction.Type.Reduce, 1, "binop") },
+                { Tuple.Create(3, '+'), new LrAction(LrAction.Type.Reduce, 1, "number") },
+                { Tuple.Create(3, Empty()), new LrAction(LrAction.Type.Reduce, 1, "number") },
+                { Tuple.Create(4, '0'), new LrAction(LrAction.Type.Reduce, 1, "binop") },
                 { Tuple.Create(5, Empty()), new LrAction(LrAction.Type.Reduce, 2, "expr") },
-                { Tuple.Create(6, '+'), new LrAction(LrAction.Type.Reduce, 0, "number") },
-                { Tuple.Create(6, '-'), new LrAction(LrAction.Type.Reduce, 0, "number") },
-                { Tuple.Create(6, Empty()), new LrAction(LrAction.Type.Reduce, 0, "number") },
-                { Tuple.Create(7, '+'), new LrAction(LrAction.Type.Shift, 3) },
-                { Tuple.Create(7, '-'), new LrAction(LrAction.Type.Shift, 4) },
+                { Tuple.Create(6, '0'), new LrAction(LrAction.Type.Shift, 3) },
+                { Tuple.Create(7, '+'), new LrAction(LrAction.Type.Shift, 4) },
                 { Tuple.Create(7, Empty()), new LrAction(LrAction.Type.Reduce, 0, "{<binop>,<number>}") },
                 { Tuple.Create(8, Empty()), new LrAction(LrAction.Type.Reduce, 3, "{<binop>,<number>}") },
                 
