@@ -1299,10 +1299,12 @@
 				\caption{Comparaison entre \textit{avec} et \textit{sans} \textit{lexer}}
 			\end{table}
 			
-			On constate aisément que quelque soit les paramètres d'entrées, la version avec \textit{lexer} est toujours meilleure que celle sans \textit{lexer}.
+			On constate aisément que quelque soit les paramètres d'entrées, la version avec \textit{lexer} est toujours meilleure que celle sans \textit{lexer}.\\
+
+			Le code source pour ce test est dans le dossier \texttt{./trials/csharp-lexer-analysis/}. Notons encore que le \textit{lexer} implémenté est très simple, ce qui implique que les résultats ci-dessus ne sont pas représentatifs à 100\%. 
 		
 		\subsection{Quels sont les gains sur la chaîne de compilation ?}
-			Comme on a pu le voir, l'ajout du \textit{lexer} apporte un gain conséquent en terme de performances. Cela s'explique assez facilement, en effet la conséquence directe de cet ajout est que la table LALR est plus simple. Ce qui implique donc un AST plus simple/petit, donc plus rapidement construit et évalué.\\
+			Comme on a pu le voir, l'ajout du \textit{lexer} apporte un gain conséquent en terme de performances. Cela s'explique assez facilement, en effet la conséquence directe de cet ajout est que la table LALR est plus simple. Ce qui implique donc un AST plus simple/petit, donc plus rapidement construit et évalué. Tout cela vient du fait que l'entrée est une suite de \textit{token} et non pas de caractères.\\
 			
 			L'ajout de l'analyse lexicale en début de compilation apporte donc un grand plus sur toute la suite de la chaîne.
 		
