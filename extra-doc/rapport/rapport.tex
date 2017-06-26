@@ -1337,6 +1337,48 @@
 				\end{enumerate}
 			\end{quote} 
 			
+	\section{Intégration de l'analyse lexicale}
+		Nous avons vu dans la section précédente que l'analyse lexicale (\textit{lexer}) est un plus pour PP. Nous allons donc à présent nous pencher sur son intégration dans le produit actuel. Pour obtenir une meilleure vision du travail à effectuer, nous avons commencé par lire le chapitre 3 du Dragon Book \cite{dragonbook} qui concerne l'analyse lexicale. À partir de cela les sous-tâches suivantes ont pu être posées:
+		\begin{enumerate}
+			\item Intégration des motifs lexicaux au fichier de grammaire
+			\subitem + Définir la syntaxe utilisée dans la grammaire
+			\subitem + Définir l'AST pour les motifs lexicaux
+			
+			\item Effectuer la séparation \textit{lexer} / \textit{parser}
+			\subitem Remplacer les terminaux par des motifs
+			\subitem Modifier l'AST de l'EBNF en conséquence
+			
+			\item Génération des automates du \textit{lexer}
+			\subitem + De l'AST vers un AFN 
+			\subitem + De l'AFN vers un AFD
+			\subitem + Éventuellement d'autres approches/optimisations sont possibles
+			
+			\item Implémentation du \textit{lexer} complet
+			\subitem + Définir la représentation des \textit{tokens}
+			
+			\item Intégration et tests
+			\subitem + Intégration au \textit{parser} déjà existant
+			\subitem + Intégration au compilateur de \textit{template}
+			\subitem + Tester l'ensemble sur une grammaire complexe\\
+		\end{enumerate} 
+		
+		Nous allons attaquer ces différentes étapes dans l'ordre.
+		
+		\subsection{Définition des expressions régulières et ajout à la grammaire}
+			\todo{}
+			
+		\subsection{Séparation des parties \textit{lexer} et des parties \textit{parser}}
+			\todo{}
+			
+		\subsection{Génération des automates pour l'analyse lexicale}
+			\todo{}
+			
+		\subsection{Implémentation du \textit{lexer} complet}
+			\todo{}
+			
+		\subsection{Intégration à PP et tests}
+			\todo{}
+			
 	\section{TODO}
 		\todo{}
 	
