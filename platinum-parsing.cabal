@@ -21,6 +21,8 @@ library
                      , PP.Builders.Lr1
                      , PP.Grammar
                      , PP.Grammars.Ebnf
+                     , PP.Grammars.Lexical
+                     , PP.Grammars.LexicalHelper
                      , PP.Parser
                      , PP.Parsers.Lr
                      , PP.Rule
@@ -58,6 +60,8 @@ test-suite pp-test
   other-modules:       PPTest.Builders.Lalr
                      , PPTest.Builders.Lr1
                      , PPTest.Grammars.Ebnf
+                     , PPTest.Grammars.Lexical
+                     , PPTest.Grammars.LexicalHelper
                      , PPTest.Rule
                      , PPTest.Parsers.Lr
                      , PPTest.Templates.Lr

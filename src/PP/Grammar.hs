@@ -34,6 +34,9 @@ class (Eq ast, Show ast) => InputGrammar ast where
   stringify = show
   -- |AST to canonical rules
   rules :: ast -> [Rule]
+  -- |Transform terminals to lexical rules
+  lexify :: ast -> ast
+  lexify = id
 
 -- |Exception-safe version of `rules`
 rules' :: (InputGrammar ast) => ast -> IO (Either String [Rule])

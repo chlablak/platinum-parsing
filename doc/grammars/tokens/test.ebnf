@@ -1,0 +1,3 @@
+digit %= "[0-9]" ;
+number %= digit, "+" ;
+start = "count", number ;

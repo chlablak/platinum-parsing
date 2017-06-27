@@ -3,6 +3,8 @@ module Main where
 import qualified PPTest.Builders.Lalr
 import qualified PPTest.Builders.Lr1
 import qualified PPTest.Grammars.Ebnf
+import qualified PPTest.Grammars.Lexical
+import qualified PPTest.Grammars.LexicalHelper
 import qualified PPTest.Parsers.Lr
 import qualified PPTest.Rule
 import qualified PPTest.Templates.Lr
@@ -17,3 +19,5 @@ main = hspec $
     PPTest.Builders.Lalr.specs
     PPTest.Parsers.Lr.specs
     PPTest.Templates.Lr.specs
+    PPTest.Grammars.LexicalHelper.specs
+    PPTest.Grammars.Lexical.specs

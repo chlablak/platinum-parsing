@@ -12,6 +12,8 @@ module PP.Rule
       Rule(..)
     , uniformize
     , extend
+    , separate
+    , regexfy
       -- * Canonical rules as Map
     , RuleSet
     , ruleSet
@@ -40,6 +42,8 @@ data Rule
   | Empty
   -- |Concatenated rules, useful for PP.InputGrammar.rules
   | Concat [Rule]
+  -- |Regular expression, useful for lexical rules
+  | RegEx String
     deriving (Eq, Ord)
 
 instance Show Rule where
@@ -52,6 +56,7 @@ instance Show Rule where
   show (Term c) = show c
   show Empty = "$"
   show (Concat xs) = "Concat " ++ show xs
+  show (RegEx re) = '%' : show re
 
 -- |Uniformize a list of rules
 -- `uniformize = sort . nub . concatMap (flatten . clean)`
@@ -165,3 +170,29 @@ first Empty _           = [Empty]
 first a@(Term _) _      = [a]
 first (NonTerm s) fs    = fromMaybe [Empty] (Map.lookup s fs)
 first (Rule _ (x:_)) fs = first x fs
+
+-- |Separate rules into (parsing rules, lexing rules)
+separate :: [Rule] -> ([Rule], [Rule])
+separate rs = (filter (not . hasRegex) rs, filter hasRegex rs)
+  where
+    hasRegex (Rule _ [])     = False
+    hasRegex (Rule r (x:xs)) = hasRegex x || hasRegex (Rule r xs)
+    hasRegex (NonTerm a)     = False
+    hasRegex (Term c)        = False
+    hasRegex Empty           = False
+    hasRegex (Concat [])     = False
+    hasRegex (Concat (x:xs)) = hasRegex x || hasRegex (Concat xs)
+    hasRegex (RegEx _)       = True
+
+-- |Transform lexing rules to have only one RegEx on right
+regexfy :: [Rule] -> [Rule]
+regexfy lrs = concatMap replace lrs
+  where
+    replace (Rule r xs)  = [Rule r $ bind [] $ concatMap replace xs]
+    replace (NonTerm nt) = concatMap replace $ find nt
+    replace x            = [x]
+    bind acc [Empty]                = acc ++ [Empty]
+    bind [] (x:xs)                  = bind [x] xs
+    bind (RegEx a:acc) (RegEx b:xs) = bind [RegEx $ a ++ b] xs
+    find r = let (Rule _ xs:_) = rule r rs in init xs
+    rs = ruleSet lrs
