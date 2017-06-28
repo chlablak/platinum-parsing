@@ -60,11 +60,13 @@ lexer = Token.makeTokenParser def
 identifier = Token.identifier lexer       -- ^identifier
 reservedOp = Token.reservedOp lexer       -- ^reserved operator
 stringLiteral = Token.stringLiteral lexer -- ^string literal
+whiteSpace = Token.whiteSpace lexer       -- ^white spaces
 
 -- |Parser for LexicalRule
 lexicalRule :: Parser LexicalRule
-lexicalRule = LexicalRule <$> (lexicalIdentifier <* reservedOp "%=")
-                          <*> (lexicalDefinitionList <* reservedOp ";")
+lexicalRule = whiteSpace *>
+              (LexicalRule <$> (lexicalIdentifier <* reservedOp "%=")
+                           <*> (lexicalDefinitionList <* reservedOp ";"))
   <?> "lexical rule"
 
 -- |Parser for LexicalDefinitionList$

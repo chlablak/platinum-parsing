@@ -127,3 +127,13 @@ specs = describe "PPTest.Grammars.Ebnf" $ do
                             Rule "a" [NonTerm "[(<b>,<c>)|{<d>}]",NonTerm "e",PP.Empty],
                             Rule "{<d>}" [NonTerm "d",NonTerm "{<d>}",PP.Empty],
                             Rule "{<d>}" [PP.Empty]]
+
+  it "should handle lexical rules (PP.Grammars.LexicalHelper)" $
+    let Right ast = parseAst "a = b; b %= c; c = d;" :: To Syntax in
+      rules ast `shouldBe` [Rule "a" [NonTerm "b", PP.Empty],
+                            Rule "b" [NonTerm "c", PP.Empty],
+                            Rule "c" [NonTerm "d", PP.Empty]]
+
+  it "should lexify correctly" $
+    let Right ast = parseAst "d%=\"[0-9]\";\nn%=d,\"+\";\ns=\"ab\",n;" :: To Syntax in
+      stringify (lexify ast) `shouldBe` "__token_0%=\"ab\";\nd%=\"[0-9]\";\nn%=d,\"+\";\n<s>=<__token_0>,<n>;"

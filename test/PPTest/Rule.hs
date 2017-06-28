@@ -105,3 +105,21 @@ specs = describe "PPTest.Rule" $ do
 
   it "should check a rules set for indirect left recursion" $
     pendingWith "not impl. yet"
+
+  it "should separate parsing and lexing rules" $ do
+    let r = [Rule "a" [NonTerm "b", Empty],
+             Rule "c" [RegEx "d", Empty]]
+    let e = ([Rule "a" [NonTerm "b", Empty]],
+             [Rule "c" [RegEx "d", Empty]])
+    separate r `shouldBe` e
+
+  it "should transform lexical rules to have only one regex on right" $ do
+    let r = [Rule "a" [NonTerm "b", Empty],
+             Rule "b" [NonTerm "c", RegEx "bb", Empty],
+             Rule "c" [RegEx "cc", NonTerm "d", Empty],
+             Rule "d" [RegEx "dd", RegEx "dd", Empty]]
+    let e = [Rule "a" [RegEx "ccddddbb", Empty],
+             Rule "b" [RegEx "ccddddbb", Empty],
+             Rule "c" [RegEx "ccdddd", Empty],
+             Rule "d" [RegEx "dddd", Empty]]
+    regexfy r `shouldBe` e
