@@ -8,19 +8,27 @@ Stability   : provisional
 Portability : portable
 -}
 module PP.Builder
-    ( LrTable(..)
+    ( -- *(LA)LR
+      LrTable(..)
     , action
     , action'
     , LrAction(..)
     , LrCollection(..)
     , LrSet(..)
     , LrBuilder(..)
+      -- *NFA
+    , NfaGraph(..)
+    , NfaNode(..)
+    , NfaSymbol(..)
+    , NfaBuilder(..)
     ) where
 
-import qualified Data.Map.Strict as Map
+import qualified Data.Graph.Inductive.Graph        as Gr
+import qualified Data.Graph.Inductive.PatriciaTree as Gr
+import qualified Data.Map.Strict                   as Map
 import           Data.Maybe
-import qualified Data.Set        as Set
-import qualified Data.Vector     as Vector
+import qualified Data.Set                          as Set
+import qualified Data.Vector                       as Vector
 import           PP.Rule
 
 -- |All LR parsers have the same table format
@@ -63,3 +71,12 @@ class Ord item => LrBuilder item where
   collection :: RuleSet -> FirstSet -> LrCollection item
   -- |Build the parsing table
   table :: LrCollection item -> Either [String] LrTable
+
+-- |Nondeterministic finite automaton (NFA)
+type NfaGraph = Gr.Gr NfaNode NfaSymbol
+data NfaNode = NfaInitial | NfaNode | NfaFinal deriving (Eq, Ord, Show, Read)
+data NfaSymbol = NfaValue Char | NfaEmpty deriving (Eq, Ord, Show, Read)
+
+-- |NFA builders
+class NfaBuilder from where
+  buildNfa :: from -> NfaGraph

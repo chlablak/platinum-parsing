@@ -9,7 +9,7 @@ Portability : portable
 -}
 module PP.Grammars.Lexical
     ( -- *AST
-      RegExpr
+      RegExpr(..)
     ) where
 
 import           Control.Applicative                    ((<$>), (<*>))

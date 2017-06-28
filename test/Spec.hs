@@ -2,6 +2,7 @@ module Main where
 
 import qualified PPTest.Builders.Lalr
 import qualified PPTest.Builders.Lr1
+import qualified PPTest.Builders.Nfa
 import qualified PPTest.Grammars.Ebnf
 import qualified PPTest.Grammars.Lexical
 import qualified PPTest.Grammars.LexicalHelper
@@ -21,3 +22,4 @@ main = hspec $
     PPTest.Templates.Lr.specs
     PPTest.Grammars.LexicalHelper.specs
     PPTest.Grammars.Lexical.specs
+    PPTest.Builders.Nfa.specs
