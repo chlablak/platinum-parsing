@@ -16,19 +16,30 @@ module PP.Builders.Dfa
 import qualified Data.Graph.Inductive.Graph as Gr
 import qualified Data.List                  as L
 import qualified Data.Map.Strict            as Map
+import           Data.Maybe
 import           PP.Builder
 
 instance DfaBuilder NfaGraph where
   buildDfa nfa = Gr.mkGraph nodes edges
     where
-      nodes = (head indices, DfaInitial)
-            : (last indices, DfaFinal)
-            : map (\k -> (k, DfaNode)) (init $ tail indices)
+      nodes = map (\k -> (k, findType k)) indices
       indices = L.nub $ map (\((k, _), _) -> k) ilist
       edges = map (\((k, NfaValue a), v) -> (k, v, DfaValue a)) ilist
       ilist = map (\((k, a), v) -> ((index k, a), index v)) list
-      index = (Map.!) $ Map.fromList $ zip (L.nub $ map (\((k, _), _) -> k) list) [0..]
+      index = (Map.!) $ Map.fromList $ zip unique [0..]
+      rindex = (Map.!) $ Map.fromList $ zip [0..] unique
+      unique = L.nub $ map (\((k, _), _) -> k) list
       list = Map.toList $ buildSubSet nfa
+      findType i = foldl1 findType' $ map (toDfa . findType'') $ rindex i
+      findType' DfaInitial _ = DfaInitial
+      findType' _ DfaInitial = DfaInitial
+      findType' DfaFinal _   = DfaFinal
+      findType' _ DfaFinal   = DfaFinal
+      findType' _ _          = DfaNode
+      findType'' i = fromMaybe NfaNode $ Gr.lab nfa i
+      toDfa NfaNode    = DfaNode
+      toDfa NfaInitial = DfaInitial
+      toDfa NfaFinal   = DfaFinal
 
 -- |Build a transition table with "subset" algorithm
 buildSubSet :: NfaGraph -> Map.Map ([Gr.Node], NfaSymbol) [Gr.Node]
