@@ -21,6 +21,11 @@ module PP.Builder
     , NfaNode(..)
     , NfaSymbol(..)
     , NfaBuilder(..)
+      -- *DFA
+    , DfaGraph(..)
+    , DfaNode(..)
+    , DfaSymbol(..)
+    , DfaBuilder(..)
     ) where
 
 import qualified Data.Graph.Inductive.Graph        as Gr
@@ -80,3 +85,12 @@ data NfaSymbol = NfaValue Char | NfaEmpty deriving (Eq, Ord, Show, Read)
 -- |NFA builders
 class NfaBuilder from where
   buildNfa :: from -> NfaGraph
+
+-- |Deterministic finite automaton (DFA)
+type DfaGraph = Gr.Gr DfaNode DfaSymbol
+data DfaNode = DfaInitial | DfaNode | DfaFinal deriving (Eq, Ord, Show, Read)
+newtype DfaSymbol = DfaValue Char deriving (Eq, Ord, Show, Read)
+
+-- |NFA builders
+class DfaBuilder from where
+  buildDfa :: from -> DfaGraph

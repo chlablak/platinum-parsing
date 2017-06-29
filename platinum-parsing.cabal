@@ -19,6 +19,7 @@ library
                      , PP.Builder
                      , PP.Builders.Lalr
                      , PP.Builders.Lr1
+                     , PP.Builders.Dfa
                      , PP.Builders.Nfa
                      , PP.Grammar
                      , PP.Grammars.Ebnf
@@ -61,6 +62,7 @@ test-suite pp-test
   main-is:             Spec.hs
   other-modules:       PPTest.Builders.Lalr
                      , PPTest.Builders.Lr1
+                     , PPTest.Builders.Dfa
                      , PPTest.Builders.Nfa
                      , PPTest.Grammars.Ebnf
                      , PPTest.Grammars.Lexical

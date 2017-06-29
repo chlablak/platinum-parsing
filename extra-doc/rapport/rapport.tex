@@ -1365,13 +1365,111 @@
 		Nous allons attaquer ces différentes étapes dans l'ordre.
 		
 		\subsection{Définition des expressions régulières et ajout à la grammaire}
-			\todo{}
+			Les expressions régulières que nous voulons sont celles de base ainsi que quelques options supplémentaires:
+			\begin{itemize}
+				\item Opérations de base:
+				\begin{itemize}
+					\item Union: \texttt{a|b}
+					\item Concaténation: \texttt{ab}
+					\item Fermeture de Kleene: \texttt{a*}
+					\item Groupement: \texttt{(a)}
+				\end{itemize}
+				\item Opérations supplémentaires:
+				\begin{itemize}
+					\item Fermeture transitive: \texttt{a+}
+					\item Option: \texttt{a?}
+					\item Classes: \texttt{[a-z]}\\
+				\end{itemize}
+			\end{itemize}
+			
+			Pour les \textit{parser} nous allons utiliser la même méthode que pour la grammaire EBNF, c'est-à-dire utiliser la bibliothèque \hs{Parsec} \cite{parsec} et générer un AST adéquat:
+			\begin{minted}{haskell}
+				-- |Lexical rule AST
+				data RegExpr
+					= RegExpr [RegExpr]       -- ^Composed of many choices
+					| Choice [RegExpr]        -- ^Composed of many expressions
+					| Many0 RegExpr           -- ^`a` many times
+					| Many1 RegExpr           -- ^`a` many times, without 0
+					| Option RegExpr          -- ^`a` 0 or 1 time
+					| Group RegExpr           -- ^`a` grouped (parenthesis)
+					| Class [RegExpr]         -- ^One character in the sub-classes
+					| Interval Char Char      -- ^One character in the interval
+					| Value Char              -- ^One specific character
+					| Any                     -- ^One character
+						deriving (Show, Eq)
+			\end{minted}
+			\captionof{listing}{AST des expressions régulières}
+			
+			\paragraph{}
+			Les modules suivants ont été ajoutés: \hs{PP.Grammars.Lexical} et \hs{PPTest.Grammars.Lexical}.\\
+			
+			À présent que nous pouvons lire des expressions régulières, nous devons pouvoir les récupérer dans un fichier de grammaire, typiquement EBNF dans notre cas. Nous devons donc ajouter cela à \hs{PP.Grammars.EBNF}. Cet ajout pouvant être commun aux modules de \hs{PP.Grammars.*}, nous allons créer un \textit{helper} \hs{PP.Grammars.LexicalHelper} dont l'unique objectif est de lire les règles lexicales et de s'intégrer aisément dans un autre module.\\
+			
+			Cette approche fait que \hs{PP.Grammars.Ebnf} n'a pas demandé beaucoup de changements. Nous pouvons les résumer:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{ll}
+					\hs{PP.Grammars.LexicalHelper} & \textit{Parser} pour les règles lexicales\\
+					\hs{PP.Grammars.Ebnf} & Utilisation de \hs{LexicalHelper}\\
+					\hs{PP.lexify} & Transforme un AST pour que les terminaux deviennent des règles lexicales\\
+					\hs{PP.separate} & Sépare les règles (canoniques) en deux ensembles: les règles de \textit{parsing} \\&et celles de \textit{lexing}\\
+					\hs{PP.regexfy} & Uniformise une règles lexicales\\ 
+				\end{tabular}
+				\caption{Modifications effectuées pour l'ajout des règles lexicales}
+			\end{table} 
+			
+			Notons que la syntaxe choisie est la suivante:
+			\begin{minted}{ebnf}
+				(* Règle de grammaire: = *)
+				expr = number, binop, number ; 
+				
+				(* Règles lexicales: %= *)
+				binop %= "+|-" ;
+				number %= digit, "+" ;
+				digit %= "[0-9]" ;
+			\end{minted}
+			\captionof{listing}{Règles de grammaire et règles lexicales}
 			
 		\subsection{Séparation des parties \textit{lexer} et des parties \textit{parser}}
-			\todo{}
+			Cette partie a pu être faîte dans la partie précédente.
 			
 		\subsection{Génération des automates pour l'analyse lexicale}
-			\todo{}
+			Chaque expression régulière est utilisée par le \textit{lexer} pour reconnaître les différentes unités lexicales (\textit{token}). Cependant l'AST d'une \textit{regex} reste une structure complexe à utiliser. C'est pour cette raison que les \textit{lexer} utilisent plutôt des automates à états finis à la place d'un AST.\\
+			
+			Le \textit{Dragon Book} nous explique comment passer de l'AST à un AFN (automate à états finis non-déterministe), puis d'un AFN à un AFD (automate à états finis déterministe). Un \textit{lexer} peut utiliser directement un AFN, cependant l'utilisation d'un AFD est plus efficace.\\
+			
+			Un automate est un graphe orienté, avec les sommets comme états et les arcs comme transition entre les états. Chaque arc est accompagné du symbole (caractère) autorisant la transition d'un état à un autre:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.5\textwidth]{../diagrams/misc/dfa-exemple}
+				\caption{Exemple d'un AFD pour l'expression: \texttt{(a|b)*abb}}
+			\end{figure}
+			
+			La représentation de graphe cyclique en Haskell n'étant pas trivial, nous avons utilisé la bibliothèque \textit{Functional Graph Library} (ou \textit{fgl} \cite{fgl}) pour cela.\\
+			
+			Les modules qui ont été modifiés/ajoutés sont:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{ll}
+					\hs{PP.Builder} & Ajout des classes de type \hs{NfaBuilder} et \hs{DfaBuilder}\\
+					\hs{PP.Builders.Nfa} & Génération d'un AFN depuis un AST\\
+					\hs{PP.Builders.Dfa} & Génération d'un AFD depuis un AFN\\
+					\hs{PPTest.*} & Les tests correspondants ont été créés\\
+				\end{tabular}
+				\caption{Modules pour la génération des automates}
+			\end{table}
+			
+			Pour finir, voici un exemple pour générer l'AFD à partir d'une expression régulière:
+			\begin{minted}{haskell}
+				-- AST -> AFN -> AFD
+				Right ast = parseAst "(a|b)*abb" :: To RegExpr
+				nfa = buildNfa ast
+				dfa = buildDfa nfa
+			\end{minted}
+			\captionof{listing}{Génération d'un AFD depuis une \textit{regex} avec PP}
+			
+			\paragraph{}
+			Notons qu'il est possible d'optimiser l'AFD obtenu, cependant cela est gardé pour une amélioration future.
 			
 		\subsection{Implémentation du \textit{lexer} complet}
 			\todo{}
@@ -1540,6 +1638,9 @@
 						
 					\bibitem{lr} LR Parser,\\
 						\url{https://en.wikipedia.org/wiki/LR_parser}\\
+						
+					\bibitem{fgl} Functional Graph Library,\\
+						\url{https://hackage.haskell.org/package/fgl-5.5.3.1}\\
 						
 				\end{thebibliography}
 			\endgroup
