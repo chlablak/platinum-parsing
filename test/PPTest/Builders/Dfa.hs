@@ -7,7 +7,7 @@ import           PP.Builders.Nfa
 import           PP.Grammars.Lexical
 import           Test.Hspec
 
-specs = describe "PPTest.Builders.Dfa" $
+specs = describe "PPTest.Builders.Dfa" $ do
 
   it "should build the correct automaton (from NFA: (a|b)*abb)" $ do
     -- Dragon Book, page 142, figures 3.34 and 3.36
@@ -25,4 +25,13 @@ specs = describe "PPTest.Builders.Dfa" $
                         (1,3,DfaValue 'b'),(2,1,DfaValue 'a'),(2,2,DfaValue 'b'),
                         (3,1,DfaValue 'a'),(3,4,DfaValue 'b'),(4,1,DfaValue 'a'),
                         (4,2,DfaValue 'b')]
+    buildDfa nfa `shouldBe` e
+
+  it "should keep all final nodes from the NFA" $ do
+    let nfa = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaFinal),(3,NfaNode),
+                          (4,NfaFinal)]
+                         [(0,1,NfaEmpty),(0,3,NfaEmpty),(1,2,NfaValue 'a'),
+                          (3,4,NfaValue 'b')] :: NfaGraph
+    let e = Gr.mkGraph [(1,DfaInitial),(2,DfaFinal),(3,DfaFinal)]
+                       [(1,2,DfaValue 'a'),(1,3,DfaValue 'b')]
     buildDfa nfa `shouldBe` e

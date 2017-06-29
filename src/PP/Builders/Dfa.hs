@@ -20,7 +20,7 @@ import           Data.Maybe
 import           PP.Builder
 
 instance DfaBuilder NfaGraph where
-  buildDfa nfa = Gr.mkGraph nodes edges
+  buildDfa nfa = removeDeadState $ Gr.mkGraph nodes edges
     where
       nodes = map (\k -> (k, findType k)) indices
       indices = L.nub $ map (\((k, _), _) -> k) ilist
@@ -30,7 +30,7 @@ instance DfaBuilder NfaGraph where
       rindex = (Map.!) $ Map.fromList $ zip [0..] unique
       unique = L.nub $ map (\((k, _), _) -> k) list
       list = Map.toList $ buildSubSet nfa
-      findType i = foldl1 findType' $ map (toDfa . findType'') $ rindex i
+      findType i = foldl findType' DfaNode $ map (toDfa . findType'') $ rindex i
       findType' DfaInitial _ = DfaInitial
       findType' _ DfaInitial = DfaInitial
       findType' DfaFinal _   = DfaFinal
@@ -89,3 +89,12 @@ transition :: [Gr.Node] -> NfaSymbol -> NfaGraph -> [Gr.Node]
 transition ns s g = L.sort $ L.nub $ map fst $ filter (\(_, l) -> l == s) suc
   where
     suc = concat [Gr.lsuc g i | i <- ns]
+
+-- |Remove dead states in the DFA
+removeDeadState :: DfaGraph -> DfaGraph
+removeDeadState g = Gr.labnfilter isNotDead g
+  where
+    isNotDead (n, DfaNode) =
+      let (_, _, _, suc) = Gr.context g n in
+        any (\(_, i) -> i /= n) suc
+    isNotDead _            = True
