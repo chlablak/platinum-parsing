@@ -79,18 +79,19 @@ class Ord item => LrBuilder item where
 
 -- |Nondeterministic finite automaton (NFA)
 type NfaGraph = Gr.Gr NfaNode NfaSymbol
-data NfaNode = NfaInitial | NfaNode | NfaFinal deriving (Eq, Ord, Show, Read)
+data NfaNode = NfaInitial | NfaNode | NfaFinal String deriving (Eq, Ord, Show, Read)
 data NfaSymbol = NfaValue Char | NfaEmpty deriving (Eq, Ord, Show, Read)
 
 -- |NFA builders
 class NfaBuilder from where
   buildNfa :: from -> NfaGraph
+  buildNfa' :: String -> from -> NfaGraph
 
 -- |Deterministic finite automaton (DFA)
 type DfaGraph = Gr.Gr DfaNode DfaSymbol
-data DfaNode = DfaInitial | DfaNode | DfaFinal deriving (Eq, Ord, Show, Read)
+data DfaNode = DfaInitial | DfaNode | DfaFinal String deriving (Eq, Ord, Show, Read)
 newtype DfaSymbol = DfaValue Char deriving (Eq, Ord, Show, Read)
 
--- |NFA builders
+-- |DFA builders
 class DfaBuilder from where
   buildDfa :: from -> DfaGraph

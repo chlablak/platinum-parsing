@@ -31,15 +31,15 @@ instance DfaBuilder NfaGraph where
       unique = L.nub $ map (\((k, _), _) -> k) list
       list = Map.toList $ buildSubSet nfa
       findType i = foldl findType' DfaNode $ map (toDfa . findType'') $ rindex i
-      findType' DfaInitial _ = DfaInitial
-      findType' _ DfaInitial = DfaInitial
-      findType' DfaFinal _   = DfaFinal
-      findType' _ DfaFinal   = DfaFinal
-      findType' _ _          = DfaNode
+      findType' DfaInitial _   = DfaInitial
+      findType' _ DfaInitial   = DfaInitial
+      findType' (DfaFinal n) _ = DfaFinal n
+      findType' _ (DfaFinal n) = DfaFinal n
+      findType' _ _            = DfaNode
       findType'' i = fromMaybe NfaNode $ Gr.lab nfa i
-      toDfa NfaNode    = DfaNode
-      toDfa NfaInitial = DfaInitial
-      toDfa NfaFinal   = DfaFinal
+      toDfa NfaNode      = DfaNode
+      toDfa NfaInitial   = DfaInitial
+      toDfa (NfaFinal n) = DfaFinal n
 
 -- |Build a transition table with "subset" algorithm
 buildSubSet :: NfaGraph -> Map.Map ([Gr.Node], NfaSymbol) [Gr.Node]

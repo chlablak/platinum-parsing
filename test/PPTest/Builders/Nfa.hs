@@ -19,7 +19,7 @@ specs = describe "PPTest.Builders.Nfa" $ do
     let expr = "(a|b)*abb"
     let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaNode),
                         (4,NfaNode),(5,NfaNode),(6,NfaNode),(7,NfaNode),
-                        (8,NfaNode),(9,NfaNode),(10,NfaFinal)]
+                        (8,NfaNode),(9,NfaNode),(10,NfaFinal expr)]
                        [(0,1,NfaEmpty),(0,7,NfaEmpty),(1,2,NfaEmpty),
                         (1,4,NfaEmpty),(2,3,NfaValue 'a'),(3,6,NfaEmpty),
                         (4,5,NfaValue 'b'),(5,6,NfaEmpty),(6,1,NfaEmpty),
@@ -29,14 +29,14 @@ specs = describe "PPTest.Builders.Nfa" $ do
 
   it "should build the correct automaton (a+)" $ do
     let expr = "a+"
-    let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaFinal)]
+    let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaFinal expr)]
                        [(0,1,NfaEmpty),(1,2,NfaValue 'a'),
                         (2,1,NfaEmpty),(2,3,NfaEmpty)]
     getNfa expr `shouldBe` e
 
   it "should build the correct automaton (a?)" $ do
     let expr = "a?"
-    let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaFinal)]
+    let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaFinal expr)]
                        [(0,1,NfaEmpty),(0,3,NfaEmpty),
                         (1,2,NfaValue 'a'),(2,3,NfaEmpty)]
     getNfa expr `shouldBe` e
@@ -44,7 +44,7 @@ specs = describe "PPTest.Builders.Nfa" $ do
   it "should build the correct automaton ([a-c])" $ do
     let expr = "[a-c]"
     let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaNode),
-                        (4,NfaNode),(5,NfaNode),(6,NfaNode),(7,NfaFinal)]
+                        (4,NfaNode),(5,NfaNode),(6,NfaNode),(7,NfaFinal expr)]
                        [(0,1,NfaEmpty),(0,3,NfaEmpty),(0,5,NfaEmpty),
                         (1,2,NfaValue 'a'),(2,7,NfaEmpty),(3,4,NfaValue 'b'),
                         (4,7,NfaEmpty),(5,6,NfaValue 'c'),(6,7,NfaEmpty)]
@@ -56,7 +56,7 @@ specs = describe "PPTest.Builders.Nfa" $ do
                         (4,NfaNode),(5,NfaNode),(6,NfaNode),(7,NfaNode),
                         (8,NfaNode),(9,NfaNode),(10,NfaNode),(11,NfaNode),
                         (12,NfaNode),(13,NfaNode),(14,NfaNode),(15,NfaNode),
-                        (16,NfaNode),(17,NfaFinal)]
+                        (16,NfaNode),(17,NfaFinal expr)]
                        [(0,1,NfaEmpty),(0,3,NfaEmpty),(0,5,NfaEmpty),
                         (0,7,NfaEmpty),(0,9,NfaEmpty),(0,11,NfaEmpty),
                         (0,13,NfaEmpty),(0,15,NfaEmpty),(1,2,NfaValue 'a'),
@@ -72,3 +72,14 @@ specs = describe "PPTest.Builders.Nfa" $ do
     let e = [c | c <- [minBound..maxBound], C.isAscii c]
     let values = map (\(_, _, NfaValue c) -> c) $ filter isValue $ Gr.labEdges $ getNfa expr
     values `shouldBe` e
+
+  it "should combine multiple NFA in one correctly" $ do
+    let a = Gr.mkGraph [(0,NfaInitial),(1,NfaFinal "a")]
+                       [(0,1,NfaValue 'a')]
+    let b = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaFinal "bc")]
+                       [(0,1,NfaValue 'b'),(1,2,NfaValue 'c')]
+    let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaFinal "a"),(3,NfaNode),
+                        (4,NfaNode),(5,NfaFinal "bc")]
+                       [(0,1,NfaEmpty),(0,3,NfaEmpty),(1,2,NfaValue 'a'),
+                        (3,4,NfaValue 'b'),(4,5,NfaValue 'c')]
+    combineNfa [a,b] `shouldBe` e

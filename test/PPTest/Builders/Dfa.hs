@@ -13,14 +13,14 @@ specs = describe "PPTest.Builders.Dfa" $ do
     -- Dragon Book, page 142, figures 3.34 and 3.36
     let nfa = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaNode),
                           (4,NfaNode),(5,NfaNode),(6,NfaNode),(7,NfaNode),
-                          (8,NfaNode),(9,NfaNode),(10,NfaFinal)]
+                          (8,NfaNode),(9,NfaNode),(10,NfaFinal "(a|b)*abb")]
                          [(0,1,NfaEmpty),(0,7,NfaEmpty),(1,2,NfaEmpty),
                           (1,4,NfaEmpty),(2,3,NfaValue 'a'),(3,6,NfaEmpty),
                           (4,5,NfaValue 'b'),(5,6,NfaEmpty),(6,1,NfaEmpty),
                           (6,7,NfaEmpty),(7,8,NfaValue 'a'),(8,9,NfaValue 'b'),
                           (9,10,NfaValue 'b')] :: NfaGraph
     let e = Gr.mkGraph [(0,DfaInitial),(1,DfaNode),(2,DfaNode),(3,DfaNode),
-                        (4,DfaFinal)]
+                        (4,DfaFinal "(a|b)*abb")]
                        [(0,1,DfaValue 'a'),(0,2,DfaValue 'b'),(1,1,DfaValue 'a'),
                         (1,3,DfaValue 'b'),(2,1,DfaValue 'a'),(2,2,DfaValue 'b'),
                         (3,1,DfaValue 'a'),(3,4,DfaValue 'b'),(4,1,DfaValue 'a'),
@@ -28,10 +28,10 @@ specs = describe "PPTest.Builders.Dfa" $ do
     buildDfa nfa `shouldBe` e
 
   it "should keep all final nodes from the NFA" $ do
-    let nfa = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaFinal),(3,NfaNode),
-                          (4,NfaFinal)]
+    let nfa = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaFinal "a"),(3,NfaNode),
+                          (4,NfaFinal "b")]
                          [(0,1,NfaEmpty),(0,3,NfaEmpty),(1,2,NfaValue 'a'),
                           (3,4,NfaValue 'b')] :: NfaGraph
-    let e = Gr.mkGraph [(1,DfaInitial),(2,DfaFinal),(3,DfaFinal)]
+    let e = Gr.mkGraph [(1,DfaInitial),(2,DfaFinal "a"),(3,DfaFinal "b")]
                        [(1,2,DfaValue 'a'),(1,3,DfaValue 'b')]
     buildDfa nfa `shouldBe` e

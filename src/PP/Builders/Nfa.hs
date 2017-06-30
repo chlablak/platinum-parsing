@@ -8,33 +8,35 @@ Stability   : provisional
 Portability : portable
 -}
 module PP.Builders.Nfa
-    (
+    ( combineNfa
     ) where
 
 import qualified Data.Char                  as C
 import qualified Data.Graph.Inductive.Graph as Gr
 import qualified Data.List                  as L
 import           PP.Builder
+import           PP.Grammar
 import           PP.Grammars.Lexical
 
 -- |Build a NFA from a RegExpr
 instance NfaBuilder RegExpr where
-  buildNfa (RegExpr [])  = buildSym NfaEmpty
-  buildNfa (RegExpr [x]) = buildNfa x
-  buildNfa (RegExpr xs)  = union $ map buildNfa xs
-  buildNfa (Choice [])   = buildSym NfaEmpty
-  buildNfa (Choice [x])  = buildNfa x
-  buildNfa (Choice xs)   = foldl1 concatenate $ map buildNfa xs
-  buildNfa (Many0 x)     = kleeneStar $ buildNfa x
-  buildNfa (Many1 x)     = kleenePlus $ buildNfa x
-  buildNfa (Option x)    = option $ buildNfa x
-  buildNfa (Group x)     = buildNfa x
-  buildNfa (Value c)     = buildSym $ NfaValue c
-  buildNfa classes       = buildNfa $ buildClasses classes
+  buildNfa re = buildNfa' (stringify re) re
+  buildNfa' n (RegExpr [])  = buildSym n NfaEmpty
+  buildNfa' n (RegExpr [x]) = buildNfa' n x
+  buildNfa' n (RegExpr xs)  = union n $ map (buildNfa' n) xs
+  buildNfa' n (Choice [])   = buildSym n NfaEmpty
+  buildNfa' n (Choice [x])  = buildNfa' n x
+  buildNfa' n (Choice xs)   = foldl1 concatenate $ map (buildNfa' n) xs
+  buildNfa' n (Many0 x)     = kleeneStar $ buildNfa' n x
+  buildNfa' n (Many1 x)     = kleenePlus $ buildNfa' n x
+  buildNfa' n (Option x)    = option $ buildNfa' n x
+  buildNfa' n (Group x)     = buildNfa' n x
+  buildNfa' n (Value c)     = buildSym n $ NfaValue c
+  buildNfa' n classes       = buildNfa' n $ buildClasses classes
 
 -- |Build a simple NFA
-buildSym :: NfaSymbol -> NfaGraph
-buildSym s = Gr.mkGraph [(0,NfaInitial),(1,NfaFinal)] [(0,1,s)]
+buildSym :: String -> NfaSymbol -> NfaGraph
+buildSym n s = Gr.mkGraph [(0,NfaInitial),(1,NfaFinal n)] [(0,1,s)]
 
 -- |Extract values from a class
 buildClasses :: RegExpr -> RegExpr
@@ -60,11 +62,11 @@ concatenate a b = Gr.mkGraph (an2 ++ bn) (ae ++ be)
     an = Gr.labNodes a
 
 -- |Union a list of NFA
-union :: [NfaGraph] -> NfaGraph
-union gs = Gr.mkGraph (nodesU ++ nodes3) (edgesU ++ edges2)
+union :: String -> [NfaGraph] -> NfaGraph
+union n gs = Gr.mkGraph (nodesU ++ nodes3) (edgesU ++ edges2)
   where
     nodes3 = map (\(i, _) -> (i, NfaNode)) nodes2
-    nodesU = [(0,NfaInitial),(final,NfaFinal)]
+    nodesU = [(0,NfaInitial),(final,NfaFinal n)]
     edgesU = [ (i,j,NfaEmpty)
              | n <- nodes2
              , isNotNode n
@@ -74,7 +76,7 @@ union gs = Gr.mkGraph (nodesU ++ nodes3) (edgesU ++ edges2)
     nodes = map Gr.labNodes gs
     edges = map Gr.labEdges gs
     getIJ (j, NfaInitial) = (0, j)
-    getIJ (i, NfaFinal)   = (i, final)
+    getIJ (i, NfaFinal _) = (i, final)
     final = last diff
     diff = diff' nodes 1
     diff' [] d     = [d]
@@ -90,13 +92,14 @@ union gs = Gr.mkGraph (nodesU ++ nodes3) (edgesU ++ edges2)
 kleeneStar :: NfaGraph -> NfaGraph
 kleeneStar g = Gr.mkGraph (nodes2 ++ nodesK) (edges2 ++ edgesK)
   where
-    nodesK = [(initial-1,NfaInitial),(final+1,NfaFinal)]
+    nodesK = [(initial-1,NfaInitial),(final+1,NfaFinal finalN)]
     edgesK = [(initial-1,initial,NfaEmpty),
               (final,final+1,NfaEmpty),
               (initial-1,final+1,NfaEmpty)]
     nodes2 = map (\(i, _) -> (i, NfaNode)) nodes
     edges2 = (final,initial,NfaEmpty) : edges
     final = let [(i, _)] = filter isFinal nodes in i
+    finalN = let [(_, NfaFinal n)] = filter isFinal nodes in n
     initial = let [(i, _)] = filter isInitial nodes in i
     nodes = map (\(i, n) -> (i + 1, n)) $ Gr.labNodes g
     edges = map (\(i, j, e) -> (i + 1, j + 1, e)) $ Gr.labEdges g
@@ -113,11 +116,36 @@ option g = Gr.delEdge (ifinal g' - 1, iinitial g' + 1) g'
   where
     g' = kleeneStar g
 
+-- |Combine multiple NFA in one
+combineNfa :: [NfaGraph] -> NfaGraph
+combineNfa gs = Gr.mkGraph (nodesU ++ nodes3) (edgesU ++ edges2)
+  where
+    nodes3 = map (\n@(i, _) -> if isFinal n then n else (i, NfaNode)) nodes2
+    nodesU = [(0,NfaInitial)]
+    edgesU = [ (i,j,NfaEmpty)
+             | n <- nodes2
+             , isInitial n
+             , let (i,j) = getIJ n]
+    nodes2 = concat $ add $ zip diff nodes
+    edges2 = concat $ adde $ zip diff edges
+    nodes = map Gr.labNodes gs
+    edges = map Gr.labEdges gs
+    getIJ (j, NfaInitial) = (0, j)
+    diff = diff' nodes 1
+    diff' [] d     = []
+    diff' (x:xs) d = d : diff' xs (d + length x)
+    add = map add'
+    add' (d, xs) = map (add'' d) xs
+    add'' d (i, n) = (i + d, n)
+    adde = map adde'
+    adde' (d, xs) = map (adde'' d) xs
+    adde'' d (i, j, n) = (i + d, j + d, n)
+
 -- Utilities
 iinitial g = let [(i, _)] = filter isInitial (Gr.labNodes g) in i
 ifinal g = let [(i, _)] = filter isFinal (Gr.labNodes g) in i
-isFinal (_, NfaFinal) = True
-isFinal _             = False
+isFinal (_, NfaFinal _) = True
+isFinal _               = False
 isInitial (_, NfaInitial) = True
 isInitial _               = False
 isNotNode (_, NfaNode) = False

@@ -14,6 +14,7 @@ For more informations about this tool, please look at:
 module PP
     ( module PP.Builder
     , module PP.Grammar
+    , module PP.Lexer
     , module PP.Parser
     , module PP.Rule
     , module PP.Template
@@ -21,6 +22,7 @@ module PP
 
 import           PP.Builder
 import           PP.Grammar
+import           PP.Lexer
 import           PP.Parser
 import           PP.Rule
 import           PP.Template
