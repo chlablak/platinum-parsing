@@ -24,10 +24,21 @@ specs = describe "PPTest.Lexers.Dfa" $ do
     createDfa rs `shouldBe` e
 
   it "should consume a simple input correctly" $ do
-    let rs = [Rule "abb" [RegEx "abb", Empty]]
+    let rs = [Rule "p1" [RegEx "abb", Empty]]
     let dfa = createDfa rs
-    let e = [OToken2 "abb" [IToken1 'a', IToken1 'b', IToken1 'b']]
+    let e = [OToken2 "p1" [IToken1 'a', IToken1 'b', IToken1 'b']]
     let input = "abb"
     let config = dfaConfig input dfa
-    let c2 = consume config
+    output (consume config) `shouldBe` e
+
+  it "should consume a input correctly" $ do
+    -- Dragon Book, page 156, example 3.29
+    let rs = [Rule "p1" [RegEx "a", Empty],
+              Rule "p2" [RegEx "abb", Empty],
+              Rule "p3" [RegEx "a*b+", Empty]]
+    let dfa = createDfa rs
+    let e = [OToken2 "p2" [IToken1 'a',IToken1 'b',IToken1 'b'],
+             OToken2 "p1" [IToken1 'a']]
+    let input = "abba"
+    let config = dfaConfig input dfa
     output (consume config) `shouldBe` e
