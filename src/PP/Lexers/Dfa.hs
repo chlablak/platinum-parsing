@@ -69,7 +69,8 @@ findNext g (IToken1 i) (n, _) =
 
 -- |Reduce path to initial node and construct an output token, if any
 reducePath :: DfaConfig -> DfaConfig
-reducePath c@(DfaConfig _ _ _ _ ((_, DfaInitial):_)) = c
+reducePath (DfaConfig (_:is) bs os g ps@((_, DfaInitial):_)) =
+  DfaConfig is bs os g ps
 reducePath (DfaConfig is (b:bs) os g ((_, DfaNode):ps)) =
   reducePath $ DfaConfig (b:is) bs os g ps
 reducePath (DfaConfig is bs os g ((_, DfaFinal n):_)) =

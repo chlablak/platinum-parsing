@@ -1,0 +1,14 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "<i>Lexer</i>" as parser
+rectangle "Entrée" as input
+rectangle "Sortie" as output
+rectangle "DFA" as table
+
+table <-- parser
+input -> parser
+parser -> output
+
+@enduml

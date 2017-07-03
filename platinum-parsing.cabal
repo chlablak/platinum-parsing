@@ -71,6 +71,7 @@ test-suite pp-test
                      , PPTest.Grammars.Lexical
                      , PPTest.Grammars.LexicalHelper
                      , PPTest.Lexers.Dfa
+                     , PPTest.Other.LexerDfaParserLr
                      , PPTest.Rule
                      , PPTest.Parsers.Lr
                      , PPTest.Templates.Lr

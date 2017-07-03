@@ -1472,7 +1472,57 @@
 			Notons qu'il est possible d'optimiser l'AFD obtenu, cependant cela est gardé pour une amélioration future.
 			
 		\subsection{Implémentation du \textit{lexer} complet}
-			\todo{}
+			L'architecture d'un \textit{lexer} est semblable à celle d'un \textit{parser} LR:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.5\textwidth]{../diagrams/misc/lexer-dfa}
+				\caption{Architecture d'un \textit{lexer} avec AFD}
+			\end{figure}
+			
+			Par conséquent nous allons utiliser la même approche que pour le \textit{parser} au niveau des modules:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{ll}
+					\hs{PP.Lexer} & Parties communes aux \textit{lexers}, dont la classe de type \hs{Lexer}\\
+					\hs{PP.Lexers.Dfa} & Implémentation d'un \textit{lexer} utilisant un AFD\\
+					\hs{PPTest.*} & Les tests correspondants ont été ajoutés\\
+				\end{tabular}
+				\caption{Modules pour l'analyseur lexical}
+			\end{table}
+			
+			La partie complexe étant la génération de l'AFD, l'implémentation est ici assez simple:
+			\begin{minted}{haskell}
+				{- Dans PP.Lexer -}
+				-- |Lexer class
+				class Lexer config where
+					-- |Simulate the automaton on the input, for one iteration
+					simulate :: config -> config
+					-- |Check if the input is consumed
+					consumed :: config -> Bool
+					-- |Get the output tokens
+					output :: config -> [OToken]
+					-- |Consume the complete input
+					consume :: config -> config
+					consume c = if consumed c then c else consume $ simulate c
+				
+				{- Dans PP.Lexers.Dfa -}
+				-- |DFA configuration
+				data DfaConfig = DfaConfig
+					{ dfaInput  :: [IToken]             -- ^Input tokens
+					, dfaBuffer :: [IToken]             -- ^Buffer
+					, dfaOutput :: [OToken]             -- ^Output tokens
+					, dfaGraph  :: DfaGraph             -- ^Automaton
+					, dfaPath   :: [Gr.LNode DfaNode]   -- ^Path for the current buffer
+					} deriving (Show)
+				
+				-- |Lexer instance for DFA configuration
+				instance Lexer DfaConfig where
+					simulate = simulateDfa
+					consumed c = head (dfaInput c) == IToken0
+					output = reverse . dfaOutput
+					consume c = if consumed c then simulate c else consume $ simulate c
+			\end{minted}
+			\captionof{listing}{Extrait de l'instance de \hs{Lexer} pour un AFD}
 			
 		\subsection{Intégration à PP et tests}
 			\todo{}

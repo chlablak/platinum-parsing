@@ -8,6 +8,7 @@ import qualified PPTest.Grammars.Ebnf
 import qualified PPTest.Grammars.Lexical
 import qualified PPTest.Grammars.LexicalHelper
 import qualified PPTest.Lexers.Dfa
+import qualified PPTest.Other.LexerDfaParserLr
 import qualified PPTest.Parsers.Lr
 import qualified PPTest.Rule
 import qualified PPTest.Templates.Lr
@@ -27,3 +28,4 @@ main = hspec $
     PPTest.Builders.Nfa.specs
     PPTest.Builders.Dfa.specs
     PPTest.Lexers.Dfa.specs
+    PPTest.Other.LexerDfaParserLr.specs
