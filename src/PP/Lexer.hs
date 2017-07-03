@@ -8,32 +8,24 @@ Stability   : provisional
 Portability : portable
 -}
 module PP.Lexer
-    ( IToken(..)
-    , iToken
+    ( IToken
     , OToken(..)
+    , charLexer
     , Lexer(..)
     ) where
 
 -- |Input token
-data IToken
-  = IToken0       -- ^Null token
-  | IToken1 Char  -- ^Token value
-    deriving (Eq, Ord)
-
-instance Show IToken where
-  show IToken0     = []
-  show (IToken1 c) = [c]
-
--- |String to IToken
-iToken :: String -> [IToken]
-iToken s = map IToken1 s ++ [IToken0]
+type IToken = Char
 
 -- |Output token
 data OToken
-  = OToken0                  -- ^Null token
-  | OToken1 String           -- ^Token name
-  | OToken2 String [IToken]  -- ^Token name and value
+  = OToken1 String           -- ^Token value
+  | OToken2 [IToken] String  -- ^Token value and name
     deriving (Show, Eq, Ord)
+
+-- |String to OToken
+charLexer :: String -> [OToken]
+charLexer = map (\c -> OToken1 [c])
 
 -- |Lexer class
 class Lexer config where

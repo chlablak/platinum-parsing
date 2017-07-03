@@ -51,9 +51,10 @@ regExprP = RegExpr . reverse <$> sepBy1 choiceP (char '|')
     optionP = Option <$> (char '?' *> exprP)
     groupP = Group <$> between (char ')') (char '(') regExprP
     classP = Class . reverse <$> between (char ']') (char '[')
-                                         (many1 (try intervalP <|> valueP))
+                                         (many1 (try intervalP <|> classValueP))
     intervalP = flip Interval <$> (anyChar <* char '-') <*> anyChar
     valueP = Value <$> noneOf "|*+?()[]"
+    classValueP = Value <$> noneOf "["
     anyP = Any <$ char '.'
 
 -- |RegExpr InputGrammar instance

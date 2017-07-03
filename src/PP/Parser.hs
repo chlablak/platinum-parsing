@@ -12,11 +12,12 @@ module PP.Parser
     ) where
 
 import           PP.Builder (LrTable)
+import           PP.Lexer   (OToken (..))
 
 -- |Type class for LR parser
 class LrParser config where
   -- |Put the input into the configuration
-  config :: LrTable -> String -> config
+  config :: LrTable -> [OToken] -> config
   -- |Parse one iteration only
   next :: LrTable -> config -> config
   -- |Check if there is still an iteration

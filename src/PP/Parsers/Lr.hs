@@ -12,6 +12,7 @@ module PP.Parsers.Lr
     ) where
 
 import           PP.Builder (LrAction (..), LrTable (..), action, action')
+import           PP.Lexer   (OToken (..))
 import           PP.Parser  (LrParser (..))
 import           PP.Rule    (Rule (..))
 
@@ -20,7 +21,7 @@ data LrConfig = LrConfig
   { lrCount  :: Int        -- ^Counter
   , lrStack  :: [Int]      -- ^State stack
   , lrAction :: LrAction   -- ^Action to do
-  , lrInput  :: String     -- ^Input
+  , lrInput  :: [OToken]   -- ^Input
   } deriving (Eq, Show)
 
 instance LrParser LrConfig where

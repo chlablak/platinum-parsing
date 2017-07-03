@@ -29,6 +29,7 @@ import           Data.Either
 import           Data.List
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
+import           PP.Lexer        (IToken)
 
 data Rule
   -- |A rule is defined by a non terminal and a list of Term and NonTerm
@@ -37,7 +38,9 @@ data Rule
   -- |Non terminal string
   | NonTerm String
   -- |Terminal character
-  | Term Char
+  | Term IToken
+  -- |Terminal token
+  | TermToken String
   -- |Empty
   | Empty
   -- |Concatenated rules, useful for PP.InputGrammar.rules
@@ -54,6 +57,7 @@ instance Show Rule where
       right (x:xs) = show x ++ "," ++ right xs
   show (NonTerm a) = a
   show (Term c) = show c
+  show (TermToken t) = '%' : t
   show Empty = "$"
   show (Concat xs) = "Concat " ++ show xs
   show (RegEx re) = '%' : show re
@@ -161,6 +165,7 @@ firstSet rs = Map.mapWithKey (\k _ -> find k rs) rs
       [Empty] -> compute $ Rule name xs
       a       -> a
     compute a@(Term _) = [a]
+    compute a@(TermToken _) = [a]
     compute (NonTerm s) = find s rs
     compute Empty = [Empty]
 
@@ -168,29 +173,42 @@ firstSet rs = Map.mapWithKey (\k _ -> find k rs) rs
 first :: Rule -> FirstSet -> [Rule]
 first Empty _           = [Empty]
 first a@(Term _) _      = [a]
+first a@(TermToken _) _ = [a]
 first (NonTerm s) fs    = fromMaybe [Empty] (Map.lookup s fs)
 first (Rule _ (x:_)) fs = first x fs
 
 -- |Separate rules into (parsing rules, lexing rules)
 separate :: [Rule] -> ([Rule], [Rule])
-separate rs = (filter (not . hasRegex) rs, filter hasRegex rs)
+separate rs = nonTermToToken (filter (not . hasRegex) rs, filter hasRegex rs)
   where
     hasRegex (Rule _ [])     = False
     hasRegex (Rule r (x:xs)) = hasRegex x || hasRegex (Rule r xs)
-    hasRegex (NonTerm a)     = False
-    hasRegex (Term c)        = False
+    hasRegex (NonTerm _)     = False
+    hasRegex (Term _)        = False
+    hasRegex (TermToken _)   = False
     hasRegex Empty           = False
     hasRegex (Concat [])     = False
     hasRegex (Concat (x:xs)) = hasRegex x || hasRegex (Concat xs)
     hasRegex (RegEx _)       = True
 
+-- |Transform NonTerm into TermToken, when needed
+nonTermToToken :: ([Rule], [Rule]) -> ([Rule], [Rule])
+nonTermToToken (rs, lrs) = (mappers rs, mappers lrs)
+    where
+      mappers = map (\(Rule r xs) -> Rule r $ map (replaceNonTerm tok) xs)
+      tok = map (\(Rule r _) -> r) lrs
+      replaceNonTerm [] r = r
+      replaceNonTerm (t:ts) r@(NonTerm nt) =
+        if nt == t then TermToken t else replaceNonTerm ts r
+      replaceNonTerm (_:ts) r = replaceNonTerm ts r
+
 -- |Transform lexing rules to have only one RegEx on right
 regexfy :: [Rule] -> [Rule]
 regexfy lrs = concatMap replace lrs
   where
-    replace (Rule r xs)  = [Rule r $ bind [] $ concatMap replace xs]
-    replace (NonTerm nt) = concatMap replace $ find nt
-    replace x            = [x]
+    replace (Rule r xs)    = [Rule r $ bind [] $ concatMap replace xs]
+    replace (TermToken nt) = concatMap replace $ find nt
+    replace x              = [x]
     bind acc [Empty]                = acc ++ [Empty]
     bind [] (x:xs)                  = bind [x] xs
     bind (RegEx a:acc) (RegEx b:xs) = bind [RegEx $ a ++ b] xs

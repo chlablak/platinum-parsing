@@ -9,7 +9,7 @@ specs = describe "PPTest.Lexers.Dfa" $ do
 
   it "should create a DFA from a list of lexical rules" $ do
     let rs = [Rule "digit" [RegEx "[0-2]", Empty],
-              Rule "number" [NonTerm "digit", RegEx "+", Empty]]
+              Rule "number" [TermToken "digit", RegEx "+", Empty]]
     let e = Gr.mkGraph [(0,DfaInitial),(1,DfaFinal "digit"),
                         (2,DfaFinal "digit"),(3,DfaFinal "digit"),
                         (4,DfaFinal "number"),(5,DfaFinal "number"),
@@ -26,7 +26,7 @@ specs = describe "PPTest.Lexers.Dfa" $ do
   it "should consume a simple token correctly" $ do
     let rs = [Rule "p1" [RegEx "abb", Empty]]
     let dfa = createDfa rs
-    let e = [OToken2 "p1" [IToken1 'a', IToken1 'b', IToken1 'b']]
+    let e = [OToken2 "abb" "p1"]
     let input = "abb"
     let config = dfaConfig input dfa
     output (consume config) `shouldBe` e
@@ -37,8 +37,8 @@ specs = describe "PPTest.Lexers.Dfa" $ do
               Rule "p2" [RegEx "abb", Empty],
               Rule "p3" [RegEx "a*b+", Empty]]
     let dfa = createDfa rs
-    let e = [OToken2 "p2" [IToken1 'a',IToken1 'b',IToken1 'b'],
-             OToken2 "p1" [IToken1 'a']]
+    let e = [OToken2 "abb" "p2",
+             OToken2 "a" "p1"]
     let input = "abba"
     let config = dfaConfig input dfa
     output (consume config) `shouldBe` e

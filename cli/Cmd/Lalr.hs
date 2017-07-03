@@ -115,7 +115,8 @@ dispatch (Args _ (LalrCmd args)) = do
                     -- Flag '--test-with'
                     when (testWith args /= "") $ do
                       source <- Log.io $ readFile $ testWith args
-                      let cfg = PP.parse' t $ PP.config t source :: [Parser.LrConfig]
+                      let tokens = PP.charLexer source
+                      let cfg = PP.parse' t $ PP.config t tokens :: [Parser.LrConfig]
                       printCfg cfg
 
                     -- Flag '--template'

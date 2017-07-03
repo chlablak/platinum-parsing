@@ -114,9 +114,9 @@ specs = describe "PPTest.Rule" $ do
     separate r `shouldBe` e
 
   it "should transform lexical rules to have only one regex on right" $ do
-    let r = [Rule "a" [NonTerm "b", Empty],
-             Rule "b" [NonTerm "c", RegEx "bb", Empty],
-             Rule "c" [RegEx "cc", NonTerm "d", Empty],
+    let r = [Rule "a" [TermToken "b", Empty],
+             Rule "b" [TermToken "c", RegEx "bb", Empty],
+             Rule "c" [RegEx "cc", TermToken "d", Empty],
              Rule "d" [RegEx "dd", RegEx "dd", Empty]]
     let e = [Rule "a" [RegEx "ccddddbb", Empty],
              Rule "b" [RegEx "ccddddbb", Empty],

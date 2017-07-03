@@ -34,19 +34,22 @@ import qualified Data.Map.Strict                   as Map
 import           Data.Maybe
 import qualified Data.Set                          as Set
 import qualified Data.Vector                       as Vector
+import           PP.Lexer                          (OToken (..))
 import           PP.Rule
 
 -- |All LR parsers have the same table format
 type LrTable = Map.Map (Int, Rule) LrAction
 
--- |Get a LrAction from a LrTable
+-- |Get a LrAction from a LrTable (Rule version)
 action :: LrTable -> Int -> Rule -> LrAction
 action t i r    = fromMaybe LrError (Map.lookup (i, r) t)
 
--- |Get a LrAction from a LrTable
-action' :: LrTable -> Int -> String -> LrAction
-action' t i []    = action t i Empty
-action' t i (x:_) = action t i $ Term x
+-- |Get a LrAction from a LrTable (OToken version)
+action' :: LrTable -> Int -> [OToken] -> LrAction
+action' t i []                = action t i Empty
+action' t i (OToken1 []:_)    = action t i Empty
+action' t i (OToken1 (x:_):_) = action t i $ Term x
+action' t i (OToken2 _ s:_)   = action t i $ TermToken s
 
 -- |LR actions for a LR parser
 data LrAction

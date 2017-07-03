@@ -72,8 +72,9 @@ instance LrBuilder LalrItem where
              , nonTerm s
              , let j = next gs i s
              , isJust j]
-      term (Term _) = True
-      term _        = False
+      term (Term _)      = True
+      term (TermToken _) = True
+      term _             = False
       reductibles is = [x | x <- Set.toList is, reductible x]
       reductible (LalrItem (Rule _ xs) p _) = L.length xs == p + 1
       acc = not . Set.null . Set.filter
