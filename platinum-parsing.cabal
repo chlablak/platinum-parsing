@@ -31,6 +31,7 @@ library
                      , PP.Parsers.Lr
                      , PP.Rule
                      , PP.Template
+                     , PP.Templates.Dfa
                      , PP.Templates.Lr
   build-depends:       base >= 4.7 && < 5
                      , parsec
@@ -75,6 +76,7 @@ test-suite pp-test
                      , PPTest.Rule
                      , PPTest.Parsers.Lr
                      , PPTest.Templates.Lr
+                     , PPTest.Templates.Dfa
   build-depends:       base
                      , platinum-parsing
                      , hspec

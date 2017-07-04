@@ -11,6 +11,7 @@ import qualified PPTest.Lexers.Dfa
 import qualified PPTest.Other.LexerDfaParserLr
 import qualified PPTest.Parsers.Lr
 import qualified PPTest.Rule
+import qualified PPTest.Templates.Dfa
 import qualified PPTest.Templates.Lr
 import           Test.Hspec
 
@@ -29,3 +30,4 @@ main = hspec $
     PPTest.Builders.Dfa.specs
     PPTest.Lexers.Dfa.specs
     PPTest.Other.LexerDfaParserLr.specs
+    PPTest.Templates.Dfa.specs
