@@ -1,0 +1,378 @@
+(*
+! -----------------------------------------------------------------------
+! RTScriptC
+!
+! A version of the C language adapted for realtime scripting purpose
+! -----------------------------------------------------------------------
+
+"Name"    = 'RTDynamicC'
+"Version" = '2011'
+"Author"  = 'Objectis SA'
+"About"   = 'A version of the C language adapted for realtime scripting purpose.'
+
+"Case Sensitive" = true
+"Start Symbol"   = <Decls>
+*)
+
+Digit %= "[0-9]" ;
+Hex Digit %= Digit, "|[a-fA-F]" ;
+Oct Digit %= "[0-7]" ;
+
+Letter %= "[a-zA-Z]" ;
+Id Head %= Letter, "|_" ;
+Id Tail %= Id Head, "|", Digit ;
+
+Printable %= "." ;
+String Ch %= Printable ; (* - ["] *)
+Char Ch %= Printable ; (* - ['] *)
+
+ExponentPartIndicator %= "[eE]" ;
+Sign %= "[-+]" ;
+
+DecLiteral %= "[1-9]", Digit, "*" ;
+OctLiteral %= "0", Oct Digit, "*" ;
+HexLiteral %= "0x", Hex Digit, "+" ;
+FloatLiteral %= Digit, "*[.]", Digit, "+" ;
+FloatLiteralExponent = Digit, "*[.]", Digit, "+", ExponentPartIndicator, Sign, "?", Digit, "+|", Digit, "+", ExponentPartIndicator, Sign, "?", Digit, "+";
+
+StringLiteral %= "\"(", String Ch, "|\\", Printable, ")*\"" ;
+CharLiteral %= "'(", Char Ch, "|\\", Printable, ")'" ;
+BoolLiteral %= "true|false" ;
+
+Id %= Id Head, Id Tail, "*" ;
+
+(*
+! ===================================================================
+! Comments
+! ===================================================================
+
+Comment Start = '/*'
+Comment End   = '*/'
+Comment Line  = '//'
+
+! Typically, C comments cannot be nested. As a result, the
+! Comment Start and Comment End terminals cannot be used.
+!
+! To implement non-nested comments, the whitespace terminal is
+! modified to accept them. In the definition below, Whitespace
+! is defined as one or more {Whitespace} characters OR a series
+! of characters delimited by /* and */. Note that the characters
+! between the two delimiters cannot contain the */ sequence.
+!
+! Uncomment the following to prevent block commments. Make sure
+! to comment the Comment Start and Comment End definitions.
+!
+! {Non Slash}     = {Printable} - [/]
+! {Non Asterisk}  = {Printable} - [*]
+!
+! Whitespace     = {Whitespace}+
+!                | '/*' (  {Non Asterisk} | '*' {Non Slash}? )*  '*/'
+
+!=======================================================
+*)
+
+Decls = [Decl, Decls] ;
+
+Decl = Func Decl
+     | Var Decl
+     | Func Proto
+     | Struct Decl ;
+(*
+!    | <Union Decl>
+!    | <Enum Decl>
+!    | <Typedef Decl>
+*)
+
+(*
+! ===================================================================
+! Function  Declaration
+! ===================================================================
+*)
+
+Func Proto = Func ID, "(",  Params, ")", ";"
+           | Func ID, "(", ")", ";" ;
+
+Func Decl = Func Item
+          | Mode, Func Item ;
+
+Func Item = Func ID, "(", Params ")", Block
+          | Func ID, "(", ")", Block ;
+
+Params = ParamItem, ",", Params
+       | ParamItem ;
+
+Param ref = "&" ;
+
+ArrayRef = "[", "]" ;
+
+ArrayRefs = ArrayRef, ArrayRefs
+          | ArrayRef ;
+
+ParamItem = Param
+          | "const", Param ;
+
+Param = Type, Id
+      | Type, Param ref, Id
+      | Type, Id, ArrayRefs
+      | Type, ArrayRefs, Id ;
+
+Func ID = Type, Id
+        | Type, "&", Id
+        | Type, ArrayRefs, Id ;
+
+(*
+! ===================================================================
+! Type Declaration
+! ===================================================================
+*)
+
+(*
+!<Typedef Decl> ::= typedef <Type> ID ';'
+*)
+
+Struct Decl = "struct", Id, "{", Struct Def, "}", ";" ;
+
+(*
+!<Union Decl>   ::= union Id '{' <Struct Def> '}'  ';'
+*)
+
+Struct Def = [Field Decl, Struct Def] ;
+
+Field Decl = Type, Field, Field List, ";" ;
+
+Field = Id
+      | Id, Arrays ;
+
+Field List = [",", Field, Field List] ;
+
+(*
+! ===================================================================
+! Variable Declaration
+! ===================================================================
+*)
+
+Var Decl = Type, Var, Var List, ";"
+         | Mode, Type, Var, Var List, ";" ;
+
+Mode = "const" ;
+
+(*
+!<Value List> ::= ',' <Op If> <Value List>
+!              |
+*)
+
+Var = Id
+    | Id, "=", Op If
+    | "&", Id, "=", Op If
+    | Id, Arrays
+    | Id, ArrayRefs, "=", Op If
+    | ArrayRefs, Id, "=", Op If ;
+(*
+!             | ID <Arrays> '=' '{' <Op If> <Value List> '}'
+*)
+
+IntLiteral = OctLiteral
+           | HexLiteral
+           | DecLiteral
+           | CharLiteral ;
+
+Array = "[", IntLiteral, "]" ;
+
+Arrays = Array, Arrays
+       | Array ;
+
+Var List = [",", Var, Var List] ;
+
+(*
+! ===================================================================
+! Enumerations
+! ===================================================================
+*)
+
+(*
+!<Enum Decl>    ::= enum Id '{' <Enum Def> '}'  ';'
+
+!<Enum Def>     ::= <Enum Val> ',' <Enum Def>
+!                 | <Enum Val>
+
+!<Enum Val>     ::= Id
+!                 | Id '=' OctLiteral
+!                 | Id '=' HexLiteral
+!                 | Id '=' DecLiteral
+*)
+
+(*
+! ===================================================================
+! Types
+! ===================================================================
+*)
+
+Type = Base ;
+
+Base = Signed, Scalar
+     | "struct", Id ;
+(*
+!             | struct '{' <Struct Def> '}'
+!             | union Id
+!             | union '{' <Struct Def> '}'
+!             | enum Id
+*)
+
+Signed = "signed"
+       | "unsigned"
+       | ;
+
+Scalar = "bool"
+       | "char"
+       | "int"
+       | "short"
+       | "long"
+       | "short int"
+       | "long int"
+       | "float"
+       | "double"
+       | "void" ;
+
+(*
+! ===================================================================
+! Statements
+! ===================================================================
+*)
+
+Stm = Var Decl
+    | Id, ":" (* !Label *)
+    | "if", "(", Expr, ")", Stm
+    | "if", "(", Expr, ")", Then Stm, "else" Stm
+    | "while", "(", Expr, ")", Stm
+    | "for", "(", Arg, ";", Arg, ";", Arg, ")", Stm
+    | Normal Stm ;
+
+Then Stm = "if", "(", Expr, ")", Then Stm, "else", Then Stm
+         | "while", "(", Expr, ")", Then Stm
+         | "for", "(", Arg, ";", Arg, ";", Arg, ")", Then Stm
+         | Normal Stm ;
+
+Normal Stm = "do", Stm, "while", "(", Expr, ")"
+           | "switch", "(", Expr, ")", Switch block
+           | Block
+           | Expr, ";"
+           | "goto", Id, ";"
+           | "break", ";"
+           | "continue", ";"
+           | "return", Expr, ";"
+           | ";" ; (* !Null statement *)
+
+Arg = [Expr] ;
+
+Switch block = "{", Case Stms, "}" ;
+
+CaseValue = BoolLiteral
+          | OctLiteral
+          | HexLiteral
+          | DecLiteral ;
+
+Case Stm = "case", CaseValue, ":", Stm List ;
+
+Case Stms = Case Stm, Case Stms
+          | "default", ":", Stm List
+          | ;
+
+Block = "{", Stm List, "}" ;
+
+Stm List = [Stm, Stm List] ;
+
+(*
+! ===================================================================
+! Here begins the C's 15 levels of operator precedence.
+! ===================================================================
+*)
+
+Expr = Expr, ",", Op Assign
+     | Op Assign ;
+
+Op Assign = Op If, "=", Op Assign
+          | Op If, "+=" , Op Assign
+          | Op If, "-=" , Op Assign
+          | Op If, "*=" , Op Assign
+          | Op If, "/=" , Op Assign
+          | Op If, "^=" , Op Assign
+          | Op If, "&=" , Op Assign
+          | Op If, "|=" , Op Assign
+          | Op If, ">>=", Op Assign
+          | Op If, "<<=", Op Assign
+          | Op If ;
+
+Op If = Op Or, "?", Op If, ":", Op If
+      | Op Or ;
+
+Op Or = Op Or, "||", Op And
+      | Op And ;
+
+Op And = Op And, "&&", Op BinOR
+       | Op BinOR ;
+
+Op BinOR = Op BinOr, "|", Op BinXOR
+         | Op BinXOR ;
+
+Op BinXOR = Op BinXOR, "^", Op BinAND
+          | Op BinAND ;
+
+Op BinAND = Op BinAND, "&", Op Equate
+          | Op Equate ;
+
+Op Equate = Op Equate, "==", Op Compare
+          | Op Equate, "!=", Op Compare
+          | Op Compare ;
+
+Op Compare = Op Compare, "<", Op Shift
+           | Op Compare, ">", Op Shift
+           | Op Compare, "<=", Op Shift
+           | Op Compare, ">=", Op Shift
+           | Op Shift ;
+
+Op Shift = Op Shift, "<<", Op Add
+         | Op Shift, ">>", Op Add
+         | Op Add ;
+
+Op Add = Op Add, "+", Op Mult
+       | Op Add, "-", Op Mult
+       | Op Mult ;
+
+Op Mult = Op Mult, "*", Op Unary
+        | Op Mult, "/", Op Unary
+        | Op Mult, "%", Op Unary
+        | Op Unary ;
+
+Op Unary = "!", Op Unary
+         | "~", Op Unary
+         | "-", Op Unary
+         | "+", Op Unary
+         | "++", Op Unary
+         | "--", Op Unary
+         | Op Reference, "++"
+         | Op Reference, "--"
+         | "(", Type, ")", Op Unary  (* !CAST *)
+         | "sizeof", "(", Type, ")"
+         | "sizeof", "(", Expr, ")"
+         | Op Reference ;
+
+Op Reference = Value
+             | Op Reference, "[", Expr, "]"
+             | Op Reference, ".", Id ;
+
+
+Func Arguments = Op Assign, ",", Func Arguments
+               | Op Assign
+               | ;
+
+Value = BoolLiteral
+      | OctLiteral
+      | HexLiteral
+      | DecLiteral
+      | StringLiteral
+      | CharLiteral
+      | FloatLiteral
+      | FloatLiteralExponent
+      | Id, "(", Func Arguments, ")"
+      | Id
+      | "(", Expr, ")" ;

@@ -11,8 +11,11 @@ module PP.Lexers.Dfa
     ( DfaConfig
     , dfaConfig
     , createDfa
+    , createDfa'
     ) where
 
+import           Control.Exception
+import           Data.Either
 import qualified Data.Graph.Inductive.Graph as Gr
 import           Data.Maybe
 import           PP.Builder
@@ -58,6 +61,14 @@ createDfa = buildDfa . combineNfa . map createNfa . regexfy
       case parseAst re :: To RegExpr of
         Left e    -> error $ show e
         Right ast -> buildNfa' n ast
+
+-- |Exception-safe version of `createDfa`
+createDfa' :: [Rule] -> IO (Either String DfaGraph)
+createDfa' rs = do
+    a <- try (evaluate $ createDfa rs) :: IO (Either SomeException DfaGraph)
+    case a of
+        Left e  -> return $ Left $ head $ lines $ displayException e
+        Right r -> return $ Right r
 
 -- |Simulate one iteration
 simulateDfa :: DfaConfig -> DfaConfig

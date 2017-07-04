@@ -39,6 +39,8 @@ commandArgs = EbnfCmd <$> ebnfArgs
         <> help "Print the first set" )
       <*> switch ( long "check"
         <> help "Search for errors" )
+      <*> switch ( long "lexical"
+        <> help "Print lexical rules" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -56,13 +58,20 @@ dispatch (Args _ (EbnfCmd args)) = do
         Log.info "minified:"
         Log.out $ PP.stringify ast
 
-      r <- Log.io $ PP.rules' ast
+      r <- Log.io $ PP.rules' $ PP.lexify ast
       case r of
         Left err -> do
           Log.err $ "cannot make rules: " ++ err
           Log.abort
-        Right r ->
-          case PP.extend r of
+        Right r -> do
+          let (prs, lrs) = PP.separate r
+
+          -- Flag `--lexical`
+          when (showLexical args) $ do
+            Log.info "lexical rules:"
+            mapM_ (Log.out . show) lrs
+
+          case PP.extend prs of
             Left err -> do
               Log.err "cannot extend the input grammar:"
               Log.err err

@@ -93,7 +93,10 @@ class NfaBuilder from where
 -- |Deterministic finite automaton (DFA)
 type DfaGraph = Gr.Gr DfaNode DfaSymbol
 data DfaNode = DfaInitial | DfaNode | DfaFinal String deriving (Eq, Ord, Show, Read)
-newtype DfaSymbol = DfaValue Char deriving (Eq, Ord, Show, Read)
+newtype DfaSymbol = DfaValue Char deriving (Eq, Ord, Read)
+
+instance Show DfaSymbol where
+  show (DfaValue c) = show c
 
 -- |DFA builders
 class DfaBuilder from where

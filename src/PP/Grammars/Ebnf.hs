@@ -188,9 +188,10 @@ lexifySyntax s = replaceTerm tok $ addLexicalInner tok s
     generateTokens terms = L.zip terms ["__token_" ++ show i | i <- [0..]]
     addLexicalInner [] s = s
     addLexicalInner ((n, t):ts) (Syntax srs) =
-      Syntax $ LexicalInner (lexicalString t n) : srs
+      addLexicalInner ts $ Syntax $ LexicalInner (lexicalString t n) : srs
     replaceTerm [] s                = s
-    replaceTerm (t:ts) (Syntax srs) = Syntax $ L.map (replaceTerm' t) srs
+    replaceTerm (t:ts) (Syntax srs) =
+      replaceTerm ts $ Syntax $ L.map (replaceTerm' t) srs
     replaceTerm' t (SyntaxRule r dl)   = SyntaxRule r $ replaceTerm'' t dl
     replaceTerm' _ li@(LexicalInner _) = li
     replaceTerm'' t (DefinitionsList sds) =

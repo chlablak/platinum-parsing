@@ -58,6 +58,7 @@ executable pp
                      , containers
                      , mtl
                      , clock
+                     , fgl
   default-language:    Haskell2010
 
 test-suite pp-test
@@ -77,6 +78,7 @@ test-suite pp-test
                      , PPTest.Parsers.Lr
                      , PPTest.Templates.Lr
                      , PPTest.Templates.Dfa
+                     , PPTest.Template
   build-depends:       base
                      , platinum-parsing
                      , hspec

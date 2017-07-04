@@ -1413,7 +1413,7 @@
 					\hs{PP.Grammars.Ebnf} & Utilisation de \hs{LexicalHelper}\\
 					\hs{PP.lexify} & Transforme un AST pour que les terminaux deviennent des règles lexicales\\
 					\hs{PP.separate} & Sépare les règles (canoniques) en deux ensembles: les règles de \textit{parsing} \\&et celles de \textit{lexing}\\
-					\hs{PP.regexfy} & Uniformise une règles lexicales\\ 
+					\hs{PP.regexfy} & Uniformise des règles lexicales\\ 
 				\end{tabular}
 				\caption{Modifications effectuées pour l'ajout des règles lexicales}
 			\end{table} 
@@ -1525,10 +1525,33 @@
 			\captionof{listing}{Extrait de l'instance de \hs{Lexer} pour un AFD}
 			
 		\subsection{Intégration à PP et tests}
-			\todo{PP}
-			\todo{Template}
-			\todo{CLI}
-			\todo{Démo}
+			Maintenant que le \textit{lexer} est complet (générateurs et simulateurs d'automates), nous pouvons intégrer cela au reste de PP. Pour rappel, le \textit{parser} actuel lit l'entrée caractère par caractère. Nous allons modifier ce comportement pour lire \textit{token} par \textit{token}.\\
+			
+			Concrètement les changements consistent à changer le type d'entrée \hs{String} (= \hs{[Char]}) en \hs{[OToken]}, partout où cela est nécessaire:
+			\begin{itemize}
+				\item \hs{PP.Rule}
+				\item \hs{PP.Builder}
+				\item \hs{PP.Builders.*}
+				\item \hs{PP.Parser}
+				\item \hs{PP.Parsers.*}\\
+			\end{itemize}
+			
+			Les responsabilités étant bien découplés, le support des \hs{OToken} n'ont pas demandé beaucoup de changements.\\
+			
+			Les modules suivant ont également été modifiés pour intégrer le \textit{lexer}:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{ll}
+					\hs{PP.Templates.Dfa} & Possibilité d'exporter l'AFD avec le moteur de \textit{template}\\
+					\hs{Cmd.Ebnf} & Gestion du \textit{lexer} depuis la commande \texttt{pp ebnf}, avec une nouvelle option \\&\texttt{--lexical} pour afficher les règles lexicales\\
+					\hs{Cmd.Lalr} & Gestion du \textit{lexer} depuis la commande \texttt{pp lalr}, avec une nouvelle option \\&\texttt{--dfa} pour afficher l'AFD généré
+				\end{tabular}
+				\caption{Modules changés pour l'intégration du \textit{lexer}}
+			\end{table}
+			
+			À présent que le \textit{lexer} ainsi que le \textit{parser} peuvent interagir ensemble, nous pouvons tester PP sur une grammaire plus conséquente: une grammaire du langage C, modifiée.\\
+			
+			\todo{grammaire C, tests, démo?} 
 			
 	\section{TODO}
 		\todo{}

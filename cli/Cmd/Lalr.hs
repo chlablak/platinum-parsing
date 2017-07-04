@@ -14,18 +14,21 @@ module Cmd.Lalr
     ) where
 
 import           Args
-import           Control.Monad       (when)
-import qualified Data.Map.Strict     as Map
-import           Data.Semigroup      ((<>))
-import qualified Data.Set            as Set
-import qualified Data.Vector         as Vector
+import           Control.Monad              (when)
+import qualified Data.Graph.Inductive.Graph as Gr
+import qualified Data.Map.Strict            as Map
+import           Data.Semigroup             ((<>))
+import qualified Data.Set                   as Set
+import qualified Data.Vector                as Vector
 import qualified Log
 import           Options.Applicative
 import qualified PP
-import qualified PP.Builders.Lalr    as Builder
-import qualified PP.Grammars.Ebnf    as Grammar
-import qualified PP.Parsers.Lr       as Parser
-import qualified PP.Templates.Lr     as Template
+import qualified PP.Builders.Lalr           as Builder
+import qualified PP.Grammars.Ebnf           as Grammar
+import qualified PP.Lexers.Dfa              as Lexer
+import qualified PP.Parsers.Lr              as Parser
+import qualified PP.Templates.Dfa           as DfaTemplate
+import qualified PP.Templates.Lr            as LrTemplate
 
 -- |Command arguments
 commandArgs :: Parser CommandArgs
@@ -53,6 +56,8 @@ commandArgs = LalrCmd <$> lalrArgs
         <> metavar "FILENAME"
         <> value ""
         <> help "Specify a template file to use" )
+      <*> switch ( long "dfa"
+        <> help "Print the DFA" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -65,13 +70,14 @@ dispatch (Args _ (LalrCmd args)) = do
       Log.err $ show err
       Log.abort
     Right ast -> do
-      r <- Log.io $ PP.rules' ast
+      r <- Log.io $ PP.rules' $ PP.lexify ast
       case r of
         Left err ->  do
           Log.err $ "cannot make rules: " ++ err
           Log.abort
-        Right rules ->
-          case PP.extend rules of
+        Right rules -> do
+          let (prs, lrs) = PP.separate rules
+          case PP.extend prs of
             Left err -> do
               Log.err "cannot extend the input grammar:"
               Log.err err
@@ -112,19 +118,36 @@ dispatch (Args _ (LalrCmd args)) = do
                       Log.info "table:"
                       printTable t
 
-                    -- Flag '--test-with'
-                    when (testWith args /= "") $ do
-                      source <- Log.io $ readFile $ testWith args
-                      let tokens = PP.charLexer source
-                      let cfg = PP.parse' t $ PP.config t tokens :: [Parser.LrConfig]
-                      printCfg cfg
+                    Log.pushTask "compute DFA"
+                    dfa' <- Log.io $ Lexer.createDfa' lrs
+                    case dfa' of
+                      Left err -> do
+                        Log.popTask
+                        Log.err $ "cannot create DFA: " ++ err
+                        Log.abort
+                      Right dfa -> do
+                        Log.popTask
 
-                    -- Flag '--template'
-                    when (template args /= "") $ do
-                      te <- Log.io $ readFile $ template args
-                      let compiled = PP.compile (Template.context t) te
-                      Log.info "compiled template:"
-                      Log.out compiled
+                        -- Flag `--dfa`
+                        when (showDfa args) $
+                          printDfa dfa
+
+                        -- Flag '--test-with'
+                        when (testWith args /= "") $ do
+                          source <- Log.io $ readFile $ testWith args
+                          let lconfig = Lexer.dfaConfig source dfa
+                          let tokens = PP.output $ PP.consume lconfig
+                          let cfg = PP.parse' t $ PP.config t tokens :: [Parser.LrConfig]
+                          printCfg cfg
+
+                        -- Flag '--template'
+                        when (template args /= "") $ do
+                          te <- Log.io $ readFile $ template args
+                          let c1 = LrTemplate.context t
+                          let c2 = DfaTemplate.context dfa
+                          let compiled = PP.compile (PP.mergeContext c1 c2) te
+                          Log.info "compiled template:"
+                          Log.out compiled
 
   -- End
   return ()
@@ -154,3 +177,7 @@ printCfg = printCfg' . head
       case a of
         PP.LrAccept -> Log.info "input accepted"
         _           -> Log.err $ "error at " ++ show (take 20 i)
+
+-- |Pretty print for DFA
+printDfa :: PP.DfaGraph -> Log.Logger
+printDfa = Log.out . Gr.prettify

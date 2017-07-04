@@ -40,6 +40,7 @@ data EbnfArgs = EbnfArgs
   , showRules    :: Bool     -- ^Print the obtained rules
   , showFirstSet :: Bool     -- ^Print the first set
   , doCheck      :: Bool     -- ^Search for errors in grammar
+  , showLexical  :: Bool     -- ^Print lexical rules
   }
     deriving Show
 
@@ -51,5 +52,6 @@ data LalrArgs = LalrArgs
   , showTable      :: Bool    -- ^Print the LALR table
   , testWith       :: String  -- ^Test the LALR table on a source file
   , template       :: String  -- ^Specify a template
+  , showDfa        :: Bool    -- ^Print the DFA
   }
     deriving Show
