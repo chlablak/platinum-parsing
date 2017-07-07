@@ -60,3 +60,8 @@ specs = describe "PPTest.Grammars.Lexical" $ do
     case parseAst "(a*b)?|[a-z]+(a|[b-d])?|(a|(b|c))de|.|" :: To RegExpr of
       Left e  -> show e `shouldBe` "not an error"
       Right o -> stringify o `shouldBe` "(a*b)?|[a-z]+(a|[b-d])?|(a|(b|c))de|.|"
+
+  it "should parse all meta symbols into class" $
+    case parseAst "[[][|][*][+][?][(][(][]][.]" :: To RegExpr of
+      Left e  -> show e `shouldBe` "not an error"
+      Right o -> stringify o `shouldBe` "[[][|][*][+][?][(][(][]][.]"

@@ -24,6 +24,7 @@ data Args = Args CommonArgs CommandArgs
 data CommonArgs = CommonArgs
   { setLevel :: Int   -- ^Verbosity level
   , silent   :: Bool  -- ^Verbosity off
+  , useWork  :: Bool  -- ^Use '.pp-work/' directory
   }
     deriving Show
 
@@ -35,12 +36,13 @@ data CommandArgs
 
 -- |EBNF command arguments
 data EbnfArgs = EbnfArgs
-  { ebnfFile     :: String   -- ^Input file
-  , showMinified :: Bool     -- ^Print the minified grammar to output
-  , showRules    :: Bool     -- ^Print the obtained rules
-  , showFirstSet :: Bool     -- ^Print the first set
-  , doCheck      :: Bool     -- ^Search for errors in grammar
-  , showLexical  :: Bool     -- ^Print lexical rules
+  { ebnfFile      :: String   -- ^Input file
+  , showMinified  :: Bool     -- ^Print the minified grammar to output
+  , showRules     :: Bool     -- ^Print the obtained rules
+  , showFirstSet  :: Bool     -- ^Print the first set
+  , doCheck       :: Bool     -- ^Search for errors in grammar
+  , showLexical   :: Bool     -- ^Print lexical rules
+  , showRegexfied :: Bool     -- ^Print the regexfied lexical rules
   }
     deriving Show
 

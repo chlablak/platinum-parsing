@@ -136,4 +136,4 @@ specs = describe "PPTest.Grammars.Ebnf" $ do
 
   it "should lexify correctly" $
     let Right ast = parseAst "d%=\"[0-9]\";\nn%=d,\"+\";\ns=\"ab\",n;" :: To Syntax in
-      stringify (lexify ast) `shouldBe` "__token_0%=\"ab\";\nd%=\"[0-9]\";\nn%=d,\"+\";\n<s>=<__token_0>,<n>;"
+      stringify (lexify ast) `shouldBe` "__token_ab%=\"ab\";\nd%=\"[0-9]\";\nn%=d,\"+\";\n<s>=<__token_ab>,<n>;"

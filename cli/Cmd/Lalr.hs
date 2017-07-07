@@ -61,7 +61,7 @@ commandArgs = LalrCmd <$> lalrArgs
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
-dispatch (Args _ (LalrCmd args)) = do
+dispatch (Args cargs (LalrCmd args)) = do
   Log.pushTag "lalr"
   input <- Log.io $ readFile $ lalrFile args
   case PP.parseAst input :: (PP.To Grammar.Syntax) of

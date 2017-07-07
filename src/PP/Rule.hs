@@ -47,6 +47,7 @@ data Rule
   | Concat [Rule]
   -- |Regular expression, useful for lexical rules
   | RegEx String
+  | RegExString String -- ^No parse-string
     deriving (Eq, Ord)
 
 instance Show Rule where
@@ -61,6 +62,7 @@ instance Show Rule where
   show Empty = "$"
   show (Concat xs) = "Concat " ++ show xs
   show (RegEx re) = '%' : show re
+  show (RegExString s) = show s
 
 -- |Uniformize a list of rules
 -- `uniformize = sort . nub . concatMap (flatten . clean)`
@@ -190,6 +192,7 @@ separate rs = nonTermToToken (filter (not . hasRegex) rs, filter hasRegex rs)
     hasRegex (Concat [])     = False
     hasRegex (Concat (x:xs)) = hasRegex x || hasRegex (Concat xs)
     hasRegex (RegEx _)       = True
+    hasRegex (RegExString _) = True
 
 -- |Transform NonTerm into TermToken, when needed
 nonTermToToken :: ([Rule], [Rule]) -> ([Rule], [Rule])
@@ -206,11 +209,12 @@ nonTermToToken (rs, lrs) = (mappers rs, mappers lrs)
 regexfy :: [Rule] -> [Rule]
 regexfy lrs = concatMap replace lrs
   where
-    replace (Rule r xs)    = [Rule r $ bind [] $ concatMap replace xs]
+    replace (Rule r xs)    = [Rule r $ bind [RegEx ""] $ concatMap replace xs]
     replace (TermToken nt) = concatMap replace $ find nt
     replace x              = [x]
-    bind acc [Empty]                = acc ++ [Empty]
-    bind [] (x:xs)                  = bind [x] xs
-    bind (RegEx a:acc) (RegEx b:xs) = bind [RegEx $ a ++ b] xs
+    bind acc [Empty]                      = acc ++ [Empty]
+    bind (RegEx a:acc) (RegEx b:xs)       = bind [RegEx $ a ++ b] xs
+    bind (RegEx a:acc) (RegExString b:xs) = bind [RegEx $ a ++ toRegex b] xs
     find r = let (Rule _ xs:_) = rule r rs in init xs
+    toRegex s = '(' : concat [['[',c,']'] | c <- s] ++ ")"
     rs = ruleSet lrs

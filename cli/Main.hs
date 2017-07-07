@@ -22,6 +22,7 @@ import           Control.Monad.State
 import           Data.Semigroup      ((<>))
 import qualified Log
 import           Options.Applicative
+import qualified Work
 
 main :: IO ()
 main = do
@@ -35,12 +36,15 @@ main = do
 
 -- |Dispatch arguments to commands
 dispatch :: Args -> Log.Logger
-dispatch args@(Args (CommonArgs l s) _) = do
-  Log.start (if s then 1000000 else l) "pp"
+dispatch args@(Args cargs _) = do
+  Log.start (if silent cargs then 1000000 else setLevel cargs) "pp"
   Log.autoFlush True
   Log.info "starting..."
-  Log.info $ "verbosity: " ++ (if l == 0 then "all" else show l)
+  Log.info $ "verbosity: " ++
+    (if setLevel cargs == 0 then "all" else show (setLevel cargs))
+  when (useWork cargs) Work.initialize
   dispatch' args
+  Log.info "bye."
   where
     dispatch' :: Args -> Log.Logger
     dispatch' a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
@@ -61,6 +65,9 @@ commonArgs = CommonArgs
   <*> switch ( long "silent"
     <> short 's'
     <> help "Verbosity off" )
+  <*> switch ( long "work"
+    <> short 'w'
+    <> help "Use '.pp-work/' directory" )
 
 -- |Commands arguments
 commandArgs :: Parser CommandArgs

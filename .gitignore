@@ -3,6 +3,7 @@
 ignored/
 pp.*
 **/*.zip
+.pp-work/
 
 # LaTeX
 **/*.aux

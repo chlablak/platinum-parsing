@@ -9,6 +9,7 @@ Portability : portable
 -}
 module Log
     ( Logger
+    , LoggerIO
     -- ** High-API
     , start
     --, setLevel
@@ -59,9 +60,10 @@ data Message
 -- |Logger
 type Log = (Bool, Level, [Tag], [(Task, TimeSpec)], [Message])
 type Logger = StateT Log IO ()
+type LoggerIO a = StateT Log IO a
 
 -- |IO operation
-io :: IO a -> StateT Log IO a
+io :: IO a -> LoggerIO a
 io = liftIO
 
 -- |Pre-defined shortcuts

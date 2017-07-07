@@ -185,7 +185,7 @@ lexifySyntax s = replaceTerm tok $ addLexicalInner tok s
     findTerm'''''' (PrimaryMetaIdentifier mi) = []
     findTerm'''''' (TerminalString term)      = [term]
     findTerm'''''' Empty                      = []
-    generateTokens terms = L.zip terms ["__token_" ++ show i | i <- [0..]]
+    generateTokens = map (\t -> (t, "__token_" ++ t)) . L.nub
     addLexicalInner [] s = s
     addLexicalInner ((n, t):ts) (Syntax srs) =
       addLexicalInner ts $ Syntax $ LexicalInner (lexicalString t n) : srs

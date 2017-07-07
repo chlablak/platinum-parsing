@@ -34,7 +34,8 @@ newtype LexicalDefinitionList = LexicalDefinitionList [LexicalDefinition]
 
 data LexicalDefinition
   -- |Regular expression as a terminal string
-  = LexicalString String
+  = LexicalRegEx String
+  | LexicalString String
   -- |Other lexical rule identifier
   | LexicalIdentifier String
     deriving (Show, Eq)
@@ -47,8 +48,8 @@ lexicalString n s = LexicalRule n $ LexicalDefinitionList [LexicalString s]
 lexer = Token.makeTokenParser def
   where
     def = emptyDef {
-        Token.commentStart = ""
-      , Token.commentEnd = ""
+        Token.commentStart = "(*"
+      , Token.commentEnd = "*)"
       , Token.commentLine = ""
       , Token.nestedComments = False
       , Token.identStart = letter
@@ -76,7 +77,7 @@ lexicalDefinitionList = LexicalDefinitionList <$> sepBy1 lexicalDefinition (rese
 
 -- |Parser for LexicalDefinition
 lexicalDefinition :: Parser LexicalDefinition
-lexicalDefinition = LexicalString <$> stringLiteral
+lexicalDefinition = LexicalRegEx <$> stringLiteral
                 <|> LexicalIdentifier <$> lexicalIdentifier
   <?> "lexical definition"
 
@@ -102,6 +103,8 @@ instance InputGrammar LexicalDefinitionList where
 instance InputGrammar LexicalDefinition where
   parser = lexicalDefinition
   stringify (LexicalString x)     = show x
+  stringify (LexicalRegEx x)      = show x
   stringify (LexicalIdentifier x) = x
-  rules (LexicalString x)     = [R.RegEx x]
+  rules (LexicalRegEx x)      = [R.RegEx x]
+  rules (LexicalString x)     = [R.RegExString x]
   rules (LexicalIdentifier x) = [R.NonTerm x]

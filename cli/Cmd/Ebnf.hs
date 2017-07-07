@@ -41,6 +41,8 @@ commandArgs = EbnfCmd <$> ebnfArgs
         <> help "Search for errors" )
       <*> switch ( long "lexical"
         <> help "Print lexical rules" )
+      <*> switch ( long "regexfy"
+        <> help "Print regexfied lexical rules" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -70,6 +72,11 @@ dispatch (Args _ (EbnfCmd args)) = do
           when (showLexical args) $ do
             Log.info "lexical rules:"
             mapM_ (Log.out . show) lrs
+
+          -- Flag `--regexfy`
+          when (showRegexfied args) $ do
+            Log.info "regexfied lexical rules:"
+            mapM_ (Log.out . show) $ PP.regexfy lrs
 
           case PP.extend prs of
             Left err -> do

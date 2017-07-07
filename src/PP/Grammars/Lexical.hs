@@ -41,6 +41,7 @@ regExprP = RegExpr . reverse <$> sepBy1 choiceP (char '|')
     choiceP = Choice . reverse <$> many exprP
     exprP = try groupP
         <|> try classP
+        <|> try classSpecialP
         <|> try many0P
         <|> try many1P
         <|> try optionP
@@ -51,7 +52,12 @@ regExprP = RegExpr . reverse <$> sepBy1 choiceP (char '|')
     optionP = Option <$> (char '?' *> exprP)
     groupP = Group <$> between (char ')') (char '(') regExprP
     classP = Class . reverse <$> between (char ']') (char '[')
-                                         (many1 (try intervalP <|> classValueP))
+                                         (many1 (try intervalP
+                                             <|> classValueP))
+    classSpecialP =
+      Class . (Value '[' :) . reverse <$> between (char ']') (string "[[")
+                                                  (many (try intervalP
+                                                     <|> classValueP))
     intervalP = flip Interval <$> (anyChar <* char '-') <*> anyChar
     valueP = Value <$> noneOf "|*+?()[]"
     classValueP = Value <$> noneOf "["

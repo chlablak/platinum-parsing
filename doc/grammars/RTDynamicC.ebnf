@@ -14,6 +14,8 @@
 "Start Symbol"   = <Decls>
 *)
 
+Start = Decls ;
+
 Digit %= "[0-9]" ;
 Hex Digit %= Digit, "|[a-fA-F]" ;
 Oct Digit %= "[0-7]" ;
@@ -23,8 +25,8 @@ Id Head %= Letter, "|_" ;
 Id Tail %= Id Head, "|", Digit ;
 
 Printable %= "." ;
-String Ch %= Printable ; (* - ["] *)
-Char Ch %= Printable ; (* - ['] *)
+String Ch %= Printable, "" ; (* - ["] *)
+Char Ch %= Printable, "" ; (* - ['] *)
 
 ExponentPartIndicator %= "[eE]" ;
 Sign %= "[-+]" ;
@@ -95,7 +97,7 @@ Func Proto = Func ID, "(",  Params, ")", ";"
 Func Decl = Func Item
           | Mode, Func Item ;
 
-Func Item = Func ID, "(", Params ")", Block
+Func Item = Func ID, "(", Params, ")", Block
           | Func ID, "(", ")", Block ;
 
 Params = ParamItem, ",", Params
@@ -242,7 +244,7 @@ Scalar = "bool"
 Stm = Var Decl
     | Id, ":" (* !Label *)
     | "if", "(", Expr, ")", Stm
-    | "if", "(", Expr, ")", Then Stm, "else" Stm
+    | "if", "(", Expr, ")", Then Stm, "else", Stm
     | "while", "(", Expr, ")", Stm
     | "for", "(", Arg, ";", Arg, ";", Arg, ")", Stm
     | Normal Stm ;
@@ -287,8 +289,9 @@ Stm List = [Stm, Stm List] ;
 ! ===================================================================
 *)
 
-Expr = Expr, ",", Op Assign
-     | Op Assign ;
+(* Expr = Expr, ",", Op Assign | Op Assign ; *)
+Expr = Op Assign, Expr_ ;
+Expr_ = ",", Op Assign, Expr_ | ;
 
 Op Assign = Op If, "=", Op Assign
           | Op If, "+=" , Op Assign
@@ -305,61 +308,92 @@ Op Assign = Op If, "=", Op Assign
 Op If = Op Or, "?", Op If, ":", Op If
       | Op Or ;
 
-Op Or = Op Or, "||", Op And
-      | Op And ;
+(* Op Or = Op Or, "||", Op And | Op And ; *)
+Op Or = Op And, Op Or_ ;
+Op Or_ = "||", Op And, Op Or_ | ;
 
-Op And = Op And, "&&", Op BinOR
-       | Op BinOR ;
+(* Op And = Op And, "&&", Op BinOR | Op BinOR ; *)
+Op And = Op BinOR, Op And_ ;
+Op And_ = "&&", Op BinOR, Op And_ | ;
 
-Op BinOR = Op BinOr, "|", Op BinXOR
-         | Op BinXOR ;
+(* Op BinOR = Op BinOR, "|", Op BinXOR | Op BinXOR ; *)
+Op BinOR = Op BinXOR, Op BinOR_ ;
+Op BinOR_ = "|", Op BinXOR, Op BinOR_ | ;
 
-Op BinXOR = Op BinXOR, "^", Op BinAND
-          | Op BinAND ;
+(* Op BinXOR = Op BinXOR, "^", Op BinAND | Op BinAND ; *)
+Op BinXOR = Op BinAND, Op BinXOR_ ;
+Op BinXOR_ = "^", Op BinAND, Op BinXOR_ | ;
 
-Op BinAND = Op BinAND, "&", Op Equate
-          | Op Equate ;
+(* Op BinAND = Op BinAND, "&", Op Equate | Op Equate ; *)
+Op BinAND = Op Equate, Op BinAND_ ;
+Op BinAND_ = "&", Op Equate, Op BinAND_ | ;
 
-Op Equate = Op Equate, "==", Op Compare
+(* Op Equate = Op Equate, "==", Op Compare
           | Op Equate, "!=", Op Compare
-          | Op Compare ;
+          | Op Compare ; *)
+Op Equate = Op Compare, Op Equate_ ;
+Op Equate_ = "==", Op Compare, Op Equate_
+           | "!=", Op Compare, Op Equate_
+           | ;
 
-Op Compare = Op Compare, "<", Op Shift
+(* Op Compare = Op Compare, "<", Op Shift
            | Op Compare, ">", Op Shift
            | Op Compare, "<=", Op Shift
            | Op Compare, ">=", Op Shift
-           | Op Shift ;
+           | Op Shift ; *)
+Op Compare = Op Shift, Op Compare_ ;
+Op Compare_ = "<", Op Shift, Op Compare_
+            | ">", Op Shift, Op Compare_
+            | "<=", Op Shift, Op Compare_
+            | ">=", Op Shift, Op Compare_
+            | ;
 
-Op Shift = Op Shift, "<<", Op Add
+(* Op Shift = Op Shift, "<<", Op Add
          | Op Shift, ">>", Op Add
-         | Op Add ;
+         | Op Add ; *)
+Op Shift = Op Add, Op Shift_ ;
+Op Shift_ = "<<", Op Add, Op Shift_
+          | ">>", Op Add, Op Shift_
+          | ;
 
-Op Add = Op Add, "+", Op Mult
+(* Op Add = Op Add, "+", Op Mult
        | Op Add, "-", Op Mult
-       | Op Mult ;
+       | Op Mult ; *)
+Op Add = Op Mult, Op Add_ ;
+Op Add_ = Op Add Bin, Op Mult, Op Add_
+        | ;
+Op Add Bin %= "[+]|-" ; (* avoid conflicts with Op Unary *)
 
-Op Mult = Op Mult, "*", Op Unary
+(* Op Mult = Op Mult, "*", Op Unary
         | Op Mult, "/", Op Unary
         | Op Mult, "%", Op Unary
-        | Op Unary ;
+        | Op Unary ; *)
+Op Mult = Op Unary, Op Mult_ ;
+Op Mult_ = "*", Op Unary, Op Mult_
+         | "/", Op Unary, Op Mult_
+         | "%", Op Unary, Op Mult_
+         | ;
 
 Op Unary = "!", Op Unary
          | "~", Op Unary
          | "-", Op Unary
          | "+", Op Unary
-         | "++", Op Unary
-         | "--", Op Unary
-         | Op Reference, "++"
-         | Op Reference, "--"
+         | Op Unary Pre Inc, Op Unary
+         | Op Reference, Op Unary Post Inc
          | "(", Type, ")", Op Unary  (* !CAST *)
          | "sizeof", "(", Type, ")"
          | "sizeof", "(", Expr, ")"
          | Op Reference ;
+Op Unary Pre Inc %= "[+][+]|--" ;
+Op Unary Post Inc %= "[+][+]|--" ;
 
-Op Reference = Value
+(* Op Reference = Value
              | Op Reference, "[", Expr, "]"
-             | Op Reference, ".", Id ;
-
+             | Op Reference, ".", Id ; *)
+Op Reference = Value, Op Reference_ ;
+Op Reference_ = "[", Expr, "]", Op Reference_
+              | ".", Id, Op Reference_
+              | ;
 
 Func Arguments = Op Assign, ",", Func Arguments
                | Op Assign
@@ -373,6 +407,8 @@ Value = BoolLiteral
       | CharLiteral
       | FloatLiteral
       | FloatLiteralExponent
-      | Id, "(", Func Arguments, ")"
+      | Id, Value Call Open, Func Arguments, Value Call Close
       | Id
       | "(", Expr, ")" ;
+Value Call Open %= "[(]" ;
+Value Call Close %= "[)]" ;
