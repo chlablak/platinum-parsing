@@ -11,6 +11,8 @@ module PP.Builders.Lalr
     ( LalrItem(..)
     ) where
 
+import           Control.Monad
+import           Data.Binary
 import qualified Data.List       as L
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
@@ -33,6 +35,10 @@ instance Show LalrItem where
       right xs 0     = "*," ++ right xs (-1)
       right [x] _    = show x
       right (x:xs) p = show x ++ "," ++ right xs (p - 1)
+
+instance Binary LalrItem where
+  put (LalrItem r p la) = put r >> put p >> put la
+  get = liftM3 LalrItem get get get
 
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where

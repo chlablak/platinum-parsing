@@ -41,6 +41,7 @@ library
                      , HStringTemplate
                      , fgl
                      , mtl
+                     , binary
   default-language:    Haskell2010
 
 executable pp

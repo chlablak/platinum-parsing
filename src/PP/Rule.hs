@@ -25,6 +25,8 @@ module PP.Rule
     , first
     ) where
 
+import           Control.Monad
+import           Data.Binary
 import           Data.Either
 import           Data.List
 import qualified Data.Map.Strict as Map
@@ -63,6 +65,27 @@ instance Show Rule where
   show (Concat xs) = "Concat " ++ show xs
   show (RegEx re) = '%' : show re
   show (RegExString s) = show s
+
+instance Binary Rule where
+  put (Rule a xs)     = putWord8 0 >> put a >> put xs
+  put (NonTerm a)     = putWord8 1 >> put a
+  put (Term c)        = putWord8 2 >> put c
+  put (TermToken t)   = putWord8 3 >> put t
+  put Empty           = putWord8 4
+  put (Concat xs)     = putWord8 5 >> put xs
+  put (RegEx re)      = putWord8 6 >> put re
+  put (RegExString s) = putWord8 7 >> put s
+  get = do
+    tag <- getWord8
+    case tag of
+      0 -> liftM2 Rule get get
+      1 -> fmap NonTerm get
+      2 -> fmap Term get
+      3 -> fmap TermToken get
+      4 -> return Empty
+      5 -> fmap Concat get
+      6 -> fmap RegEx get
+      7 -> fmap RegExString get
 
 -- |Uniformize a list of rules
 -- `uniformize = sort . nub . concatMap (flatten . clean)`

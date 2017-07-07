@@ -29,6 +29,7 @@ import qualified PP.Lexers.Dfa              as Lexer
 import qualified PP.Parsers.Lr              as Parser
 import qualified PP.Templates.Dfa           as DfaTemplate
 import qualified PP.Templates.Lr            as LrTemplate
+import qualified Work
 
 -- |Command arguments
 commandArgs :: Parser CommandArgs
@@ -93,7 +94,10 @@ dispatch (Args cargs (LalrCmd args)) = do
               else do
                 let fs = PP.firstSet rs
                 Log.pushTask "compute collection and table"
-                let c = PP.collection rs fs :: PP.LrCollection Builder.LalrItem
+                c <- Work.loadIf (lalrFile args)
+                                 (lalrFile args ++ ".collection")
+                                 (Log.io $ return $ PP.collection rs fs)
+                     :: Log.LoggerIO (PP.LrCollection Builder.LalrItem)
 
                 -- Flag '--collection'
                 when (showCollection args) $
@@ -103,7 +107,9 @@ dispatch (Args cargs (LalrCmd args)) = do
                 when (showSetI args /= (-1)) $
                   printSet (showSetI args) $ c Vector.! showSetI args
 
-                let t = PP.table c
+                t <- Work.loadIf (lalrFile args)
+                                 (lalrFile args ++ ".table")
+                                 (Log.io $ return $ PP.table c)
                 case t of
                   Left err -> do
                     Log.popTask
@@ -119,7 +125,9 @@ dispatch (Args cargs (LalrCmd args)) = do
                       printTable t
 
                     Log.pushTask "compute DFA"
-                    dfa' <- Log.io $ Lexer.createDfa' lrs
+                    dfa' <- Work.loadIf (lalrFile args)
+                                        (lalrFile args ++ ".dfa")
+                                        (Log.io $ Lexer.createDfa' lrs)
                     case dfa' of
                       Left err -> do
                         Log.popTask

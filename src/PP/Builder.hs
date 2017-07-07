@@ -7,6 +7,8 @@ Maintainer  : chlablak@gmail.com
 Stability   : provisional
 Portability : portable
 -}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 module PP.Builder
     ( -- *(LA)LR
       LrTable(..)
@@ -28,6 +30,8 @@ module PP.Builder
     , DfaBuilder(..)
     ) where
 
+import           Control.Monad
+import           Data.Binary
 import qualified Data.Graph.Inductive.Graph        as Gr
 import qualified Data.Graph.Inductive.PatriciaTree as Gr
 import qualified Data.Map.Strict                   as Map
@@ -67,8 +71,27 @@ instance Show LrAction where
   show LrError      = "error"
   show LrAccept     = "accept"
 
+instance Binary LrAction where
+  put (LrShift i)  = putWord8 0 >> put i
+  put (LrReduce r) = putWord8 1 >> put r
+  put (LrGoto i)   = putWord8 2 >> put i
+  put LrError      = putWord8 3
+  put LrAccept     = putWord8 4
+  get = do
+    tag <- getWord8
+    case tag of
+      0 -> fmap LrShift get
+      1 -> fmap LrReduce get
+      2 -> fmap LrGoto get
+      3 -> return LrError
+      4 -> return LrAccept
+
 -- |LR items set collection
 type LrCollection item = Vector.Vector (LrSet item)
+
+instance (Binary item) => Binary (LrCollection item) where
+  put c = put $ Vector.toList c
+  get = fmap Vector.fromList get
 
 -- |LR items set
 type LrSet item = Set.Set item
@@ -97,6 +120,25 @@ newtype DfaSymbol = DfaValue Char deriving (Eq, Ord, Read)
 
 instance Show DfaSymbol where
   show (DfaValue c) = show c
+
+instance Binary DfaGraph where
+  put g = put (Gr.labNodes g) >> put (Gr.labEdges g)
+  get = liftM2 Gr.mkGraph get get
+
+instance Binary DfaNode where
+  put DfaInitial   = putWord8 0
+  put DfaNode      = putWord8 1
+  put (DfaFinal s) = putWord8 2 >> put s
+  get = do
+    tag <- getWord8
+    case tag of
+      0 -> return DfaInitial
+      1 -> return DfaNode
+      2 -> fmap DfaFinal get
+
+instance Binary DfaSymbol where
+  put (DfaValue c) = put c
+  get = fmap DfaValue get
 
 -- |DFA builders
 class DfaBuilder from where

@@ -22,6 +22,8 @@ module Work
     , register
     , modified
     , modified'
+      -- *Binary files and modification
+    , loadIf
     ) where
 
 import           Control.Monad
@@ -99,6 +101,23 @@ register = undefined
 modified :: FilePath -> Log.LoggerIO Bool
 modified = undefined
 
+-- |Get the hash of a file
+getHash :: FilePath -> Log.LoggerIO Word64
+getHash p = do
+  f <- Log.io $ readFile p
+  return $ asWord64 $ hash f
+
 -- |Check if a file has changed, if true: register it again
 modified' :: FilePath -> Log.LoggerIO Bool
-modified' = undefined
+modified' p = do
+  m <- modified p
+  when m $ register p
+  return m
+
+-- |If file `p` has not changed and file `b` exists, load `b`, otherwise compute c
+loadIf :: (Binary a) => FilePath -> FilePath -> Log.LoggerIO a -> Log.LoggerIO a
+loadIf p b c = do
+  m <- modified' p
+  r <- if m then c else loadOr b c
+  save b r -- TODO add condition
+  return r
