@@ -1551,7 +1551,68 @@
 			
 			À présent que le \textit{lexer} ainsi que le \textit{parser} peuvent interagir ensemble, nous pouvons tester PP sur une grammaire plus conséquente: une grammaire du langage C, modifiée.\\
 			
-			\todo{grammaire C, tests, démo?} 
+			Cette grammaire étant beaucoup plus grande et complexe que les précédentes, elle a permit de mettre en évidence certains soucis de PP:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{lll}
+					\textbf{\#} & \textbf{Description} & \textbf{Statut}\\
+					\hline
+					1 & Commentaires EBNF non reconnus après une règle lexicale & Corrigé\\
+					2 & Les \textit{tokens} avec la même valeur ne sont pas uniques & Corrigé\\
+					3 & La grammaire C fournie est récursive à gauche & Corrigé à la main\\
+					4 & La grammaire C n'était pas LALR (conflits) & Corrigé à la main\\
+					5 & Les terminaux étaient traités comme des \textit{regex} & Corrigé\\ 
+				\end{tabular}
+				\caption{Bugs découverts lors du test de la grammaire C}
+			\end{table}
+			
+			En plus des bugs découverts et corrigés, nous avons constater que la génération de la table LALR et de l'AFD prenait environ 45 minutes. Ce temps est conséquent, surtout si nous devons relancer une commande plusieurs fois et donc régénérer le tout à chaque fois. Cette problématique est le sujet de la prochaine section.
+			
+	\section{Réutilisation des résultats précédents}
+		Comme mentionné juste avant, nous avons décidé d'ajouter un module \hs{Work} au CLI, responsable de stocker les résultats et de les réutiliser si possible. Pour cela, le module a besoin de savoir ce qui a déjà été fait ou non. Nous avons donc eu besoin des bibliothèques Haskell suivantes:
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{ll}
+				\textbf{Nom} & \textbf{Description}\\
+				\hline 
+				\hs{Data.Binary} & Sérialisation des structures de données\\
+				\hs{Data.Hash} & Hash des structures de données\\
+				\hs{Data.Yaml} & Manipulation de fichier \texttt{.yaml}\\
+				\hs{System.Directory} & Manipulation du système de fichiers\\
+			\end{tabular}
+			\caption{Bibliothèques utiles pour le module \hs{Work} du CLI}
+		\end{table}
+			
+		Le module stocke ces informations dans le dossier \texttt{.pp-work/}, relativement au dossier où est lancé la commande. De plus le fichier \texttt{.pp-work/work.yaml} contient toutes les informations dont le module a besoin:
+		\begin{minted}{yaml}
+			- path: grammar.ebnf        # grammaire traitee
+			  id: 1234                  # ID unique pour la grammaire
+			  hash:					
+			    - name: collection      # collection deja generee
+			      value: 6789           # hash de la grammaire
+			    - name: table           # ...
+			      value: 5678
+		\end{minted}
+		\captionof{listing}{Exemple du fichier \texttt{.pp-work/work.yaml}}
+		
+		\paragraph{}
+		Ici le champ \texttt{value} est le hash du \textit{contenu} de \texttt{grammar.ebnf}, ainsi si la grammaire est modifiée on sait qu'il faut régénérer une partie du processus. Par exemple si le hash du contenu est 6789, il est inutile de générer la collection, cependant la table doit elle être recalculée.\\
+		
+		Les structures sauvegardées le sont ainsi:
+		\begin{figure}[H]
+			\centering
+			\dirtree{%
+				.1 .pp-work/\DTcomment{dossier de travail}.
+				.2 work.yaml\DTcomment{fichier d'informations}.
+				.2 1234/\DTcomment{dossier pour les structures (id de \texttt{grammar.ebnf})}.
+				.3 collection\DTcomment{collection sauvegardée}.
+				.3 table\DTcomment{table sauvegardée}.
+				.3 <...>\DTcomment{}.
+				.2 <...>\DTcomment{}.
+			}
+		\end{figure}
+		
+		Tout cela permet de gagner un temps énorme lorsque la grammaire n'est plus amenée à changer.
 			
 	\section{TODO}
 		\todo{}
