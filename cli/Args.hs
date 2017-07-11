@@ -14,6 +14,7 @@ module Args
     , CommandArgs(..)
     , EbnfArgs(..)
     , LalrArgs(..)
+    , NewArgs(..)
     ) where
 
 -- |Global arguments
@@ -32,6 +33,7 @@ data CommonArgs = CommonArgs
 data CommandArgs
   = EbnfCmd EbnfArgs -- ^EBNF command
   | LalrCmd LalrArgs -- ^LALR command
+  | NewCmd NewArgs   -- ^New command
     deriving Show
 
 -- |EBNF command arguments
@@ -57,3 +59,8 @@ data LalrArgs = LalrArgs
   , showDfa        :: Bool    -- ^Print the DFA
   }
     deriving Show
+
+newtype NewArgs = NewArgs
+  { projectName :: String   -- ^Project name
+  }
+    deriving (Show)

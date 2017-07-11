@@ -51,8 +51,10 @@ executable pp
   other-modules:       Args
                      , Cmd.Ebnf
                      , Cmd.Lalr
+                     , Cmd.New
                      , Log
                      , Work
+                     , Project
   build-depends:       base
                      , platinum-parsing
                      , optparse-applicative

@@ -17,6 +17,7 @@ module Main where
 import           Args
 import qualified Cmd.Ebnf
 import qualified Cmd.Lalr
+import qualified Cmd.New
 import           Control.Monad       (void)
 import           Control.Monad.State
 import           Data.Semigroup      ((<>))
@@ -49,6 +50,7 @@ dispatch args@(Args cargs _) = do
     dispatch' :: Args -> Log.Logger
     dispatch' a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
     dispatch' a@(Args _ (LalrCmd _)) = Cmd.Lalr.dispatch a
+    dispatch' a@(Args _ (NewCmd _))  = Cmd.New.dispatch a
 
 -- |Arguments
 args :: Parser Args
@@ -73,4 +75,5 @@ commonArgs = CommonArgs
 commandArgs :: Parser CommandArgs
 commandArgs = hsubparser
   ( command "ebnf" (info Cmd.Ebnf.commandArgs (progDesc "Manipulate EBNF grammars"))
-  <> command "lalr" (info Cmd.Lalr.commandArgs (progDesc "Generate LALR parsing table")))
+  <> command "lalr" (info Cmd.Lalr.commandArgs (progDesc "Generate LALR parsing table"))
+  <> command "new" (info Cmd.New.commandArgs (progDesc "Create a new PP project")))

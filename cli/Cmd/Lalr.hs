@@ -187,7 +187,8 @@ printCfg = printCfg' . head
       Log.info $ "after " ++ show c ++ " iterations: "
       case a of
         PP.LrAccept -> Log.info "input accepted"
-        _           -> Log.err $ "error at " ++ show (take 20 i)
+        _           -> Log.err $ "error at " ++ show (take 20 (str i))
+    str = concatMap (\(PP.OToken2 v _) -> v)
 
 -- |Pretty print for DFA
 printDfa :: PP.DfaGraph -> Log.Logger
