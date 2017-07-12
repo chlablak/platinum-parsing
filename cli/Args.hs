@@ -23,9 +23,10 @@ data Args = Args CommonArgs CommandArgs
 
 -- |Common arguments
 data CommonArgs = CommonArgs
-  { setLevel :: Int   -- ^Verbosity level
-  , silent   :: Bool  -- ^Verbosity off
-  , useWork  :: Bool  -- ^Use '.pp-work/' directory
+  { setLevel :: Int     -- ^Verbosity level
+  , silent   :: Bool    -- ^Verbosity off
+  , useWork  :: Bool    -- ^Use '.pp-work/' directory
+  , path     :: String  -- ^Working directory path
   }
     deriving Show
 

@@ -43,6 +43,7 @@ dispatch args@(Args cargs _) = do
   Log.info "starting..."
   Log.info $ "verbosity: " ++
     (if setLevel cargs == 0 then "all" else show (setLevel cargs))
+  Work.path $ path cargs
   when (useWork cargs) Work.initialize
   dispatch' args
   Log.info "bye."
@@ -70,6 +71,10 @@ commonArgs = CommonArgs
   <*> switch ( long "work"
     <> short 'w'
     <> help "Use '.pp-work/' directory" )
+  <*> strOption ( long "path"
+    <> metavar "PATH"
+    <> value "."
+    <> help "Change working directory path" )
 
 -- |Commands arguments
 commandArgs :: Parser CommandArgs

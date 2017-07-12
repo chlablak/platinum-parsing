@@ -11,6 +11,7 @@ Portability : portable
 module Work
     ( initialize
     , reuse
+    , path
     ) where
 
 import           Control.Monad
@@ -29,6 +30,16 @@ wDir :: FilePath -> FilePath
 wDir p = ".pp-work/" ++ p
 wDir2 a b = wDir a ++ "/" ++ b
 wFile = wDir "work.yaml"
+
+-- |Change working directory
+path :: FilePath -> Log.Logger
+path p = do
+  e <- Log.io $ doesDirectoryExist p
+  if e then do
+    Log.io $ setCurrentDirectory p
+    Log.info $ "working directory set to: " ++ p
+  else
+    Log.err $ "path doesn't exist: " ++ p
 
 -- |Initialize module if necessary
 initialize :: Log.Logger
