@@ -161,6 +161,7 @@ dispatch (Args cargs (LalrCmd args)) = do
                           Log.out compiled
 
   -- End
+  Log.popTag
   return ()
 
 -- |Pretty print for collection

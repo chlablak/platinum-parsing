@@ -52,6 +52,7 @@ executable pp
                      , Cmd.Ebnf
                      , Cmd.Lalr
                      , Cmd.New
+                     , Cmd.Build
                      , Log
                      , Work
                      , Project

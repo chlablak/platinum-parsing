@@ -15,6 +15,7 @@ module Args
     , EbnfArgs(..)
     , LalrArgs(..)
     , NewArgs(..)
+    , BuildArgs(..)
     ) where
 
 -- |Global arguments
@@ -32,9 +33,10 @@ data CommonArgs = CommonArgs
 
 -- |Allowed commands
 data CommandArgs
-  = EbnfCmd EbnfArgs -- ^EBNF command
-  | LalrCmd LalrArgs -- ^LALR command
-  | NewCmd NewArgs   -- ^New command
+  = EbnfCmd EbnfArgs    -- ^EBNF command
+  | LalrCmd LalrArgs    -- ^LALR command
+  | NewCmd NewArgs      -- ^New command
+  | BuildCmd BuildArgs  -- ^Build command
     deriving Show
 
 -- |EBNF command arguments
@@ -61,7 +63,14 @@ data LalrArgs = LalrArgs
   }
     deriving Show
 
+-- |New command arguments
 newtype NewArgs = NewArgs
   { projectName :: String   -- ^Project name
+  }
+    deriving (Show)
+
+-- |Build command arguments
+newtype BuildArgs = BuildArgs
+  { disableTemplate :: Bool -- ^Disable template compilation
   }
     deriving (Show)

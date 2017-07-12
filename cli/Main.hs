@@ -15,6 +15,7 @@ For more informations about this tool, please look at:
 module Main where
 
 import           Args
+import qualified Cmd.Build
 import qualified Cmd.Ebnf
 import qualified Cmd.Lalr
 import qualified Cmd.New
@@ -49,9 +50,10 @@ dispatch args@(Args cargs _) = do
   Log.info "bye."
   where
     dispatch' :: Args -> Log.Logger
-    dispatch' a@(Args _ (EbnfCmd _)) = Cmd.Ebnf.dispatch a
-    dispatch' a@(Args _ (LalrCmd _)) = Cmd.Lalr.dispatch a
-    dispatch' a@(Args _ (NewCmd _))  = Cmd.New.dispatch a
+    dispatch' a@(Args _ (EbnfCmd _))  = Cmd.Ebnf.dispatch a
+    dispatch' a@(Args _ (LalrCmd _))  = Cmd.Lalr.dispatch a
+    dispatch' a@(Args _ (NewCmd _))   = Cmd.New.dispatch a
+    dispatch' a@(Args _ (BuildCmd _)) = Cmd.Build.dispatch a
 
 -- |Arguments
 args :: Parser Args
@@ -79,6 +81,7 @@ commonArgs = CommonArgs
 -- |Commands arguments
 commandArgs :: Parser CommandArgs
 commandArgs = hsubparser
-  ( command "ebnf" (info Cmd.Ebnf.commandArgs (progDesc "Manipulate EBNF grammars"))
+  (  command "ebnf" (info Cmd.Ebnf.commandArgs (progDesc "Manipulate EBNF grammars"))
   <> command "lalr" (info Cmd.Lalr.commandArgs (progDesc "Generate LALR parsing table"))
-  <> command "new" (info Cmd.New.commandArgs (progDesc "Create a new PP project")))
+  <> command "new" (info Cmd.New.commandArgs (progDesc "Create a new PP project"))
+  <> command "build" (info Cmd.Build.commandArgs (progDesc "Build a PP project")))

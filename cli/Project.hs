@@ -10,9 +10,13 @@ Portability : portable
 {-# LANGUAGE OverloadedStrings #-}
 module Project
     ( Project(..)
+    , ProjectTemplate(..)
     , new
+    , get
+    , set
     ) where
 
+import qualified Args
 import           Control.Monad
 import           Data.Maybe
 import           Data.Yaml        ((.:), (.=))
@@ -31,7 +35,7 @@ new name = do
   Log.io $ createDirectory name
   Log.io $ writeFile (name ++ "/grammar.ebnf") "(* Here comes the grammar *)"
   let p = Project name "0.0.0" "A short description" ["grammar.ebnf"] [] True
-  setProject p
+  set p
 
 -- |Project configuration
 data Project = Project
@@ -39,10 +43,16 @@ data Project = Project
   , projectVersion     :: String
   , projectDescription :: String
   , projectGrammars    :: [String]
-  , projectTemplates   :: [String]
+  , projectTemplates   :: [ProjectTemplate]
   , projectUseWork     :: Bool
   }
   | NoProject
+  | MalformedProject String
+    deriving (Eq, Show)
+data ProjectTemplate = ProjectTemplate
+  { templateFile :: String
+  , templateDst  :: String
+  }
     deriving (Eq, Show)
 
 instance Y.FromJSON Project where
@@ -60,15 +70,29 @@ instance Y.ToJSON Project where
                       , "templates" .= projectTemplates v
                       , "use-work" .= projectUseWork v]
 
+instance Y.FromJSON ProjectTemplate where
+  parseJSON (Y.Object v) = ProjectTemplate <$> v .: "file"
+                                           <*> v .: "destination"
+instance Y.ToJSON ProjectTemplate where
+  toJSON v = Y.object [ "file" .= templateFile v
+                      , "destination" .= templateDst v]
+
 -- |Get project config
-getProject :: Log.LoggerIO Project
-getProject = do
-  p <- Log.io $ Y.decodeFile $ pFile "."
-  return $ fromMaybe NoProject p
+get :: Log.LoggerIO Project
+get = do
+  let f = pFile "."
+  e <- Log.io $ doesFileExist f
+  if e then do
+    p <- Log.io (Y.decodeFileEither f :: IO (Either Y.ParseException Project))
+    case p of
+      Left err -> return $ MalformedProject $ show err
+      Right q  -> return q
+  else
+    return NoProject
 
 -- |Set project config
-setProject :: Project -> Log.Logger
-setProject p = do
+set :: Project -> Log.Logger
+set p = do
   e <- Log.io $ doesFileExist $ pFile "."
   let f = if e then "." else projectName p
   Log.io $ Y.encodeFile (pFile f) p
