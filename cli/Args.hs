@@ -60,6 +60,7 @@ data LalrArgs = LalrArgs
   , testWith       :: String  -- ^Test the LALR table on a source file
   , template       :: String  -- ^Specify a template
   , showDfa        :: Bool    -- ^Print the DFA
+  , showAst        :: Bool    -- ^Print the parsed AST
   }
     deriving Show
 

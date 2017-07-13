@@ -59,6 +59,8 @@ commandArgs = LalrCmd <$> lalrArgs
         <> help "Specify a template file to use" )
       <*> switch ( long "dfa"
         <> help "Print the DFA" )
+      <*> switch ( long "ast"
+        <> help "Print the parsed AST (with --test-with)" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -149,6 +151,10 @@ dispatch (Args cargs (LalrCmd args)) = do
                           let lconfig = Lexer.dfaConfig source dfa
                           let tokens = PP.output $ PP.consume lconfig
                           let cfg = PP.parse' t $ PP.config t tokens :: [Parser.LrConfig]
+
+                          -- Flag `--ast`
+                          when (showAst args) $
+                            Log.out $ Parser.prettyAst $ Parser.lrAst $ head cfg
                           printCfg cfg
 
                         -- Flag '--template'
@@ -184,7 +190,7 @@ printTable = Log.out . Map.showTree
 printCfg :: [Parser.LrConfig] -> Log.Logger
 printCfg = printCfg' . head
   where
-    printCfg' (Parser.LrConfig c _ a i) = do
+    printCfg' (Parser.LrConfig c _ a i _) = do
       Log.info $ "after " ++ show c ++ " iterations: "
       case a of
         PP.LrAccept -> Log.info "input accepted"

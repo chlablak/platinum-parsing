@@ -55,7 +55,7 @@ dispatch (Args cargs0 (BuildCmd args)) = do
 
         -- LALR generation
         Log.info "LALR generation"
-        let lalr = LalrArgs file False (-1) False "" "" False
+        let lalr = LalrArgs file False (-1) False "" "" False False
         Cmd.Lalr.dispatch $ Args cargs $ LalrCmd lalr
 
         genOk <- Log.ok
@@ -83,11 +83,11 @@ mergeCArgs (CommonArgs l s _ p) pr =
 
 -- |Build template
 buildTemplate :: CommonArgs -> LalrArgs -> Project.ProjectTemplate -> Log.Logger
-buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7) t = do
+buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8) t = do
   Log.pushTag "template"
   Log.info $ Project.templateFile t ++ " > " ++ Project.templateDst t
   Log.flushAll
-  let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7
+  let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7 l8
   Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
   Log.flushAllToFile $ Project.templateDst t
   Log.popTag
