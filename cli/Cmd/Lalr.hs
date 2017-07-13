@@ -61,6 +61,10 @@ commandArgs = LalrCmd <$> lalrArgs
         <> help "Print the DFA" )
       <*> switch ( long "ast"
         <> help "Print the parsed AST (with --test-with)" )
+      <*> strOption ( long "ast-to-html"
+        <> metavar "FILENAME"
+        <> value ""
+        <> help "Output the parsed AST to HTML list" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -157,6 +161,11 @@ dispatch (Args cargs (LalrCmd args)) = do
                             Log.info "parsed AST:"
                             Log.out $ Parser.prettyAst $ Parser.lrAst $ head cfg
 
+                          -- Flag `--ast-to-html`
+                          when (astHtml args /= "") $ do
+                            Log.info $ "AST to HTML: " ++ astHtml args
+                            Log.io $ writeFile (astHtml args) (astToHtml $ Parser.lrAst $ head cfg)
+
                           printCfg cfg
 
                         -- Flag '--template'
@@ -202,3 +211,9 @@ printCfg = printCfg' . head
 -- |Pretty print for DFA
 printDfa :: PP.DfaGraph -> Log.Logger
 printDfa = Log.out . Gr.prettify
+
+-- |Print the AST to HTML
+astToHtml :: Parser.LrAst -> String
+astToHtml (Parser.LrAstRoot xs) = "<ul>" ++ concatMap astToHtml xs ++ "</ul>"
+astToHtml (Parser.LrAstNonTerm r xs) = "<li>" ++ r ++ "<ul>" ++ concatMap astToHtml xs ++ "</ul></li>"
+astToHtml (Parser.LrAstTerm t) = "<li>" ++ show t ++ "</li>"

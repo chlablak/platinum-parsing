@@ -37,7 +37,11 @@ commandArgs = BuildCmd <$> buildArgs
         <> value ""
         <> help "Test the grammar on a source file" )
       <*> switch ( long "ast"
-        <> help "Print the parsed AST (with --test-with)")
+        <> help "Print the parsed AST (with --test-with)" )
+      <*> strOption ( long "ast-to-html"
+        <> metavar "FILENAME"
+        <> value ""
+        <> help "Output the parsed AST to HTML list" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -64,7 +68,7 @@ dispatch (Args cargs0 (BuildCmd args)) = do
 
         -- LALR generation
         Log.info "LALR generation:"
-        let lalr = LalrArgs file False (-1) False (buildTestWith args) "" False (buildShowAst args)
+        let lalr = LalrArgs file False (-1) False (buildTestWith args) "" False (buildShowAst args) (buildAstHtml args)
         Cmd.Lalr.dispatch $ Args cargs $ LalrCmd lalr
 
         genOk <- Log.ok
@@ -95,24 +99,24 @@ mergeCArgs (CommonArgs l s _ p) pr =
 
 -- |Build template
 buildTemplate :: CommonArgs -> LalrArgs -> Project.ProjectTemplate -> Log.Logger
-buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8) t = do
+buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8 l9) t = do
   Log.pushTag "template"
   Log.info $ Project.templateFile t ++ " > " ++ Project.templateDst t
   Log.flushAll
-  let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7 l8
+  let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7 l8 l9
   Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
   Log.flushOutToFile $ Project.templateDst t
   Log.popTag
 
 -- |Build template
 buildTest :: CommonArgs -> LalrArgs -> Project.ProjectTest -> Log.Logger
-buildTest cargs (LalrArgs l1 l2 l3 l4 _ l6 l7 _) t = do
+buildTest cargs (LalrArgs l1 l2 l3 l4 _ l6 l7 _ l9) t = do
   Log.pushTag "test"
   Log.info $ Project.testFile t ++ if Project.testAstDst t /= ""
                                    then " > " ++ Project.testAstDst t
                                    else ""
   Log.flushAll
-  let args = LalrArgs l1 l2 l3 l4 (Project.testFile t) l6 l7 (Project.testAstDst t /= "")
+  let args = LalrArgs l1 l2 l3 l4 (Project.testFile t) l6 l7 (Project.testAstDst t /= "") l9
   Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
   if Project.testAstDst t /= "" then
     Log.flushOutToFile $ Project.testAstDst t

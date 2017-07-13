@@ -61,6 +61,7 @@ data LalrArgs = LalrArgs
   , template       :: String  -- ^Specify a template
   , showDfa        :: Bool    -- ^Print the DFA
   , showAst        :: Bool    -- ^Print the parsed AST
+  , astHtml        :: String  -- ^Output the AST to HTML list
   }
     deriving Show
 
@@ -76,5 +77,6 @@ data BuildArgs = BuildArgs
   , disableTest     :: Bool   -- ^Disable tests
   , buildTestWith   :: String -- ^Test the LALR table on a source file
   , buildShowAst    :: Bool   -- ^Print the parsed AST
+  , buildAstHtml    :: String -- ^Output the AST to HTML list
   }
     deriving (Show)
