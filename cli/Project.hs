@@ -11,6 +11,7 @@ Portability : portable
 module Project
     ( Project(..)
     , ProjectTemplate(..)
+    , ProjectTest(..)
     , new
     , get
     , set
@@ -34,7 +35,7 @@ new :: String -> Log.Logger
 new name = do
   Log.io $ createDirectory name
   Log.io $ writeFile (name ++ "/grammar.ebnf") "(* Here comes the grammar *)"
-  let p = Project name "0.0.0" "A short description" ["grammar.ebnf"] [] True
+  let p = Project name "0.0.0" "A short description" ["grammar.ebnf"] [] True []
   set p
 
 -- |Project configuration
@@ -45,6 +46,7 @@ data Project = Project
   , projectGrammars    :: [String]
   , projectTemplates   :: [ProjectTemplate]
   , projectUseWork     :: Bool
+  , projectTests       :: [ProjectTest]
   }
   | NoProject
   | MalformedProject String
@@ -52,8 +54,11 @@ data Project = Project
 data ProjectTemplate = ProjectTemplate
   { templateFile :: String
   , templateDst  :: String
-  }
-    deriving (Eq, Show)
+  } deriving (Eq, Show)
+data ProjectTest = ProjectTest
+  { testFile   :: String
+  , testAstDst :: String
+  } deriving (Eq, Show)
 
 instance Y.FromJSON Project where
   parseJSON (Y.Object v) = Project <$> v .: "name"
@@ -62,13 +67,15 @@ instance Y.FromJSON Project where
                                    <*> v .: "grammars"
                                    <*> v .: "templates"
                                    <*> v .: "use-work"
+                                   <*> v .: "tests"
 instance Y.ToJSON Project where
   toJSON v = Y.object [ "name" .= projectName v
                       , "version" .= projectVersion v
                       , "description" .= projectDescription v
                       , "grammars" .= projectGrammars v
                       , "templates" .= projectTemplates v
-                      , "use-work" .= projectUseWork v]
+                      , "use-work" .= projectUseWork v
+                      , "tests" .= projectTests v]
 
 instance Y.FromJSON ProjectTemplate where
   parseJSON (Y.Object v) = ProjectTemplate <$> v .: "file"
@@ -76,6 +83,13 @@ instance Y.FromJSON ProjectTemplate where
 instance Y.ToJSON ProjectTemplate where
   toJSON v = Y.object [ "file" .= templateFile v
                       , "destination" .= templateDst v]
+
+instance Y.FromJSON ProjectTest where
+  parseJSON (Y.Object v) = ProjectTest <$> v .: "file"
+                                       <*> v .: "ast"
+instance Y.ToJSON ProjectTest where
+  toJSON v = Y.object [ "file" .= testFile v
+                      , "ast" .= testAstDst v]
 
 -- |Get project config
 get :: Log.LoggerIO Project

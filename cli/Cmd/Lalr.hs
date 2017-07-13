@@ -153,8 +153,10 @@ dispatch (Args cargs (LalrCmd args)) = do
                           let cfg = PP.parse' t $ PP.config t tokens :: [Parser.LrConfig]
 
                           -- Flag `--ast`
-                          when (showAst args) $
+                          when (showAst args) $ do
+                            Log.info "parsed AST:"
                             Log.out $ Parser.prettyAst $ Parser.lrAst $ head cfg
+
                           printCfg cfg
 
                         -- Flag '--template'
@@ -191,10 +193,10 @@ printCfg :: [Parser.LrConfig] -> Log.Logger
 printCfg = printCfg' . head
   where
     printCfg' (Parser.LrConfig c _ a i _) = do
-      Log.info $ "after " ++ show c ++ " iterations: "
+      Log.out $ "after " ++ show c ++ " iterations: "
       case a of
-        PP.LrAccept -> Log.info "input accepted"
-        _           -> Log.err $ "error at " ++ show (take 20 (str i))
+        PP.LrAccept -> Log.out "input accepted"
+        _           -> Log.out $ "error at " ++ show (take 20 (str i))
     str = concatMap (\(PP.OToken2 v _) -> v)
 
 -- |Pretty print for DFA

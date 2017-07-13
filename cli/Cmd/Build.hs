@@ -16,7 +16,7 @@ module Cmd.Build
 import           Args
 import qualified Cmd.Ebnf
 import qualified Cmd.Lalr
-import           Control.Monad       (when)
+import           Control.Monad       (unless, when)
 import           Data.Semigroup      ((<>))
 import qualified Log
 import           Options.Applicative
@@ -29,6 +29,15 @@ commandArgs = BuildCmd <$> buildArgs
     buildArgs = BuildArgs
       <$> switch ( long "no-template"
         <> help "Disable templates compilation" )
+      <*> switch ( long "no-test"
+        <> help "Disable tests execution" )
+      <*> strOption ( long "test-with"
+        <> short 't'
+        <> metavar "FILENAME"
+        <> value ""
+        <> help "Test the grammar on a source file" )
+      <*> switch ( long "ast"
+        <> help "Print the parsed AST (with --test-with)")
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -46,31 +55,34 @@ dispatch (Args cargs0 (BuildCmd args)) = do
       let file = head $ Project.projectGrammars p
 
       -- EBNF checks
-      Log.info "EBNF checks"
+      Log.info "EBNF checks:"
       let ebnf = EbnfArgs file False False False True False False
       Cmd.Ebnf.dispatch $ Args cargs $ EbnfCmd ebnf
 
       checkOk <- Log.ok
-      if checkOk then do
+      when checkOk $ do
 
         -- LALR generation
-        Log.info "LALR generation"
-        let lalr = LalrArgs file False (-1) False "" "" False False
+        Log.info "LALR generation:"
+        let lalr = LalrArgs file False (-1) False (buildTestWith args) "" False (buildShowAst args)
         Cmd.Lalr.dispatch $ Args cargs $ LalrCmd lalr
 
         genOk <- Log.ok
-        if genOk && not (disableTemplate args) then do
+        when genOk $ do
 
           -- Templates compilation
-          Log.info "Templates compilation"
-          Log.autoFlush False
-          mapM_ (buildTemplate cargs lalr) $ Project.projectTemplates p
-          Log.autoFlush True
+          unless (disableTemplate args) $ do
+            Log.info "Templates compilation:"
+            Log.autoFlush False
+            mapM_ (buildTemplate cargs lalr) $ Project.projectTemplates p
+            Log.autoFlush True
 
-        else
-          Log.none
-      else
-        Log.none
+          -- Tests
+          unless (disableTest args) $ do
+            Log.info "Tests execution:"
+            Log.autoFlush False
+            mapM_ (buildTest cargs lalr) $ Project.projectTests p
+            Log.autoFlush True
 
   -- End
   Log.popTag
@@ -89,5 +101,21 @@ buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8) t = do
   Log.flushAll
   let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7 l8
   Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
-  Log.flushAllToFile $ Project.templateDst t
+  Log.flushOutToFile $ Project.templateDst t
+  Log.popTag
+
+-- |Build template
+buildTest :: CommonArgs -> LalrArgs -> Project.ProjectTest -> Log.Logger
+buildTest cargs (LalrArgs l1 l2 l3 l4 _ l6 l7 _) t = do
+  Log.pushTag "test"
+  Log.info $ Project.testFile t ++ if Project.testAstDst t /= ""
+                                   then " > " ++ Project.testAstDst t
+                                   else ""
+  Log.flushAll
+  let args = LalrArgs l1 l2 l3 l4 (Project.testFile t) l6 l7 (Project.testAstDst t /= "")
+  Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
+  if Project.testAstDst t /= "" then
+    Log.flushOutToFile $ Project.testAstDst t
+  else
+    Log.flushOutOnly
   Log.popTag

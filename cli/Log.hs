@@ -16,7 +16,8 @@ module Log
     , setLevel
     , getLevel
     , flushAll
-    , flushAllToFile
+    , flushOutOnly
+    , flushOutToFile
     , pushTag
     , popTag
     , pushTask
@@ -199,8 +200,8 @@ flushAll = do
       putStr $ concatMap (\t -> "[" ++ map toUpper t ++ "]") (reverse ts) ++ " "
 
 -- |Flush the output to a file
-flushAllToFile :: FilePath -> Logger
-flushAllToFile f = do
+flushOutToFile :: FilePath -> Logger
+flushOutToFile f = do
   (af, l, ts, ks, ms, v) <- get
   io $ writeFile f ""
   flushAll' (af, l, ts, ks, reverse ms, v)
@@ -209,6 +210,23 @@ flushAllToFile f = do
     flushAll' (af, l, ts, ks, PushMsg l2 m:ms, v) = flushAll' (af, l, ts, ks, ms, v)
     flushAll' (af, l, ts, ks, PushOut m:ms, v) = do
       io $ appendFile f $ m ++ "\n"
+      flushAll' (af, l, ts, ks, ms, v)
+    flushAll' (af, l, ts, ks, PushTag t:ms, v) = flushAll' (af, l, t:ts, ks, ms, v)
+    flushAll' (af, l, _:ts, ks, PopTag:ms, v) = flushAll' (af, l, ts, ks, ms, v)
+    flushAll' (af, _, ts, ks, SetLevel l:ms, v) = flushAll' (af, l, ts, ks, ms, v)
+    flushAll' (_, l, ts, ks, AutoFlush af:ms, v) = flushAll' (af, l, ts, ks, ms, v)
+    flushAll' (af, l, ts, ks, None:ms, v) = flushAll' (af, l, ts, ks, ms, v)
+
+-- |Flush output only
+flushOutOnly :: Logger
+flushOutOnly = do
+  (af, l, ts, ks, ms, v) <- get
+  flushAll' (af, l, ts, ks, reverse ms, v)
+  where
+    flushAll' l@(_, _, _, _, [], v) = put l
+    flushAll' (af, l, ts, ks, PushMsg l2 m:ms, v) = flushAll' (af, l, ts, ks, ms, v)
+    flushAll' (af, l, ts, ks, PushOut m:ms, v) = do
+      io $ putStrLn m
       flushAll' (af, l, ts, ks, ms, v)
     flushAll' (af, l, ts, ks, PushTag t:ms, v) = flushAll' (af, l, t:ts, ks, ms, v)
     flushAll' (af, l, _:ts, ks, PopTag:ms, v) = flushAll' (af, l, ts, ks, ms, v)

@@ -71,7 +71,10 @@ newtype NewArgs = NewArgs
     deriving (Show)
 
 -- |Build command arguments
-newtype BuildArgs = BuildArgs
-  { disableTemplate :: Bool -- ^Disable template compilation
+data BuildArgs = BuildArgs
+  { disableTemplate :: Bool   -- ^Disable template compilation
+  , disableTest     :: Bool   -- ^Disable tests
+  , buildTestWith   :: String -- ^Test the LALR table on a source file
+  , buildShowAst    :: Bool   -- ^Print the parsed AST
   }
     deriving (Show)
