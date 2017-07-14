@@ -1612,7 +1612,98 @@
 			}
 		\end{figure}
 		
-		Tout cela permet de gagner un temps énorme lorsque la grammaire n'est plus amenée à changer.
+		Tout cela permet de gagner un temps énorme lorsque la grammaire n'est plus amenée à changer. Notons que l'utilisateur a le choix de l'utiliser ou non à l'aide de l'option \texttt{-w} du CLI.
+		
+	\section{Intégration à un éditeur de texte}
+		Platinum Parsing possède à présent un \textit{framework} ainsi qu'un \textit{CLI}, la dernière pièce manquante est un éditeur de texte. Le but principal étant de pouvoir utiliser le CLI sans avoir à taper une seule commande, voici une liste de fonctionnalités possibles:
+		\begin{itemize}
+			\item Création de projet PP
+			\subitem + Fichier de configuration propre au projet
+			\item Compilation de projet PP
+			\item Test d'une grammaire sur un fichier source
+			\subitem + Sortie de l'AST graphiquement
+			\item Édition de grammaire avec \textit{lint}/\textit{warning}/\textit{error}
+			\item Génération de graphiques (table, collection, etc.)\\
+		\end{itemize} 
+		
+		Pour le choix de l'éditeur de texte, nous avons choisi Atom \cite{atom} car il est/a: \textit{open source}, extensible (\textit{package}), coloration syntaxique EBNF, populaire. Les alternatives existantes sont \textit{VS Code} ou \textit{Sublime Text}.\\
+		
+		Atom propose par ailleurs un plugin \textit{Package Generator} pour commencer un nouveau plugin, c'est donc ce que nous allons utiliser pour créer notre outil. Le \textit{package} est organisé ainsi:
+		\begin{figure}[H]
+			\centering
+			\dirtree{%
+				.1 platinum-parsing-atom/\DTcomment{dossier du package}.
+				.2 keymaps/\DTcomment{définition des raccourcis clavier}.
+				.2 lib/\DTcomment{}.
+				.3 ast-viewer.coffee\DTcomment{\textit{Panel} de visualisation d'un AST}.
+				.3 dialog.coffee\DTcomment{\textit{Modal} pour demander un texte à l'utilisateur}.
+				.3 platinum-parsing-atom.coffee\DTcomment{Point d'entrée du package}.
+				.3 pp.coffee\DTcomment{Appel à la ligne de commande}.
+				.2 menus/\DTcomment{définition des menus dans l'éditeur}.
+				.2 styles\DTcomment{définition des styles (CSS)}.
+				.2 package.json\DTcomment{fichier de configuration}.
+				.2 <...>\DTcomment{}.
+			}
+		\end{figure}
+		
+		Les sources sont en CoffeeScript, un équivalent de Javascript mais avec une syntaxe plus légère. Seul le script \texttt{platinum-parsing-atom.coffee} est généré, les autres ont été ajoutés pour le besoin des fonctionnalités.\\
+		
+		Passons en revu l'utilisation du plugin, tout d'abord la création d'un projet:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.7\textwidth]{../diagrams/atom/create-menu}
+			\includegraphics[width=0.8\textwidth]{../diagrams/atom/create-dialog}
+			\includegraphics[width=0.7\textwidth]{../diagrams/atom/create-folder}
+			\caption{Création d'un nouveau projet PP}
+		\end{figure}
+		
+		Cela a pour effet d'ouvrir une nouvelle fenêtre Atom avec le dossier du projet ouvert:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.7\textwidth]{../diagrams/atom/created-project}
+			\caption{Projet PP ouvert et fichier de configuration}
+		\end{figure}
+		
+		Si nous ajoutons des informations au fichier de configuration et que nous créons quelques fichiers:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=\textwidth]{../diagrams/atom/simple-project}
+			\caption{Fichier de configuration avec \textit{templates} et tests}
+		\end{figure}
+		
+		Puis on appelle la commande de compilation:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.7\textwidth]{../diagrams/atom/build-menu}
+			\includegraphics[width=0.8\textwidth]{../diagrams/atom/build-results}
+			\caption{Compilation du projet avec Atom}
+		\end{figure}
+		
+		On voit que les informations du fichier de configuration ont bien été prises en compte. Notons également le dossier \texttt{.pp-work/} qui a été utilisé.\\
+		
+		Pour finir la dernière fonctionnalité actuellement disponible est le test de la grammaire sur un fichier source:
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.7\textwidth]{../diagrams/atom/test-menu}
+			\includegraphics[width=0.8\textwidth]{../diagrams/atom/test-dialog}
+			\includegraphics[width=0.5\textwidth]{../diagrams/atom/ast-viewer}
+			\caption{Test de la grammaire sur un fichier source avec Atom}
+		\end{figure}
+		
+		Cela a pour effet d'ouvrir un visualiseur d'AST.\\
+		
+		Évidemment le plugin ne fait qu'appeler le CLI pour faire tout cela, voici une liste des changements apportés au CLI:
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{ll}
+				\hs{Project} & Gestion du fichier de configuration \texttt{pp.yaml}\\
+				\hs{Cmd.New} & Commande \texttt{pp new} pour la création de projet\\
+				\hs{Cmd.Build} & Commande \texttt{pp build} pour la compilation\\
+			\end{tabular}
+			\caption{Modules ajoutés au CLI pour la gestion de projet PP}
+		\end{table} 
+		
+		Notons que l'\textit{AST Viewer} est encore très simple, cependant le rendre interactif prendrait trop de temps. Nous privilégions donc la tâche suivante pour le moment.\\
 			
 	\section{TODO}
 		\todo{}
