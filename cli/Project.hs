@@ -12,7 +12,6 @@ module Project
     ( Project(..)
     , ProjectTemplate(..)
     , ProjectTest(..)
-    , new
     , get
     , set
     ) where
@@ -29,14 +28,6 @@ import           System.IO
 -- |Project file
 pFile :: String -> FilePath
 pFile d = d ++ "/pp.yaml"
-
--- |New project
-new :: String -> Log.Logger
-new name = do
-  Log.io $ createDirectory name
-  Log.io $ writeFile (name ++ "/grammar.ebnf") "(* Here comes the grammar *)"
-  let p = Project name "0.0.0" "A short description" ["grammar.ebnf"] [] True []
-  set p
 
 -- |Project configuration
 data Project = Project
