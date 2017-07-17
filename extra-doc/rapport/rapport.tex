@@ -59,7 +59,7 @@
 	\vspace{6cm}
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.6\textwidth]{../logo/logo.png}
+		\includegraphics[width=0.6\textwidth]{../../doc/logo/logo.png}
 	\end{figure}
 	\thispagestyle{empty}
 	\newpage
@@ -129,7 +129,7 @@
 		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=\textwidth]{../diagrams/use-case/use-case}
+			\includegraphics[width=\textwidth]{../../doc/diagrams/use-case/use-case}
 			\caption{Diagramme des cas d'utilisation}
 		\end{figure}
 		
@@ -182,7 +182,7 @@
 			Voici le schéma tel qu'expliqué sur le site de GOLD:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-gold-parser}
+				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-gold-parser}
 				\caption{Fonctionnement de GOLD Parser System}
 			\end{figure}
 			
@@ -200,7 +200,7 @@
 			Avant de passer à la section suivante, qui explique comment PP sera organisé, nous allons rapidement définir à un niveau plus large quelles seront les différentes parties de PP:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.6\textwidth]{../diagrams/misc/architecture-pp}
+				\includegraphics[width=0.6\textwidth]{../../doc/diagrams/misc/architecture-pp}
 				\caption{Sous-projets de PP}
 			\end{figure}
 			
@@ -219,7 +219,7 @@
 			Premièrement, définissons ce que nous avons besoin au niveau du framework. Nous voulons pouvoir transformer des fichiers sources en quelque chose d'autre:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-output} 
+				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-output} 
 				\caption{Sorties possibles d'un exécutable créé avec PP}
 			\end{figure}
 			
@@ -228,7 +228,7 @@
 			Comment allons-nous créer cet exécutable? Ce prochain schéma va nous montrer cela, avec les acteurs des cas d'utilisation pour plus de clareté (voir \autoref{sec:etudes-des-cas-d-utilisation}):
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline} 
+				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline} 
 				\caption{Utilisation de PP pour créer un exécutable}
 			\end{figure}
 			
@@ -247,7 +247,7 @@
 			Si l'on met les deux schémas précédents ensemble, nous obtenons:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-full} 
+				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-full} 
 				\caption{Fonctionnement de PP}
 			\end{figure}
 			
@@ -285,7 +285,7 @@
 				Avant de commencer ce cas d'utilisation, expliquons rapidement le fonctionnement interne du framework:
 				\begin{figure}[H]
 					\centering
-					\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-framework} 
+					\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-framework} 
 					\caption{Fonctionnement interne du framework (général)}
 				\end{figure}
 				
@@ -318,7 +318,7 @@
 				Ce cas est plus intéressant, en effet il s'agit de la fonctionnalité principale de GOLD. Si nous reprenons le schéma précédent pour l'adapter à ce cas:
 				\begin{figure}[H]
 					\centering
-					\includegraphics[width=0.8\textwidth]{../diagrams/pipeline/pipeline-framework-gold} 
+					\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-framework-gold} 
 					\caption{Utilisation du framework pour recréer le \textit{Builder} de GOLD}
 				\end{figure}
 				
@@ -622,7 +622,7 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.6\textwidth]{../diagrams/misc/generation-process}
+			\includegraphics[width=0.6\textwidth]{../../doc/diagrams/misc/generation-process}
 			\caption{Processus de génération de la table LALR}
 		\end{figure}
 		
@@ -937,7 +937,7 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.5\textwidth]{../diagrams/misc/template}
+			\includegraphics[width=0.5\textwidth]{../../doc/diagrams/misc/template}
 			\caption{Processus de compilation d'un \textit{template} avec un contexte}
 		\end{figure}
 		
@@ -1204,7 +1204,7 @@
 			Nous pouvons résumer la démonstration ainsi:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.7\textwidth]{../diagrams/misc/exemple-pipeline}
+				\includegraphics[width=0.7\textwidth]{../../doc/diagrams/misc/exemple-pipeline}
 				\caption{\textit{Pipeline} de la démonstration}
 			\end{figure}
 			
@@ -1441,7 +1441,7 @@
 			Un automate est un graphe orienté, avec les sommets comme états et les arcs comme transition entre les états. Chaque arc est accompagné du symbole (caractère) autorisant la transition d'un état à un autre:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.5\textwidth]{../diagrams/misc/dfa-exemple}
+				\includegraphics[width=0.5\textwidth]{../../doc/diagrams/misc/dfa-exemple}
 				\caption{Exemple d'un AFD pour l'expression: \texttt{(a|b)*abb}}
 			\end{figure}
 			
@@ -1475,7 +1475,7 @@
 			L'architecture d'un \textit{lexer} est semblable à celle d'un \textit{parser} LR:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.5\textwidth]{../diagrams/misc/lexer-dfa}
+				\includegraphics[width=0.5\textwidth]{../../doc/diagrams/misc/lexer-dfa}
 				\caption{Architecture d'un \textit{lexer} avec AFD}
 			\end{figure}
 			
@@ -1651,31 +1651,31 @@
 		Passons en revu l'utilisation du plugin, tout d'abord la création d'un projet:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../diagrams/atom/create-menu}
-			\includegraphics[width=0.8\textwidth]{../diagrams/atom/create-dialog}
-			\includegraphics[width=0.7\textwidth]{../diagrams/atom/create-folder}
+			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/create-menu}
+			\includegraphics[width=0.8\textwidth]{../../doc/diagrams/atom/create-dialog}
+			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/create-folder}
 			\caption{Création d'un nouveau projet PP}
 		\end{figure}
 		
 		Cela a pour effet d'ouvrir une nouvelle fenêtre Atom avec le dossier du projet ouvert:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../diagrams/atom/created-project}
+			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/created-project}
 			\caption{Projet PP ouvert et fichier de configuration}
 		\end{figure}
 		
 		Si nous ajoutons des informations au fichier de configuration et que nous créons quelques fichiers:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=\textwidth]{../diagrams/atom/simple-project}
+			\includegraphics[width=\textwidth]{../../doc/diagrams/atom/simple-project}
 			\caption{Fichier de configuration avec \textit{templates} et tests}
 		\end{figure}
 		
 		Puis on appelle la commande de compilation:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../diagrams/atom/build-menu}
-			\includegraphics[width=0.8\textwidth]{../diagrams/atom/build-results}
+			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/build-menu}
+			\includegraphics[width=0.8\textwidth]{../../doc/diagrams/atom/build-results}
 			\caption{Compilation du projet avec Atom}
 		\end{figure}
 		
@@ -1684,9 +1684,9 @@
 		Pour finir la dernière fonctionnalité actuellement disponible est le test de la grammaire sur un fichier source:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../diagrams/atom/test-menu}
-			\includegraphics[width=0.8\textwidth]{../diagrams/atom/test-dialog}
-			\includegraphics[width=0.5\textwidth]{../diagrams/atom/ast-viewer}
+			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/test-menu}
+			\includegraphics[width=0.8\textwidth]{../../doc/diagrams/atom/test-dialog}
+			\includegraphics[width=0.5\textwidth]{../../doc/diagrams/atom/ast-viewer}
 			\caption{Test de la grammaire sur un fichier source avec Atom}
 		\end{figure}
 		
