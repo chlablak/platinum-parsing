@@ -1,0 +1,18 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "LR Parser" as parser
+
+rectangle "LALR Table" as table
+rectangle "Platinum Parsing CLI" as pp
+rectangle "EBNF Grammar" as ebnf
+
+tokens -> parser
+parser -> AST
+
+table <-- parser
+ebnf -> pp
+pp -> table
+
+@enduml
