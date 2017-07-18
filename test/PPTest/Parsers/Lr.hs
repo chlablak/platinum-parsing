@@ -6,6 +6,7 @@ import           PP.Builders.Lalr
 import           PP.Parsers.Lr
 import           Test.Hspec
 
+-- Dragon Book (2nd edition, fr), page 230, example 4.45
 r0 = Rule "__start" [NonTerm "E", Empty]
 r1 = Rule "E" [NonTerm "T", Term '+', NonTerm "E", Empty]
 r2 = Rule "E" [NonTerm "T", Empty]
@@ -25,6 +26,7 @@ specs = describe "PPTest.Parsers.Lr" $ do
     cfg `shouldBe` LrConfig 0 [0] (LrShift 3) (charLexer "x*x+x") (LrAstRoot [])
 
   it "should parse a simple grammar correctly" $ do
+    -- Dragon Book (2nd edition, fr), page 232, figure 4.38
     let e = [ LrConfig 0 [0] (LrShift 3) (charLexer "x*x+x")
               (LrAstRoot [])
             , LrConfig 1 [3,0] (LrReduce r6) (charLexer "*x+x")

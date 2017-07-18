@@ -10,6 +10,7 @@ import           Test.Hspec
 specs = describe "PPTest.Builders.Lalr" $ do
 
   it "should build the LALR items set collection" $ do
+    -- Dragon Book (2nd edition, fr), page 240, example 4.54
     let rs = ruleSet [Rule "__start" [NonTerm "S", Empty],
                       Rule "S" [NonTerm "C", NonTerm "C", Empty],
                       Rule "C" [Term 'c', NonTerm "C", Empty],
@@ -52,6 +53,7 @@ specs = describe "PPTest.Builders.Lalr" $ do
     Set.toList (c Vector.! 6) `shouldBe` e6
 
   it "should build the LALR parsing table" $ do
+    -- Dragon Book (2nd edition, fr), page 247, figure 4.43
     let r0 = Rule "S" [NonTerm "C", NonTerm "C", Empty]
     let r1 = Rule "C" [Term 'c', NonTerm "C", Empty]
     let r2 = Rule "C" [Term 'd', Empty]

@@ -32,6 +32,7 @@ instance Show Lr1Item where
       right (x:xs) p = show x ++ "," ++ right xs (p - 1)
 
 -- |LrBuilder instance for Lr1Item
+-- Dragon Book (2nd edition, fr), page 239, algorithm 4.53
 instance LrBuilder Lr1Item where
   collection rs fs = collection' initialise
     where

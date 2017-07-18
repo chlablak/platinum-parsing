@@ -43,6 +43,7 @@ instance Binary LalrItem where
 -- |LrBuilder instance for LalrItem
 instance LrBuilder LalrItem where
   collection rs fs = fusion (collection rs fs :: LrCollection Lr1Item)
+  -- Dragon Book (2nd edition, fr), page 243, algorithm 4.56 (without step 1)
   table c = case actions of
     Right act -> Right $ Map.union (Map.fromList act) (Map.fromList gotos)
     Left err  -> Left err
@@ -123,6 +124,7 @@ goto c i = goto' (c Vector.! i)
     inc (LalrItem r p la) = LalrItem r (p + 1) la
 
 -- |Compute the LALR collection from a LR(1) collection
+-- Dragon Book (2nd edition, fr), page 246, example 4.60
 fusion :: LrCollection Lr1Item -> LrCollection LalrItem
 fusion lr1 = Vector.foldl' fusion' Vector.empty lalr
   where

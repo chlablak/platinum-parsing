@@ -9,6 +9,7 @@ import           Test.Hspec
 specs = describe "PPTest.Builders.Lr1" $
 
   it "should build the LR(1) items set collection" $ do
+      -- Dragon Book (2nd edition, fr), page 240, example 4.54
     let rs = ruleSet [Rule "__start" [NonTerm "S", Empty],
                       Rule "S" [NonTerm "C", NonTerm "C", Empty],
                       Rule "C" [Term 'c', NonTerm "C", Empty],

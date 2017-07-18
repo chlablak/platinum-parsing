@@ -1,14 +1,14 @@
 name:                platinum-parsing
 version:             0.1.0.0
--- synopsis:
--- description:
+synopsis:            General Framework for compiler developpement.
+description:         Platinum Parsing provides many tools for the developpement of compiler (including transpiler or interpreter), based on the well-known Dragon Book (2nd edition). This package is in progress, please take a look at the github repository for more details.
 homepage:            https://github.com/chlablak/platinum-parsing
 license:             BSD3
 license-file:        LICENSE
 author:              chlablak
 maintainer:          chlablak@gmail.com
-copyright:           2017 Patrick Champion
-category:            Parsing, Compilation
+copyright:           2017, Patrick Champion
+category:            compiler, compilation, parser, lexer, lalr, framework, cli
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -34,14 +34,14 @@ library
                      , PP.Templates.Dfa
                      , PP.Templates.Lr
   build-depends:       base >= 4.7 && < 5
-                     , parsec
-                     , text
-                     , containers
-                     , vector
-                     , HStringTemplate
-                     , fgl
-                     , mtl
-                     , binary
+                     , parsec >= 3.1 && < 3.2
+                     , text >= 1.2 && < 1.3
+                     , containers >= 0.5 && < 0.6
+                     , vector >= 0.11 && < 0.12
+                     , HStringTemplate >= 0.8 && < 0.9
+                     , fgl >= 5.5 && < 5.6
+                     , mtl >= 2.2 && < 2.3
+                     , binary >= 0.8 && < 0.9
   default-language:    Haskell2010
 
 executable pp
@@ -56,19 +56,19 @@ executable pp
                      , Log
                      , Work
                      , Project
-  build-depends:       base
+  build-depends:       base >= 4.7 && < 5
                      , platinum-parsing
-                     , optparse-applicative
-                     , vector
-                     , containers
-                     , mtl
-                     , clock
-                     , fgl
-                     , directory
-                     , binary
-                     , data-hash
-                     , yaml
-                     , text
+                     , optparse-applicative >= 0.13 && < 0.14
+                     , vector >= 0.11 && < 0.12
+                     , containers >= 0.5 && < 0.6
+                     , mtl >= 2.2 && < 2.3
+                     , clock >= 0.7 && < 0.8
+                     , fgl >= 5.5 && < 5.6
+                     , directory >= 1.3 && < 1.4
+                     , binary >= 0.8 && < 0.9
+                     , data-hash >= 0.2 && < 0.3
+                     , yaml >= 0.8 && < 0.9
+                     , text >= 1.2 && < 1.3
   default-language:    Haskell2010
 
 test-suite pp-test
@@ -89,12 +89,12 @@ test-suite pp-test
                      , PPTest.Templates.Lr
                      , PPTest.Templates.Dfa
                      , PPTest.Template
-  build-depends:       base
+  build-depends:       base >= 4.7 && < 5
                      , platinum-parsing
-                     , hspec
-                     , containers
-                     , vector
-                     , fgl
+                     , hspec >= 2.4 && < 2.5
+                     , containers >= 0.5 && < 0.6
+                     , vector >= 0.11 && < 0.12
+                     , fgl >= 5.5 && < 5.6
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 

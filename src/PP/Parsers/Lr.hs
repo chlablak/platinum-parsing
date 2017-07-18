@@ -34,6 +34,7 @@ data LrConfig = LrConfig
   , lrAst    :: LrAst      -- ^Parsed AST
   } deriving (Eq, Show)
 
+-- Dragon Book (2nd edition, fr), page 230, algorithm 4.44
 instance LrParser LrConfig where
   config t i = LrConfig 0 [0] (action' t 0 i) i (LrAstRoot [])
   next t (LrConfig c ss (LrShift s) (i:is) a) =

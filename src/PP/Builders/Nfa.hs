@@ -19,6 +19,7 @@ import           PP.Grammar
 import           PP.Grammars.Lexical
 
 -- |Build a NFA from a RegExpr
+-- Dragon Book (2nd edition, fr), page 146, algorithm 3.23
 instance NfaBuilder RegExpr where
   buildNfa re = buildNfa' (stringify re) re
   buildNfa' n (RegExpr [])  = buildSym n NfaEmpty

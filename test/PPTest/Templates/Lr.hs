@@ -22,6 +22,6 @@ Right t = table c
 specs = describe "PPTest.Templates.Lr" $
 
   it "should compile correctly a template" $ do
-    te <- readFile "doc/templates/lr-table"
-    e <- readFile "doc/templates/lr-table.test"
+    te <- readFile "test/res/lr-table"
+    e <- readFile "test/res/lr-table.test"
     compile (Lr.context t) te `shouldBe` e

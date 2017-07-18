@@ -23,7 +23,7 @@ data OToken
   | OToken2 [IToken] String  -- ^Token value and name
     deriving (Show, Eq, Ord)
 
--- |String to OToken
+-- |String to OToken (char by char lexer)
 charLexer :: String -> [OToken]
 charLexer = map (\c -> OToken1 [c])
 

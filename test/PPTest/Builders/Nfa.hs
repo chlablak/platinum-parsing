@@ -15,7 +15,7 @@ isValue _                  = False
 specs = describe "PPTest.Builders.Nfa" $ do
 
   it "should build the correct automaton ((a|b)*abb)" $ do
-    -- Dragon Book, page 142, figure 3.34
+    -- Dragon Book (2nd edition, fr), page 142, figure 3.34
     let expr = "(a|b)*abb"
     let e = Gr.mkGraph [(0,NfaInitial),(1,NfaNode),(2,NfaNode),(3,NfaNode),
                         (4,NfaNode),(5,NfaNode),(6,NfaNode),(7,NfaNode),

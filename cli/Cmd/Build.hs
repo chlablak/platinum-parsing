@@ -108,7 +108,7 @@ buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8 l9) t = do
   Log.flushOutToFile $ Project.templateDst t
   Log.popTag
 
--- |Build template
+-- |Build test
 buildTest :: CommonArgs -> LalrArgs -> Project.ProjectTest -> Log.Logger
 buildTest cargs (LalrArgs l1 l2 l3 l4 _ l6 l7 _ l9) t = do
   Log.pushTag "test"

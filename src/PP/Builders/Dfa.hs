@@ -42,6 +42,7 @@ instance DfaBuilder NfaGraph where
       toDfa (NfaFinal n) = DfaFinal n
 
 -- |Build a transition table with "subset" algorithm
+-- Dragon Book (2nd edition, fr), page 140, algorithm 3.20
 buildSubSet :: NfaGraph -> Map.Map ([Gr.Node], NfaSymbol) [Gr.Node]
 buildSubSet g = buildSubSet' (mark (emptyClosure [initial] g) Map.empty)
                              [emptyClosure [initial] g]         -- not marked

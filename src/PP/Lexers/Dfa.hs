@@ -43,6 +43,7 @@ instance Show DfaConfig where
     ", dfaGraph = ..., dfaPath = " ++ show ps ++ "}"
 
 -- |Lexer instance for DFA configuration
+-- Dragon Book (2nd edition, fr), page 156, example 3.28
 instance Lexer DfaConfig where
   simulate = simulateDfa
   consumed c = null $ dfaInput c

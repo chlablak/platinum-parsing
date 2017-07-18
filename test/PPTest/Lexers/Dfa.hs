@@ -32,7 +32,7 @@ specs = describe "PPTest.Lexers.Dfa" $ do
     output (consume config) `shouldBe` e
 
   it "should consume two tokens correctly" $ do
-    -- Dragon Book, page 156, example 3.29
+    -- Dragon Book (2nd edition, fr), page 156, example 3.29
     let rs = [Rule "p1" [RegEx "a", Empty],
               Rule "p2" [RegEx "abb", Empty],
               Rule "p3" [RegEx "a*b+", Empty]]

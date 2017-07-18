@@ -17,6 +17,7 @@ g = "expr=number,{binop,number};\n\
     \digit%=\"[0-9]\";"
 Right ast = parseAst g :: To Ebnf.Syntax
 
+-- Tests for chaining the lexer followed by the parser
 specs = describe "PPTest.Other.LexerDfaParserLr" $ do
 
   it "should be able to extract rules from the AST" $ do

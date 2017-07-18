@@ -49,15 +49,15 @@ specs = describe "PPTest.Grammars.Ebnf" $ do
       Right o -> stringify o `shouldBe` "<a>=<b>|<c>;"
 
   it "should parseAst the complete EBNF grammar" $ do
-    g <- readFile "doc/grammars/ebnf.ebnf"
-    m <- readFile "doc/grammars/ebnf.min.ebnf"
+    g <- readFile "test/res/ebnf.ebnf"
+    m <- readFile "test/res/ebnf.min.ebnf"
     case parseAst g :: To Syntax of
       Left e  -> show e `shouldBe` "not an error"
       Right o -> stringify o ++ "\n" `shouldBe` m
 
   it "should parseAst the complete minified EBNF grammar" $ do
-    g <- readFile "doc/grammars/ebnf.min.ebnf"
-    m <- readFile "doc/grammars/ebnf.min.ebnf"
+    g <- readFile "test/res/ebnf.min.ebnf"
+    m <- readFile "test/res/ebnf.min.ebnf"
     case parseAst g :: To Syntax of
       Left e  -> show e `shouldBe` "not an error"
       Right o -> stringify o ++ "\n" `shouldBe` m
