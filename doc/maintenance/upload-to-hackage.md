@@ -22,7 +22,7 @@ Run:
 
   ```console
   $ stack sdist
-  $ cp .stack-work/dist/<...>/platinum-parsing-A.B.C.D.tar.gz dist/
+  $ cp .stack-work/dist/<...>/platinum-parsing-A.B.C.D.tar.gz hackage/
   ```
 
 ## Step 3: do a `git tag` of the new version
