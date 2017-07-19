@@ -59,7 +59,7 @@
 	\vspace{6cm}
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.6\textwidth]{../../doc/logo/logo.png}
+		\includegraphics[width=0.6\textwidth]{../../res/logo/logo.png}
 	\end{figure}
 	\thispagestyle{empty}
 	\newpage
@@ -129,7 +129,7 @@
 		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=\textwidth]{../../doc/diagrams/use-case/use-case}
+			\includegraphics[width=\textwidth]{../../res/diagrams/use-case/use-case}
 			\caption{Diagramme des cas d'utilisation}
 		\end{figure}
 		
@@ -182,7 +182,7 @@
 			Voici le schéma tel qu'expliqué sur le site de GOLD:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-gold-parser}
+				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-gold-parser}
 				\caption{Fonctionnement de GOLD Parser System}
 			\end{figure}
 			
@@ -200,7 +200,7 @@
 			Avant de passer à la section suivante, qui explique comment PP sera organisé, nous allons rapidement définir à un niveau plus large quelles seront les différentes parties de PP:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.6\textwidth]{../../doc/diagrams/misc/architecture-pp}
+				\includegraphics[width=0.6\textwidth]{../../res/diagrams/misc/architecture-pp}
 				\caption{Sous-projets de PP}
 			\end{figure}
 			
@@ -219,7 +219,7 @@
 			Premièrement, définissons ce que nous avons besoin au niveau du framework. Nous voulons pouvoir transformer des fichiers sources en quelque chose d'autre:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-output} 
+				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-output} 
 				\caption{Sorties possibles d'un exécutable créé avec PP}
 			\end{figure}
 			
@@ -228,7 +228,7 @@
 			Comment allons-nous créer cet exécutable? Ce prochain schéma va nous montrer cela, avec les acteurs des cas d'utilisation pour plus de clareté (voir \autoref{sec:etudes-des-cas-d-utilisation}):
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline} 
+				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline} 
 				\caption{Utilisation de PP pour créer un exécutable}
 			\end{figure}
 			
@@ -247,7 +247,7 @@
 			Si l'on met les deux schémas précédents ensemble, nous obtenons:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-full} 
+				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-full} 
 				\caption{Fonctionnement de PP}
 			\end{figure}
 			
@@ -285,7 +285,7 @@
 				Avant de commencer ce cas d'utilisation, expliquons rapidement le fonctionnement interne du framework:
 				\begin{figure}[H]
 					\centering
-					\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-framework} 
+					\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-framework} 
 					\caption{Fonctionnement interne du framework (général)}
 				\end{figure}
 				
@@ -318,7 +318,7 @@
 				Ce cas est plus intéressant, en effet il s'agit de la fonctionnalité principale de GOLD. Si nous reprenons le schéma précédent pour l'adapter à ce cas:
 				\begin{figure}[H]
 					\centering
-					\includegraphics[width=0.8\textwidth]{../../doc/diagrams/pipeline/pipeline-framework-gold} 
+					\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-framework-gold} 
 					\caption{Utilisation du framework pour recréer le \textit{Builder} de GOLD}
 				\end{figure}
 				
@@ -486,7 +486,7 @@
 		\subsection{Définition de l'AST pour la grammaire choisie}
 			À présent que le langage pour la grammaire a été choisi (EBNF), nous devons spécifier sa propre grammaire pour implémenter le parser. La norme ISO/IEC 14977:1996 nous donne cela, réécrit ci-après:
 			
-			\inputminted{ebnf}{../../doc/grammars/ebnf.ebnf}
+			\inputminted{ebnf}{../../res/grammars/ebnf.ebnf}
 			\captionof{listing}{EBNF utilisé pour se définir lui-même}
 			
 			\paragraph{}
@@ -578,7 +578,7 @@
 			
 			Actuellement la seule commande disponible donne le résultat suivant:
 			\begin{minted}{console}
-				$ pp ebnf -f doc/grammars/ebnf.ebnf --minify
+				$ pp ebnf -f res/grammars/ebnf.ebnf --minify
 				<syntax>=<syntax rule>,{<syntax rule>};
 				<syntax rule>=<meta identifier>,"=",<definitions list>,";";
 				<definitions list>=<single definition>,{"|",<single definition>};
@@ -587,7 +587,7 @@
 			\captionof{listing}{Première commande du CLI}
 			
 			\paragraph{}
-			Ce qui correspond au \textit{parsing} du fichier \texttt{doc/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
+			Ce qui correspond au \textit{parsing} du fichier \texttt{res/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
 			
 	\section{Génération de la table LALR}
 	\label{sec:generation-de-la-table-lalr}	
@@ -622,7 +622,7 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.6\textwidth]{../../doc/diagrams/misc/generation-process}
+			\includegraphics[width=0.6\textwidth]{../../res/diagrams/misc/generation-process}
 			\caption{Processus de génération de la table LALR}
 		\end{figure}
 		
@@ -705,7 +705,7 @@
 		
 		Pour écrire cette grammaire, celle-ci n'étant pas trouvable sur Internet, nous partons d'un programme écrit en ISO CNC et on en extrait des règles de production. Nous pouvons procéder ainsi car nous avons seulement besoin d'une grammaire pour les tests, pas une grammaire exacte du langage ISO CNC.\\
 		
-		Le programme se trouve dans le dossier \texttt{trials/iso-cnc-prog/}, la grammaire quant à elle dans le fichier \texttt{doc/grammars/iso-cnc.ebnf}. Pour le moment cela n'est qu'un premier jet, nous avons besoin d'implémenter la partie suivante (test des grammaires) pour la vérifier et éventuellement la corriger. Nous reviendrons donc dessus à la fin de la prochaine section.
+		Le programme se trouve dans le dossier \texttt{trials/iso-cnc-prog/}, la grammaire quant à elle dans le fichier \texttt{res/grammars/iso-cnc.ebnf}. Pour le moment cela n'est qu'un premier jet, nous avons besoin d'implémenter la partie suivante (test des grammaires) pour la vérifier et éventuellement la corriger. Nous reviendrons donc dessus à la fin de la prochaine section.
 		
 	\section{Test d'une grammaire à partir d'un texte en entrée}
 	\label{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}
@@ -810,18 +810,18 @@
 		
 		\subsection{Intégration au CLI}
 		\label{subsec:test-grammaire-integration-au-cli}
-			L'intégration au CLI est très simple et vient en l'ajout de deux nouveaux arguments: \texttt{--check} et \texttt{--test-with}. Afin de mettre en évidence leur utilisation et la détection correcte des erreurs (en plus des tests unitaires), nous avons mis dans le dossier \texttt{doc/grammars/wrong} des grammaires fausses mettant en évidence les différents problèmes possibles.\\
+			L'intégration au CLI est très simple et vient en l'ajout de deux nouveaux arguments: \texttt{--check} et \texttt{--test-with}. Afin de mettre en évidence leur utilisation et la détection correcte des erreurs (en plus des tests unitaires), nous avons mis dans le dossier \texttt{res/grammars/wrong} des grammaires fausses mettant en évidence les différents problèmes possibles.\\
 			
 			Comme exemples:
 			\begin{minted}{console}
-				$ pp ebnf -f doc/grammars/wrong/03-direct-left-recursion.ebnf --check
+				$ pp ebnf -f res/grammars/wrong/03-direct-left-recursion.ebnf --check
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][EBNF][CHECK][INFO] errors:
 				[PP][EBNF][CHECK][INFO] direct left-recusion: A
 				[PP][EBNF][CHECK][INFO] warnings:
 				
-				$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
+				$ pp lalr -f res/grammars/test.ebnf --test-with ignored/test.txt 
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][LALR][TASK][START] compute collection and table
@@ -829,7 +829,7 @@
 				[PP][LALR][INFO] after 32 iterations: 
 				[PP][LALR][INFO] input accepted
 				
-				$ pp lalr -f doc/grammars/test.ebnf --test-with ignored/test.txt 
+				$ pp lalr -f res/grammars/test.ebnf --test-with ignored/test.txt 
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][LALR][TASK][START] compute collection and table
@@ -937,7 +937,7 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.5\textwidth]{../../doc/diagrams/misc/template}
+			\includegraphics[width=0.5\textwidth]{../../res/diagrams/misc/template}
 			\caption{Processus de compilation d'un \textit{template} avec un contexte}
 		\end{figure}
 		
@@ -1002,7 +1002,7 @@
 		\end{table}
 		
 		Ces champs nous offre toutes les informations dont nous avions besoin pour l'écriture d'un \textit{template}. Nous avons ci-dessous le premier modèle, qui génère simplement la table LR:
-		\inputminted{text}{../../doc/templates/lr-table}
+		\inputminted{text}{../../res/templates/lr-table}
 		\captionof{listing}{Template générant la table LR simplement}
 		
 		\paragraph{}
@@ -1109,8 +1109,8 @@
 		
 		\subsection{Écriture du \textit{template} pour l'\textit{engine}}
 			Comme mentionné à la fin de la partie précédente, le \textit{template} doit dériver l'interface \texttt{LrTable} pour être utilisable par le moteur:
-			\inputminted{csharp}{../../doc/templates/csharp-table.cs}
-			\captionof{listing}{\textit{template} pour l'\textit{engine} C\# (fichier \texttt{doc/templates/csharp-table.cs})}
+			\inputminted{csharp}{../../res/templates/csharp-table.cs}
+			\captionof{listing}{\textit{template} pour l'\textit{engine} C\# (fichier \texttt{res/templates/csharp-table.cs})}
 			
 			\paragraph{}
 			Le langage de \texttt{HStringTemplate} étant un peu lourd à lire, voici un exemple de compilation:
@@ -1138,7 +1138,7 @@
 			Avant de faire la démonstration en ISO CNC, qui possède un code assez conséquent, nous allons valider la solution avec un exemple plus simple.\\
 			
 			Partons donc d'une grammaire simple:
-			\inputminted{ebnf}{../../doc/grammars/test.ebnf}
+			\inputminted{ebnf}{../../res/grammars/test.ebnf}
 			\captionof{listing}{Grammaire EBNF simple}
 			
 			\paragraph{}
@@ -1204,7 +1204,7 @@
 			Nous pouvons résumer la démonstration ainsi:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.7\textwidth]{../../doc/diagrams/misc/exemple-pipeline}
+				\includegraphics[width=0.7\textwidth]{../../res/diagrams/misc/exemple-pipeline}
 				\caption{\textit{Pipeline} de la démonstration}
 			\end{figure}
 			
@@ -1441,7 +1441,7 @@
 			Un automate est un graphe orienté, avec les sommets comme états et les arcs comme transition entre les états. Chaque arc est accompagné du symbole (caractère) autorisant la transition d'un état à un autre:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.5\textwidth]{../../doc/diagrams/misc/dfa-exemple}
+				\includegraphics[width=0.5\textwidth]{../../res/diagrams/misc/dfa-exemple}
 				\caption{Exemple d'un AFD pour l'expression: \texttt{(a|b)*abb}}
 			\end{figure}
 			
@@ -1475,7 +1475,7 @@
 			L'architecture d'un \textit{lexer} est semblable à celle d'un \textit{parser} LR:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.5\textwidth]{../../doc/diagrams/misc/lexer-dfa}
+				\includegraphics[width=0.5\textwidth]{../../res/diagrams/misc/lexer-dfa}
 				\caption{Architecture d'un \textit{lexer} avec AFD}
 			\end{figure}
 			
@@ -1651,31 +1651,31 @@
 		Passons en revu l'utilisation du plugin, tout d'abord la création d'un projet:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/create-menu}
-			\includegraphics[width=0.8\textwidth]{../../doc/diagrams/atom/create-dialog}
-			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/create-folder}
+			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/create-menu}
+			\includegraphics[width=0.8\textwidth]{../../res/diagrams/atom/create-dialog}
+			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/create-folder}
 			\caption{Création d'un nouveau projet PP}
 		\end{figure}
 		
 		Cela a pour effet d'ouvrir une nouvelle fenêtre Atom avec le dossier du projet ouvert:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/created-project}
+			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/created-project}
 			\caption{Projet PP ouvert et fichier de configuration}
 		\end{figure}
 		
 		Si nous ajoutons des informations au fichier de configuration et que nous créons quelques fichiers:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=\textwidth]{../../doc/diagrams/atom/simple-project}
+			\includegraphics[width=\textwidth]{../../res/diagrams/atom/simple-project}
 			\caption{Fichier de configuration avec \textit{templates} et tests}
 		\end{figure}
 		
 		Puis on appelle la commande de compilation:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/build-menu}
-			\includegraphics[width=0.8\textwidth]{../../doc/diagrams/atom/build-results}
+			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/build-menu}
+			\includegraphics[width=0.8\textwidth]{../../res/diagrams/atom/build-results}
 			\caption{Compilation du projet avec Atom}
 		\end{figure}
 		
@@ -1684,9 +1684,9 @@
 		Pour finir la dernière fonctionnalité actuellement disponible est le test de la grammaire sur un fichier source:
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.7\textwidth]{../../doc/diagrams/atom/test-menu}
-			\includegraphics[width=0.8\textwidth]{../../doc/diagrams/atom/test-dialog}
-			\includegraphics[width=0.5\textwidth]{../../doc/diagrams/atom/ast-viewer}
+			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/test-menu}
+			\includegraphics[width=0.8\textwidth]{../../res/diagrams/atom/test-dialog}
+			\includegraphics[width=0.5\textwidth]{../../res/diagrams/atom/ast-viewer}
 			\caption{Test de la grammaire sur un fichier source avec Atom}
 		\end{figure}
 		
