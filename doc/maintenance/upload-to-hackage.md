@@ -33,6 +33,8 @@ After a full commit, run:
   $ git push --tags
   ```
 
+Eventually, use `github_changelog_generator`: https://github.com/skywinder/Github-Changelog-Generator
+
 ## Step 4: upload to Hackage
 Use instructions: http://hackage.haskell.org/upload
 
