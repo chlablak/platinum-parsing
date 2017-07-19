@@ -32,6 +32,7 @@ data LexicalRule = LexicalRule String LexicalDefinitionList
 newtype LexicalDefinitionList = LexicalDefinitionList [LexicalDefinition]
   deriving (Show, Eq)
 
+-- |Lexical rule definition component
 data LexicalDefinition
   -- |Regular expression as a terminal string
   = LexicalRegEx String
@@ -58,10 +59,11 @@ lexer = Token.makeTokenParser def
       , Token.reservedOpNames = ["%=", ";", ","]
       , Token.caseSensitive = True
     }
-identifier = Token.identifier lexer       -- ^identifier
-reservedOp = Token.reservedOp lexer       -- ^reserved operator
-stringLiteral = Token.stringLiteral lexer -- ^string literal
-whiteSpace = Token.whiteSpace lexer       -- ^white spaces
+
+identifier = Token.identifier lexer
+reservedOp = Token.reservedOp lexer
+stringLiteral = Token.stringLiteral lexer
+whiteSpace = Token.whiteSpace lexer
 
 -- |Parser for LexicalRule
 lexicalRule :: Parser LexicalRule

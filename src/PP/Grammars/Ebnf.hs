@@ -41,6 +41,7 @@ import qualified Text.ParserCombinators.Parsec.Token    as Token
 newtype Syntax = Syntax [SyntaxRule]
   deriving (Show, Eq)
 
+-- |Syntax rule
 data SyntaxRule
   -- |Defines the sequence of symbols represented by a MetaIdentifier
   = SyntaxRule MetaIdentifier DefinitionsList
@@ -70,6 +71,7 @@ newtype Exception = Exception Factor
 data Factor = Factor (Maybe Integer) Primary
   deriving (Show, Eq)
 
+-- |Primary
 data Primary
   -- |Encloses symbols which are optional
   = OptionalSequence DefinitionsList
@@ -104,15 +106,15 @@ lexer = Token.makeTokenParser def
       , Token.caseSensitive = True
     }
 
-identifier = Token.identifier lexer       -- ^identifier
-reservedOp = Token.reservedOp lexer       -- ^reserved operator
-stringLiteral = Token.stringLiteral lexer -- ^string literal
-natural = Token.natural lexer             -- ^natural positive number
-whiteSpace = Token.whiteSpace lexer       -- ^white spaces
-parens = Token.parens lexer               -- ^between ( and )
-braces = Token.braces lexer               -- ^between { and }
-angles = Token.angles lexer               -- ^between < and >
-brackets = Token.brackets lexer           -- ^between [ and ]
+identifier = Token.identifier lexer
+reservedOp = Token.reservedOp lexer
+stringLiteral = Token.stringLiteral lexer
+natural = Token.natural lexer
+whiteSpace = Token.whiteSpace lexer
+parens = Token.parens lexer
+braces = Token.braces lexer
+angles = Token.angles lexer
+brackets = Token.brackets lexer
 
 -- |Syntax parser
 syntax :: Parser Syntax

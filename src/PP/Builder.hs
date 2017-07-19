@@ -105,7 +105,11 @@ class Ord item => LrBuilder item where
 
 -- |Nondeterministic finite automaton (NFA)
 type NfaGraph = Gr.Gr NfaNode NfaSymbol
+
+-- |NFA node type
 data NfaNode = NfaInitial | NfaNode | NfaFinal String deriving (Eq, Ord, Show, Read)
+
+-- |NFA symbol type
 data NfaSymbol = NfaValue Char | NfaEmpty deriving (Eq, Ord, Show, Read)
 
 -- |NFA builders
@@ -115,7 +119,11 @@ class NfaBuilder from where
 
 -- |Deterministic finite automaton (DFA)
 type DfaGraph = Gr.Gr DfaNode DfaSymbol
+
+-- |DFA node type
 data DfaNode = DfaInitial | DfaNode | DfaFinal String deriving (Eq, Ord, Show, Read)
+
+-- |DFA symbol type
 newtype DfaSymbol = DfaValue Char deriving (Eq, Ord, Read)
 
 instance Show DfaSymbol where

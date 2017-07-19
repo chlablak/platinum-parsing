@@ -33,6 +33,7 @@ import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           PP.Lexer        (IToken)
 
+-- |Canonical rule type
 data Rule
   -- |A rule is defined by a non terminal and a list of Term and NonTerm
   -- The list should end with Empty

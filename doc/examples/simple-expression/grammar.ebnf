@@ -1,0 +1,11 @@
+(* A simple expression example *)
+(* 07 july 2017 *)
+
+(* This production is a syntax rule *)
+(* It will be used by the parser *)
+Expr = Number, { BinOP, Number }, "\n" ;
+
+(* Those production are lexical rules (regular expression) *)
+(* They will be used by the lexer to produce tokens *)
+Number %= "[1-9][0-9]*" ;
+BinOP %= "-|[+]" ; (* we put the '+' in a class to disable its meaning *)

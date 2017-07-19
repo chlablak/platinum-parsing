@@ -15,6 +15,7 @@ module PP.Template
 
 import           Text.StringTemplate
 
+-- |Type class for Templatable structure
 class Template context where
   -- |Put the context into StringTemplate attributes
   attributes :: context -> StringTemplate String -> StringTemplate String
