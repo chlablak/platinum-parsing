@@ -1,0 +1,14 @@
+@startuml
+
+skinparam monochrome reverse
+
+rectangle "<i>EBNF" as ebnf
+rectangle "<b>Platinum\n<b>Parsing" as pp
+rectangle "<i>Template" as template
+rectangle "Compiled\n<i>Template" as output
+
+ebnf --> pp
+template --> pp
+pp -> output
+
+@enduml

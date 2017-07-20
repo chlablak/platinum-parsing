@@ -19,7 +19,7 @@ type IToken = Char
 
 -- |Output token
 data OToken
-  = OToken1 String           -- ^Token value
+  = OToken1 [IToken]         -- ^Token value
   | OToken2 [IToken] String  -- ^Token value and name
     deriving (Show, Eq, Ord)
 

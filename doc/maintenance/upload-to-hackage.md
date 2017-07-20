@@ -25,6 +25,8 @@ Run:
   $ cp .stack-work/dist/<...>/platinum-parsing-A.B.C.D.tar.gz hackage/
   ```
 
+Check that everything is in the tarball.
+
 ## Step 3: do a `git tag` of the new version
 After a full commit, run:
 

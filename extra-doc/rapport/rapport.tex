@@ -1704,7 +1704,37 @@
 		\end{table} 
 		
 		Notons que l'\textit{AST Viewer} est encore très simple, cependant le rendre interactif prendrait trop de temps. Nous privilégions donc la tâche suivante pour le moment.\\
+		
+	\section{Mise en ligne du projet}
+		L'une des requêtes du projet était la mise en ligne sur Internet, afin que la communauté puisse profiter et améliorer Platinum Parsing librement. Cette mise en ligne a demandé plusieurs étapes résumées ci-après.
+		
+		\subsection{\textit{Landing Page}}
+			Une \textit{landing page} est une page Internet dont le but est de présenter le produit et de donner des pointeurs aux lecteurs pour qu'il puisse aller plus loin. PP étant sur GitHub, nous allons héberger la page sur \textit{github-pages} (service de GitHub), cela permet de garder le code source du site dans le même \textit{repo} que le projet lui-même.\\
 			
+			Pour ce qui est de la création de la page elle-même, nous avons utiliser un modèle libre sur le site \url{https://html5up.net/}. Le modèle choisi est \textit{Read Only}.\\
+			
+			Pour finir, le nom de domaine \url{platinum-parsing.org} a été acheté et redirigé sur la \textit{github-pages} du projet. On peut donc y accéder aisément avec l'adresse: \url{www.platinum-parsing.org}.
+	
+		\subsection{Plugin Atom}
+			Le plugin Atom (intégration à un éditeur de texte) doit également être mis en ligne. Afin que l'installation soit aisée pour l'utilisateur d'Atom, nous avons utiliser les normes d'Atom. Cela implique que le plugin s'insère correctement dans l'\textit{écosystème} d'Atom. Le plugin est accessible ici: \url{https://atom.io/packages/platinum-parsing-atom}.\\
+			
+			Notons qu'il a été nécessaire de créer un \textit{repo} dédié au plugin: \url{https://github.com/chlablak/platinum-parsing-atom}.
+			
+		\subsection{Hackage}
+			Hackage est le centre général de tous les \textit{packages} Haskell. Cela rend leur utilisation ainsi que la gestion de leurs dépendances beaucoup plus simple. Il semble donc évident que Platinum Parsing doit être disponible sur Hackage également: \url{http://hackage.haskell.org/package/platinum-parsing}.\\
+			
+			Hackage nous apporte plusieurs avantages:
+			\begin{itemize}
+				\item La documentation est automatiquement générée et mise en ligne
+				\item Un utilisateur peut installer le CLI en une seule commande
+				\item Un utilisateur peut utiliser le Framework en une seule ligne
+			\end{itemize}
+		
+		\subsection{GitHub}
+			Pour finir le \textit{repo} du projet a été mis en public: \url{https://github.com/chlablak/platinum-parsing}. Dans le but que PP soit un projet sérieux, un \textit{README} avec procédure d'installation et liens utiles a été fait.\\
+			
+			De plus, nous avons ajouté un dossier \texttt{doc/} contenant des exemples d'utilisation, des références ainsi que des procédures utiles pour une personne souhaitant travailler sur Platinum Parsing.
+		
 	\section{TODO}
 		\todo{}
 	

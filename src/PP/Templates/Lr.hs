@@ -9,7 +9,13 @@ Stability   : provisional
 Portability : portable
 -}
 module PP.Templates.Lr
-    ( LrContext
+    ( LrContext(..)
+    , LrContextState(..)
+    , LrContextTerm(..)
+    , LrContextNonTerm(..)
+    , LrContextTable(..)
+    , LrContextTableRow(..)
+    , LrContextAction(..)
     , context
     ) where
 

@@ -9,7 +9,9 @@ Portability : portable
 -}
 {-# LANGUAGE DeriveDataTypeable #-}
 module PP.Templates.Dfa
-    ( DfaContext
+    ( DfaContext(..)
+    , DfaContextState(..)
+    , DfaContextTransition(..)
     , context
     ) where
 

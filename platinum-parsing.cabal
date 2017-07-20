@@ -2,7 +2,7 @@ name:                platinum-parsing
 version:             0.1.0.0
 synopsis:            General Framework for compiler development.
 description:         Platinum Parsing provides many tools for the development of compiler (including transpiler or interpreter), based on the well-known Dragon Book (2nd edition). This package is in progress, please take a look at the github repository for more details.
-homepage:            https://github.com/chlablak/platinum-parsing
+homepage:            http://www.platinum-parsing.org/
 license:             BSD3
 license-file:        LICENSE
 author:              chlablak
@@ -11,6 +11,16 @@ copyright:           2017, Patrick Champion
 category:            compiler, compilation, parser, lexer, lalr, framework, cli
 build-type:          Simple
 extra-source-files:  README.md
+                     -- tests resources
+                   , test/res/ebnf.ebnf
+                   , test/res/ebnf.min.ebnf
+                   , test/res/lr-table
+                   , test/res/lr-table.test
+                     -- doc resources
+extra-doc-files:     doc/*.md
+                   , doc/examples/*.md
+                   , doc/maintenance/*.md
+                   , doc/references/*.md
 cabal-version:       >=1.10
 
 library

@@ -3,7 +3,7 @@ module PPTest.Templates.Lr (specs) where
 import qualified Data.List        as L
 import           PP
 import           PP.Builders.Lalr
-import           PP.Templates.Lr  as Lr
+import qualified PP.Templates.Lr  as Lr
 import           System.IO
 import           Test.Hspec
 
