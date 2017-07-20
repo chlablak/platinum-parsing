@@ -45,6 +45,8 @@ data LrContextState = LrContextState
 data LrContextTerm = LrContextTerm
   { symbol  :: Char                 -- ^Terminal symbol
   , isEmpty :: Bool                 -- ^It's the EMPTY symbol?
+  , isToken :: Bool                 -- ^It's a token ?
+  , token   :: String               -- ^Token name
   } deriving (Data, Typeable, Eq)
 data LrContextNonTerm = LrContextNonTerm
   { name   :: String                -- ^Non-terminal name
@@ -87,9 +89,10 @@ context t = LrContext states' terms' nonTerms' table'
                                (nonTerm' r)
                                (action' a)
            | ((i, r), a) <- list']
-    term' (Term x) = LrContextTerm x False
-    term' Empty    = LrContextTerm (chr 0) True
-    term' _        = LrContextTerm (chr 0) False
+    term' (Term x)      = LrContextTerm x False False ""
+    term' (TermToken t) = LrContextTerm (chr 0) False True t
+    term' Empty         = LrContextTerm (chr 0) True False ""
+    term' _             = LrContextTerm (chr 0) False False ""
     nonTerm' (NonTerm n) = LrContextNonTerm n (-1)
     nonTerm' _           = LrContextNonTerm "" (-1)
     action' (LrReduce (Rule n xs)) =
@@ -104,11 +107,13 @@ context t = LrContext states' terms' nonTerms' table'
     action' LrAccept =
       LrContextAction False False False False True (-1) (-1) (nonTerm' Empty)
     list' = Map.toList t
-    isTerm' (Term _) = True
-    isTerm' _        = False
-    isTermOrEmpty' (Term _) = True
-    isTermOrEmpty' Empty    = True
-    isTermOrEmpty' _        = False
+    isTerm' (Term _)      = True
+    isTerm' (TermToken _) = True
+    isTerm' _             = False
+    isTermOrEmpty' (Term _)      = True
+    isTermOrEmpty' (TermToken _) = True
+    isTermOrEmpty' Empty         = True
+    isTermOrEmpty' _             = False
     isNonTerm' (NonTerm _) = True
     isNonTerm' _           = False
     isReduce' (LrReduce _) = True

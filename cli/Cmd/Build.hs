@@ -21,6 +21,7 @@ import           Data.Semigroup      ((<>))
 import qualified Log
 import           Options.Applicative
 import qualified Project
+import qualified Work
 
 -- |Command arguments
 commandArgs :: Parser CommandArgs
@@ -57,6 +58,9 @@ dispatch (Args cargs0 (BuildCmd args)) = do
       Log.info $ "build project: " ++ Project.projectName p
       let cargs = mergeCArgs cargs0 p
       let file = head $ Project.projectGrammars p
+
+      when (useWork cargs)
+        Work.initialize
 
       -- EBNF checks
       Log.info "EBNF checks:"

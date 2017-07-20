@@ -5,6 +5,8 @@ The objective is to parse a simple expression `23-34+87` and get the AST of it, 
 
 We will explore the use of the CLI.
 
+You can find the same example but for the Framework at `doc/examples/framework-simple-expression.md`.
+
 ## Step 1: writing the grammar
 For this simple language, copy the following grammar in a file named `grammar.ebnf`:
 
@@ -16,7 +18,8 @@ For this simple language, copy the following grammar in a file named `grammar.eb
   (* Those production are lexical rules (regular expression) *)
   (* They will be used by the lexer to produce tokens *)
   Number %= "[1-9][0-9]*" ;
-  BinOP %= "-|[+]" ; (* we put the '+' in a class to disable its meaning *)
+  BinOP %= "[+-]" ;
+  (* newline needed at the end *)
   ```
 
 ## Step 2: checking the grammar
