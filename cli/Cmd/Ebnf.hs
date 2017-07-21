@@ -106,6 +106,8 @@ dispatch (Args _ (EbnfCmd args)) = do
                 Log.info "warnings:"
                 mapM_ Log.info warn
                 Log.popTag
+                when (err /= [])
+                  Log.abort
 
   -- End
   Log.popTag

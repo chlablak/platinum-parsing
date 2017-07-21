@@ -64,7 +64,9 @@ commandArgs = LalrCmd <$> lalrArgs
       <*> strOption ( long "ast-to-html"
         <> metavar "FILENAME"
         <> value ""
-        <> help "Output the parsed AST to HTML list" )
+        <> help "Output the parsed AST to HTML list (with --test-with)" )
+      <*> switch ( long "tokens"
+        <> help "Print the consumed tokens (with --test-with)" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -154,6 +156,12 @@ dispatch (Args cargs (LalrCmd args)) = do
                           source <- Log.io $ readFile $ testWith args
                           let lconfig = Lexer.dfaConfig source dfa
                           let tokens = PP.output $ PP.consume lconfig
+
+                          -- Flag `--tokens`
+                          when (showTokens args) $ do
+                            Log.info "input tokens:"
+                            printTokens tokens
+
                           let cfg = PP.parse' t $ PP.config t tokens :: [Parser.LrConfig]
 
                           -- Flag `--ast`
@@ -201,12 +209,14 @@ printTable = Log.out . Map.showTree
 printCfg :: [Parser.LrConfig] -> Log.Logger
 printCfg = printCfg' . head
   where
-    printCfg' (Parser.LrConfig c _ a i _) = do
+    printCfg' (Parser.LrConfig c s a i _) = do
       Log.out $ "after " ++ show c ++ " iterations: "
       case a of
         PP.LrAccept -> Log.out "input accepted"
-        _           -> Log.out $ "error at " ++ show (take 20 (str i))
-    str = concatMap (\(PP.OToken2 v _) -> v)
+        _           -> do
+          Log.out $ "error at " ++ show (take 20 (str i))
+          Log.out $ "in state " ++ show (head s)
+    str = concatMap (\(PP.OToken2 v _) -> v ++ " ")
 
 -- |Pretty print for DFA
 printDfa :: PP.DfaGraph -> Log.Logger
@@ -217,3 +227,7 @@ astToHtml :: Parser.LrAst -> String
 astToHtml (Parser.LrAstRoot xs) = "<ul>" ++ concatMap astToHtml xs ++ "</ul>"
 astToHtml (Parser.LrAstNonTerm r xs) = "<li>" ++ r ++ "<ul>" ++ concatMap astToHtml xs ++ "</ul></li>"
 astToHtml (Parser.LrAstTerm t) = "<li>" ++ show t ++ "</li>"
+
+-- |Print input tokens
+printTokens :: [PP.OToken] -> Log.Logger
+printTokens = mapM_ (Log.out . show)

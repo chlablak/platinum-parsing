@@ -17,6 +17,7 @@ module PP.Lexers.Dfa
 import           Control.Exception
 import           Data.Either
 import qualified Data.Graph.Inductive.Graph as Gr
+import qualified Data.List                  as L
 import           Data.Maybe
 import           PP.Builder
 import           PP.Builders.Dfa
@@ -55,13 +56,19 @@ dfaConfig :: String -> DfaGraph -> DfaConfig
 dfaConfig s g = DfaConfig s [] [] g [findInitial g]
 
 -- |Create a complete DFA from a list of lexical rules
+-- Rules are sorted normally, except that underscore '_' is less than 'A'
 createDfa :: [Rule] -> DfaGraph
-createDfa = buildDfa . combineNfa . map createNfa . regexfy
+createDfa = buildDfa . combineNfa . map createNfa . sort . regexfy
   where
     createNfa (Rule n (RegEx re:_)) =
       case parseAst re :: To RegExpr of
         Left e    -> error $ show e
         Right ast -> buildNfa' n ast
+    sort = L.sortBy (\(Rule a _) (Rule b _) -> sort' a b)
+    sort' ('_':a) ('_':b) = sort' a b
+    sort' ('_':_) _       = LT
+    sort' _ ('_':_)       = GT
+    sort' a b             = compare a b
 
 -- |Exception-safe version of `createDfa`
 createDfa' :: [Rule] -> IO (Either String DfaGraph)

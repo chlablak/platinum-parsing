@@ -1614,6 +1614,31 @@
 		
 		Tout cela permet de gagner un temps énorme lorsque la grammaire n'est plus amenée à changer. Notons que l'utilisateur a le choix de l'utiliser ou non à l'aide de l'option \texttt{-w} du CLI.
 		
+		\subsection{Analyse des performances de la génération}
+			Nous allons rapidement nous intéresser aux performances de la génération, notamment pour cibler quelle partie prend le plus de temps.\\
+			
+			La procédure est assez simple, comme le travail est maintenant sauvegardé (table, collection et AFD), nous pouvons supprimer l'un des fichiers et relancer le \textit{build}. Ainsi nous avons une estimation dans perdre trop de temps:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{lll}
+					\textbf{Structure} & \textbf{Temps} & \textbf{Taille du fichier}\\
+					\hline 
+					Collection & $>$ 40m & 13Mo\\
+					Table & $<$ 20s & 690Ko\\
+					AFD & $<$ 30s & 587Ko\\
+				\end{tabular}
+				\caption{Analyse en temps et en mémoire de la génération de la grammaire C}
+			\end{table} 
+			
+			On constate que la génération de la collection d'items est la partie lente du processus. La cause peut être trouvée à différent niveau:
+			\begin{enumerate}
+				\item La collection est intrinsèquement de grande taille
+				\item L'algorithme utilisé est connu pour être gourmand
+				\item Les structures internes utilisés ne sont pas optimales\\
+			\end{enumerate}
+			
+			Par rapport au point (1), il semble prudent de dire que la génération de la collection sera toujours la partie la plus lente. Pour ce qui est de l'algorithme (2), nous avions déjà mentionné qu'une alternative plus rapide et surtout moins gourmande en mémoire existe, il s'agit donc d'un axe de développement à explorer. Pour finir avec les structures internes utilisées (3), nous utilisons des tableaux, des listes et des ensembles. À ce niveau-là il y a aussi des améliorations possibles, dans le sens où elles ne sont pas utilisées à leur maximum. Cependant la piste de l'algorithme devrait être privilégiée dans un premier temps. 
+		
 	\section{Intégration à un éditeur de texte}
 		Platinum Parsing possède à présent un \textit{framework} ainsi qu'un \textit{CLI}, la dernière pièce manquante est un éditeur de texte. Le but principal étant de pouvoir utiliser le CLI sans avoir à taper une seule commande, voici une liste de fonctionnalités possibles:
 		\begin{itemize}
@@ -1735,6 +1760,9 @@
 			
 			De plus, nous avons ajouté un dossier \texttt{doc/} contenant des exemples d'utilisation, des références ainsi que des procédures utiles pour une personne souhaitant travailler sur Platinum Parsing.
 		
+	\section{Démonstration de PP avec une grammaire conséquente}
+		\todo{}	
+	
 	\section{TODO}
 		\todo{}
 	

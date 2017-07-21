@@ -62,6 +62,7 @@ data LalrArgs = LalrArgs
   , showDfa        :: Bool    -- ^Print the DFA
   , showAst        :: Bool    -- ^Print the parsed AST
   , astHtml        :: String  -- ^Output the AST to HTML list
+  , showTokens     :: Bool    -- ^Print the input tokens
   }
     deriving Show
 

@@ -72,7 +72,7 @@ dispatch (Args cargs0 (BuildCmd args)) = do
 
         -- LALR generation
         Log.info "LALR generation:"
-        let lalr = LalrArgs file False (-1) False (buildTestWith args) "" False (buildShowAst args) (buildAstHtml args)
+        let lalr = LalrArgs file False (-1) False (buildTestWith args) "" False (buildShowAst args) (buildAstHtml args) False
         Cmd.Lalr.dispatch $ Args cargs $ LalrCmd lalr
 
         genOk <- Log.ok
@@ -103,24 +103,24 @@ mergeCArgs (CommonArgs l s _ p) pr =
 
 -- |Build template
 buildTemplate :: CommonArgs -> LalrArgs -> Project.ProjectTemplate -> Log.Logger
-buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8 l9) t = do
+buildTemplate cargs (LalrArgs l1 l2 l3 l4 l5 _ l7 l8 l9 l10) t = do
   Log.pushTag "template"
   Log.info $ Project.templateFile t ++ " > " ++ Project.templateDst t
   Log.flushAll
-  let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7 l8 l9
+  let args = LalrArgs l1 l2 l3 l4 l5 (Project.templateFile t) l7 l8 l9 l10
   Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
   Log.flushOutToFile $ Project.templateDst t
   Log.popTag
 
 -- |Build test
 buildTest :: CommonArgs -> LalrArgs -> Project.ProjectTest -> Log.Logger
-buildTest cargs (LalrArgs l1 l2 l3 l4 _ l6 l7 _ l9) t = do
+buildTest cargs (LalrArgs l1 l2 l3 l4 _ l6 l7 _ l9 l10) t = do
   Log.pushTag "test"
   Log.info $ Project.testFile t ++ if Project.testAstDst t /= ""
                                    then " > " ++ Project.testAstDst t
                                    else ""
   Log.flushAll
-  let args = LalrArgs l1 l2 l3 l4 (Project.testFile t) l6 l7 (Project.testAstDst t /= "") l9
+  let args = LalrArgs l1 l2 l3 l4 (Project.testFile t) l6 l7 (Project.testAstDst t /= "") l9 l10
   Cmd.Lalr.dispatch $ Args cargs $ LalrCmd args
   if Project.testAstDst t /= "" then
     Log.flushOutToFile $ Project.testAstDst t

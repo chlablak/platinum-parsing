@@ -50,3 +50,25 @@ specs = describe "PPTest.Lexers.Dfa" $ do
     let input = "bbb"
     let config = dfaConfig input dfa
     output (consume config) `shouldBe` e
+
+  it "should skip whitespace" $ do
+    let rs = [Rule "_type" [RegEx "int", Empty],
+              Rule "id" [RegEx "[a-z]+", Empty]]
+    let dfa = createDfa rs
+    let e = [OToken2 "int" "_type",
+             OToken2 "abc" "id"]
+    let input = "\n  int  \t \n  abc   \n"
+    let config = dfaConfig input dfa
+    output (consume config) `shouldBe` e
+
+  it "should keep all tokens, even when conflict" $ do
+    let rs = [Rule "Id" [RegEx "([a-zA-Z]|_)([a-zA-Z]|_|[0-9])*", Empty],
+              Rule "__token_int" [RegEx "([i][n][t])", Empty]]
+    let dfa = createDfa rs
+    let input = "i in int intt"
+    let e = [OToken2 "i" "Id",
+             OToken2 "in" "Id",
+             OToken2 "int" "__token_int",
+             OToken2 "intt" "Id"]
+    let config = dfaConfig input dfa
+    output (consume config) `shouldBe` e
