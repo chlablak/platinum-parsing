@@ -135,10 +135,11 @@ dispatch (Args cargs (LalrCmd args)) = do
                       printTable t
 
                     Log.pushTask "compute DFA"
+                    let lrs' = PP.removeUnusedToken rs $ PP.regexfy lrs
                     dfa' <- Work.reuse (useWork cargs)
                                        (lalrFile args)
                                        "dfa"
-                                       (Log.io $ Lexer.createDfa' lrs)
+                                       (Log.io $ Lexer.createDfa' lrs')
                     case dfa' of
                       Left err -> do
                         Log.popTask

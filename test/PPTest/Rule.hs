@@ -123,3 +123,11 @@ specs = describe "PPTest.Rule" $ do
              Rule "c" [RegEx "ccdddd", Empty],
              Rule "d" [RegEx "dddd", Empty]]
     regexfy r `shouldBe` e
+
+  it "should remove unused lexical rules" $ do
+    let r = [Rule "A" [NonTerm "Number", Empty],
+             Rule "Number" [NonTerm "Digit", RegEx "+", Empty],
+             Rule "Digit" [RegEx "[0-9]", Empty]]
+    let e = [Rule "Number" [RegEx "[0-9]+", Empty]]
+    let (rs, lrs) = separate r
+    removeUnusedToken (ruleSet rs) (regexfy lrs) `shouldBe` e

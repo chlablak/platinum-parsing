@@ -106,7 +106,8 @@ Now open the file `app/Main.hs` and edit it like this:
               Right table -> do
 
                 -- Compute the DFA (for the lexer)
-                let dfa = Lexer.createDfa lrs
+                let lrs' = PP.removeUnusedToken ruleSet $ PP.regexfy lrs
+                let dfa = Lexer.createDfa lrs'
 
                 -- Create the lexer configuration and run it to get tokens
                 let lconfig = Lexer.dfaConfig expr dfa

@@ -14,6 +14,7 @@ module PP.Rule
     , extend
     , separate
     , regexfy
+    , removeUnusedToken
       -- * Canonical rules as Map
     , RuleSet
     , ruleSet
@@ -228,6 +229,17 @@ nonTermToToken (rs, lrs) = (mappers rs, mappers lrs)
       replaceNonTerm (t:ts) r@(NonTerm nt) =
         if nt == t then TermToken t else replaceNonTerm ts r
       replaceNonTerm (_:ts) r = replaceNonTerm ts r
+
+-- |Remove unused lexical rules
+-- Apply 'regexfy' first for correct results
+removeUnusedToken :: RuleSet -> [Rule] -> [Rule]
+removeUnusedToken rs = filters
+  where
+    filters = filter (\(Rule r _) -> r `elem` right)
+    right = nub $ concat [tok xs | n <- Map.keys rs, (Rule _ xs) <- rule n rs]
+    tok []                 = []
+    tok (TermToken s : xs) = s : tok xs
+    tok (_:xs)             = tok xs
 
 -- |Transform lexing rules to have only one RegEx on right
 regexfy :: [Rule] -> [Rule]

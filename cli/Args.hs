@@ -48,6 +48,7 @@ data EbnfArgs = EbnfArgs
   , doCheck       :: Bool     -- ^Search for errors in grammar
   , showLexical   :: Bool     -- ^Print lexical rules
   , showRegexfied :: Bool     -- ^Print the regexfied lexical rules
+  , removeToken   :: Bool     -- ^Remove useless tokens
   }
     deriving Show
 

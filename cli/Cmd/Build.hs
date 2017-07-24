@@ -64,7 +64,7 @@ dispatch (Args cargs0 (BuildCmd args)) = do
 
       -- EBNF checks
       Log.info "EBNF checks:"
-      let ebnf = EbnfArgs file False False False True False False
+      let ebnf = EbnfArgs file False False False True False False False
       Cmd.Ebnf.dispatch $ Args cargs $ EbnfCmd ebnf
 
       checkOk <- Log.ok

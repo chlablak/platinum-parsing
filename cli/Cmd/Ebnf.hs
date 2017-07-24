@@ -43,6 +43,8 @@ commandArgs = EbnfCmd <$> ebnfArgs
         <> help "Print lexical rules" )
       <*> switch ( long "regexfy"
         <> help "Print regexfied lexical rules" )
+      <*> switch ( long "clean-lexical"
+        <> help "Remove unused tokens (with --regexfy)" )
 
 -- |Command dispatch
 dispatch :: Args -> Log.Logger
@@ -67,17 +69,6 @@ dispatch (Args _ (EbnfCmd args)) = do
           Log.abort
         Right r -> do
           let (prs, lrs) = PP.separate r
-
-          -- Flag `--lexical`
-          when (showLexical args) $ do
-            Log.info "lexical rules:"
-            mapM_ (Log.out . show) lrs
-
-          -- Flag `--regexfy`
-          when (showRegexfied args) $ do
-            Log.info "regexfied lexical rules:"
-            mapM_ (Log.out . show) $ PP.regexfy lrs
-
           case PP.extend prs of
             Left err -> do
               Log.err "cannot extend the input grammar:"
@@ -86,6 +77,17 @@ dispatch (Args _ (EbnfCmd args)) = do
             Right g' -> do
               let rs = PP.ruleSet g'
               let fs = PP.firstSet rs
+
+              -- Flag `--lexical`
+              when (showLexical args) $ do
+                Log.info "lexical rules:"
+                mapM_ (Log.out . show) lrs
+
+              -- Flag `--regexfy`
+              when (showRegexfied args) $ do
+                Log.info "regexfied lexical rules:"
+                let lrs' = if removeToken args then PP.removeUnusedToken rs (PP.regexfy lrs) else PP.regexfy lrs
+                mapM_ (Log.out . show) $ PP.regexfy lrs'
 
               -- Flag `--rules`
               when (showRules args) $ do
