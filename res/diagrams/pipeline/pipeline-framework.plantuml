@@ -1,0 +1,18 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "rules" as rules
+rectangle "builder" as builder
+rectangle "tables" as tables
+rectangle "engine" as engine
+rectangle "source files" as input
+rectangle "output" as output
+
+rules -> builder
+builder -> tables
+tables -> engine
+input --> engine
+engine -> output
+
+@enduml

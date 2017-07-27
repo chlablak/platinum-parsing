@@ -1,0 +1,24 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "framework" as framework
+rectangle "rules" as rules
+rectangle "..." as other
+rectangle "CLI" as cli
+rectangle "executable" as exe
+rectangle "source files" as input
+rectangle "interpretation" as o1
+rectangle "transpiled files" as o2
+rectangle "tables" as o3
+
+framework --> cli
+rules --> cli
+other --> cli
+cli -> exe
+input --> exe
+exe --> o1
+exe --> o2
+exe --> o3
+
+@enduml

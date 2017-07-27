@@ -20,7 +20,7 @@ namespace csharp_engine
                 Console.WriteLine("success, AST:");
                 Console.WriteLine(parser.ast);
 
-                // Evaluate our AST
+                // Evaluate our AST by attaching callbacks on nodes
                 LrEvaluate evaluate = new LrEvaluate(parser.ast);
                 evaluate.NonTerm("statement", (node) => node.children[0]);
                 evaluate.NonTerm("expression", (node) => {

@@ -1,0 +1,22 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "step 1 : builder" {
+  rectangle "grammar" as rules
+  rectangle "builder" as builder
+  rectangle "compiled\ngrammar\ntable (.cgt)" as tables
+}
+rectangle "step 2 : engine" {
+  rectangle "engine" as engine
+  rectangle "source\ntext to be\nparsed" as input
+  rectangle "parsed data" as output
+}
+
+rules -> builder
+builder -> tables
+tables -> engine
+input --> engine
+engine -> output
+
+@enduml

@@ -5,9 +5,9 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
-\usepackage[left=2.00cm, right=2.00cm, top=2.00cm, bottom=2.00cm]{geometry}
+\usepackage[left=2.00cm, right=2.00cm, top=3.00cm, bottom=2.00cm]{geometry}
 \usepackage{float}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{fancyhdr}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{longtable}
@@ -23,7 +23,7 @@
 % Entêtes et pieds de page
 \lhead{TB: Platinum Parsing}
 \chead{}
-\rhead{HEIG-VD}
+\rhead{HEIG-VD, Patrick Champion}
 \lfoot{}
 \cfoot{\thepage}
 \rfoot{}
@@ -49,20 +49,37 @@
 \begin{document}
 	
 	% Page de titre
-	\title{Platinum Parsing\\
-		Travail de Bachelor}
-	\author{Patrick Champion\\
-		Prof. François Birling}
-	\date{Printemps 2017\\
-		HEIG-VD}
-	\maketitle
-	\vspace{6cm}
-	\begin{figure}[H]
+%	\title{Platinum Parsing\\
+%		Travail de Bachelor}
+%	\author{Patrick Champion\\
+%		Prof. François Birling}
+%	\date{Printemps 2017\\
+%		HEIG-VD}
+%	\maketitle
+%	\vspace{6cm}
+%	\begin{figure}[H]
+%		\centering
+%		\includegraphics[width=0.6\textwidth]{../../res/logo/logo.png}
+%	\end{figure}
+%	\thispagestyle{empty}
+%	\newpage
+	\begin{titlepage}
 		\centering
-		\includegraphics[width=0.6\textwidth]{../../res/logo/logo.png}
-	\end{figure}
-	\thispagestyle{empty}
-	\newpage
+		$ $\par
+		\vspace{3cm}
+		{\scshape\LARGE HEIG-VD \par}
+		\vspace{1cm}
+		{\scshape\Large Travail de Bachelor\par}
+		\vspace{1.5cm}
+		{\huge\bfseries Platinum Parsing\par}
+		\vspace{2cm}
+		{\Large\itshape Patrick Champion\par}
+		\vfill
+		Supervisé par\par
+		Prof. François \textsc{Birling}
+		\vfill
+		{\large Printemps 2017\par}
+	\end{titlepage}
 	
 	% Page vide
 	$ $ 
@@ -72,6 +89,17 @@
 	% Table des matières
 	\tableofcontents
 	\newpage
+	
+	\section*{Résumé}
+		La compilation est le processus consistant à transformer un langage source dans un autre langage, le langage cible. Cette transformation peut prendre plusieurs formes: un compilateur classique générant un exécutable, un interpréteur exécutant les instructions directement, ou encore un transpilateur qui traduit un langage dans un autre langage, bénéficiant ainsi des outils existants dans le langage de destination.\\
+		
+		Bon nombre de projets informatiques nécessitent, que ce soit à petite ou à grande échelle, d'être capable de lire et comprendre un langage source et d'en faire quelque chose. Cependant les technologies, les concepts, ainsi que les structures ne sont pas simple à appréhender et à réaliser soi-même. Amenant les développeurs à perdre du temps sur cette étape du développement.\\
+		
+		Platinum Parsing est un projet \textit{open source} visant à simplifier la vie du développeur souhaitant utiliser la chaîne de compilation, ou juste des parties de celle-ci, en offrant des outils capable de lire, tester et générer les composants d'un compilateur.\\
+		
+		Concrètement, Platinum Parsing est capable de générer les tables pour les analyses lexicale et syntaxique à partir d'une grammaire d'un langage. Ces tables sont par la suite exportables selon un modèle définissable par le développeur, permettant une grande souplesse au niveau de l'utilisation et des domaines d'activités.\\
+		
+		Le but de ce travail de Bachelor est de développer Platinum Parsing, pour que par la suite d'autres contributeurs puissent continuer le projet. Celui-ci étant destiné pour la communauté, il est disponible en ligne à l'adresse suivante: \url{http://www.platinum-parsing.org/}.
 	
 	\section*{Table des abréviations}
 		Dans l'ordre alphabétique:\\
@@ -83,14 +111,20 @@
 			\item \textbf{GOLD} \cite{goldparser} $\rightarrow$ \textit{GOLD Parser System}
 			\item \textbf{IDE} $\rightarrow$ \textit{Integrated development environment}
 			\item \textbf{LALR} \cite{lalr} $\rightarrow$ \textit{Look-Ahead LR parser}
-			\item \textbf{LR} \cite{lr} $\rightarrow$ \textit{LR parser}
+			\item \textbf{LR} \cite{lr} $\rightarrow$ \textit{LR parser (left to right, rightmost derivation)}
 			\item \textbf{PP} $\rightarrow$ \textit{Platinum Parsing}
 			\item \textbf{TB} $\rightarrow$ Travail de Bachelor
 		\end{itemize}
+		
+	\section*{Remerciements}
+		Je tiens tout d'abord à remercier M. Prof. François Birling pour son suivi et ses conseils durant toute la durée du travail. Je veux également remercier l'auteur ainsi que le traducteur du tutoriel sur Haskell \url{http://lyah.haskell.fr/}, qui m'aura bien aidé à démarrer.
 	\newpage
+	
+	\section{Introduction}
+		Dans le cadre de la dernière année du cursus d'ingénieur en informatique, il nous est demandé de réaliser un travail de Bachelor individuel représentant environ 450 heures de travail effectif. Ce projet, \textit{Platinum Parsing}, vise à développer un outil \textit{OpenSource} permettant de lire une grammaire, d'en générer les tables pour le \textit{lexer} et le \textit{parser}, et d'être capable de les exporter selon un \textit{template} fourni par l'utilisateur.
 		
 	\section{Définition du cadre du projet}
-		Dans cette section, nous allons mettre les documents fournis au début du projet. Ainsi un lecteur pourra connaître les spécifications initiales.
+		Dans cette section, nous allons mettre les documents fournis au début du projet. Ainsi le lecteur pourra connaître les spécifications initiales qui ont lancées ce travail de Bachelor.
 		
 		\subsection{Énoncé original}
 			Pour faciliter l'écriture de compilateurs, ce travail de diplôme vise à réaliser un outil complet avec un environnement de développement intégré, permettant :
@@ -115,15 +149,16 @@
 				\item Fournir une documentation de conception et un rapport final du travail réalisé.
 			\end{itemize}
 	
+	\newpage
 	\section{Études des cas d'utilisation}
 	\label{sec:etudes-des-cas-d-utilisation}
 	
 		Afin d'analyser les fonctionnalités nécessaires de PP, nous allons utiliser une approche par cas d'utilisation. La première étape de cette analyse est de définir quels seront les acteurs qui auront besoin d'utiliser notre outil:
 		\begin{itemize}
-			\item Le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreur de syntaxe, ambiguïté, etc.)
+			\item Le \textbf{concepteur} de langage veut pouvoir définir sa grammaire EBNF, ainsi que la vérifier (erreurs de syntaxe, ambiguïtés, etc.)
 			\item Le \textbf{développeur} de compilateur veut pouvoir se baser sur une grammaire EBNF pour construire facilement les règles de production. Il souhaite également avoir le contrôle sur la sortie produite, cela à l'aide d'un langage riche
 			\item Le \textbf{mainteneur} du compilateur veut pouvoir implémenter un parser en se basant sur des tables pré-générées, cela dans n'importe quel langage
-			\item L'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle
+			\item L'\textbf{utilisateur} du compilateur veut pouvoir l'utiliser simplement, celui-ci devrait aussi optionnellement fournir des options de compilation lui offrant un certain contrôle\\
 		\end{itemize}
 		
 		À partir de ces acteurs, nous pouvons construire un diagramme des cas d'utilisation de PP:
@@ -133,9 +168,10 @@
 			\caption{Diagramme des cas d'utilisation}
 		\end{figure}
 		
+		\newpage
 		\subsection{Cahier des charges}
 		\label{subsec:cahier-des-charges}
-			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section les fonctionnalités utilisant \textit{doit} sont obligatoires, celles utilisant \textit{devrait} sont optionnelles:
+			Le diagramme ci-dessus nous offre un bon aperçu des fonctionnalités que nous devons implémenter. Nous allons cependant préciser par écrit celles-ci afin d'avoir un cahier des charges complet. Dans cette section, les fonctionnalités utilisant \textit{doit} sont obligatoires et celles utilisant \textit{devrait} sont optionnelles:
 			
 			\begin{table}[H]
 				\centering
@@ -145,9 +181,9 @@
 					&&\\
 					& Platinum Parsing: & \\
 					10.10 & \textbf{doit} être un outil fournissant des fonctionnalités similaires à \textit{Gold Parsing System} & \autoref{sec:architecture-du-projet} \\
-					10.20 & \textbf{doit} être développé à l'aide de briques technologiques efficaces pour l'analyse de la BNF, la construction des tables LALR et la génération de code multilangage & \autoref{sec:choix-des-technologies}\\
-					10.30 & devrait être pensée pour avoir une approche générique du problème de la compilation & \\
-					10.40 & devrait fournir une documentation complète de la solution & \\
+					10.20 & \textbf{doit} être développé à l'aide de briques technologiques efficaces pour l'analyse de l' EBNF, la construction des tables LALR et la génération de code multilangage & \autoref{sec:choix-des-technologies}\\
+					10.30 & devrait être pensé pour avoir une approche générique du problème de la compilation & \\
+					10.40 & devrait fournir une documentation complète de la solution & \autoref{sec:mise-en-ligne-du-projet} \\
 					&&\\
 					& Le module d'analyse de grammaire EBNF: & \\
 					20.10 & \textbf{doit} lire et comprendre une grammaire selon la syntaxe EBNF & \autoref{sec:creation-d-un-parser-pour-la-grammaire}\\
@@ -164,14 +200,29 @@
 					40.10 & \textbf{doit} permettre d'attacher un \textit{callback} à ses noeuds & \autoref{sec:demonstration-en-csharp}\\
 					&&\\
 					& L'environnement de développement: & \\
-					50.10 & devrait soit être un IDE dédié ou un plugin pour un environnement existant & \\
+					50.10 & devrait soit être un IDE dédié ou un plugin pour un environnement existant & \autoref{sec:integration-a-un-editeur-de-texte}\\
 					50.20 & devrait intégrer l'ensemble des fonctionnalités de Platinum Parsing pour en faciliter l'usage & \\
 					&&\\
 					& La solution finale: & \\
 					60.10 & \textbf{doit} fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC & \autoref{sec:demonstration-en-csharp}\\
 				\end{longtable}
 			\end{table}
+			
+	\newpage
+	\section{Livre de référence}
+		Avant d'aller plus loin, nous voulons indiquer la référence principale utilisée tout au long de ce projet. Il s'agit du livre \textit{Compilateurs: principes, techniques et outils}, également connu sous le nom du \textit{Dragon Book} \cite{dragonbook}. Ce livre est la référence dans le domaine de la compilation, il semble donc important de le mentionner car beaucoup d'algorithmes utilisés dans ce projet proviennent de cet ouvrage. 
+		
+		\begin{figure}[H]
+			\centering
+			\begin{tabular}{cc}
+				\includegraphics[width=0.45\textwidth]{../../res/diagrams/dragonbook/cover}
+				&
+				\includegraphics[width=0.40\textwidth]{../../res/diagrams/dragonbook/page}
+			\end{tabular}
+			\caption{Le \textit{Dragon Book}, la référence dans le domaine de la compilation}
+		\end{figure}
 
+	\newpage
 	\section{Architecture du projet}
 	\label{sec:architecture-du-projet}
 		Dans cette section, nous allons poser l'architecture de PP. C'est-à-dire l'organisation générale des différentes fonctionnalités requises, ainsi que leur utilisation dans des cas réels.
@@ -179,25 +230,57 @@
 		\subsection{GOLD Parser System \cite{goldparser}}
 			Pour commencer, nous allons voir comment fonctionne GOLD Parser. le but de ce projet étant de remplacer GOLD, il s'agit d'un bon point de départ. En effet nous souhaitons proposer la même chose et, éventuellement, aller plus loin encore.\\
 			
-			Voici le schéma tel qu'expliqué sur le site de GOLD:
+			Voici le fonctionnement de GOLD tel qu'expliqué sur leur site:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-gold-parser}
+				\includegraphics[width=0.9\textwidth]{../../res/diagrams/pipeline/pipeline-gold-parser}
 				\caption{Fonctionnement de GOLD Parser System}
 			\end{figure}
 			
 			L'utilisation de GOLD se décompose en 2 étapes distinctes:
 			\begin{enumerate}
-				\item Le développeur écrit la grammaire de son langage et utilise le \textit{Builder} pour générer une grammaire compilée (.cgt), constituée principalement des tables (LALR, ...) du langage en question. À partir de là, le \textit{Builder} n'est plus nécessaire
+				\item Le développeur écrit la grammaire de son langage et utilise le \textit{Builder} pour générer une grammaire compilée (fichier .cgt), constituée principalement des tables (LALR, etc.) du langage en question. À partir de là, le \textit{Builder} n'est plus nécessaire
 				\item Le développeur implémente un \textit{Engine} (dans n'importe quel langage) qui s'occupe de charger la grammaire compilée et d'effectuer le \textit{parsing} des fichiers sources 
 			\end{enumerate}
 			
-			Une des forces de GOLD est que de nombreuses personnes ont fournies une implémentation d'\textit{Engine} dans des langages de programmation différents. Ces \textit{Engine} étaient donc prêts a être utilisés, cela implique que le format du fichier .cgt doit être normalisé.\\
+			Une des forces de GOLD est que de nombreuses personnes ont fourni une implémentation d'\textit{Engine} dans des langages de programmation différents. Ces \textit{Engine} sont donc prêts a être utilisés, cela implique que le format du fichier .cgt doit être normalisé.\\
 			
-			Le désavantage de cette approche est qu'il n'est pas possible de réaliser toute la chaîne en une seule fois.
-		
+			Le désavantage de cette approche est qu'il n'est pas possible de réaliser toute la chaîne en une seule étape.
+			
+		\newpage
+		\subsection{Architecture d'un compilateur}
+			Au-delà des fonctionnalités de GOLD, PP vise à être un outil facilitant la création de compilateurs (transpilateurs et interpréteurs compris). Dans cette optique, nous allons rapidement passer en revu l'architecture classique d'un compilateur:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=\textwidth]{../../res/diagrams/misc/compiler-units}
+				\caption{Architecture classique d'un compilateur}
+			\end{figure}
+			
+			Un compilateur se décompose en trois grandes phases:
+			\begin{enumerate}
+				\item Partie frontale: 
+				\begin{enumerate}
+					\item Analyse lexicale: décomposition de l'entrée en unité lexicale
+					\item Analyse syntaxique: validation de la syntaxe de l'entrée
+					\item Analyse sémantique: validation du \textit{sens} de l'entrée
+					\item Génération de code intermédiaire: transformation de l'AST en code simplifié
+				\end{enumerate}
+				\item Optimiseur: optimisation du code intermédiaire
+				\item Partie finale: transformation en code machine ou autres\\
+			\end{enumerate}
+			
+			L'objectif principal de ce TB est la génération de tables LALR à partir d'une grammaire, qui sera utilisée par la suite par l'analyse syntaxique:
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=0.8\textwidth]{../../res/diagrams/misc/compiler-parser}
+				\caption{L'analyse syntaxique avec une table LALR}
+			\end{figure}
+			
+			Ce travail se limite donc aux premières parties d'un compilateur, cependant la vision à long terme comprends toute la chaîne de compilation.
+
+		\newpage
 		\subsection{Décomposition en sous-projets}
-			Avant de passer à la section suivante, qui explique comment PP sera organisé, nous allons rapidement définir à un niveau plus large quelles seront les différentes parties de PP:
+			Avant de passer à la section suivante, qui explique comment PP sera organisé, nous allons rapidement définir à un niveau plus large quelles seront les différentes parties qui composeront PP:
 			\begin{figure}[H]
 				\centering
 				\includegraphics[width=0.6\textwidth]{../../res/diagrams/misc/architecture-pp}
@@ -211,15 +294,16 @@
 				\item L'\textbf{IDE} (ou plugin pour un IDE existant), qui utilise principalement le CLI et qui connaît le framework pour offrir une meilleure expérience de développement\\
 			\end{itemize}
 			
-			Ces explications sont encore assez abstraites et méritent d'être approfondies, cela sera fait dans les prochaines sections. Cependant nous préférons les introduire dès maintenant pour simplifier la lecture et la compréhension.
+			Ces explications sont encore assez abstraites et méritent d'être approfondies, cela sera fait dans les prochaines sections. Cependant nous préférons les introduire dès maintenant pour simplifier la lecture ainsi que la compréhension du lecteur.
 		
 		\subsection{Organisation de Platinum Parsing}
-			PP est un outil qui peut se décomposer en plusieurs étapes successives (un \textit{pipeline}), chacune prenant des données en entrée et fournissant d'autres données en sortie pour la prochaine étape du processus. Dans cette section nous allons expliciter quelles sont ces étapes ainsi que les données intermédiaires.\\
+			PP est un outil qui peut se décomposer en plusieurs étapes successives (un \textit{pipeline}), chacune prenant des données en entrée et fournissant d'autres données en sortie pour la prochaine étape du processus. Dans cette section nous allons expliciter quelles sont ces étapes.\\
 			
+			\newpage
 			Premièrement, définissons ce que nous avons besoin au niveau du framework. Nous voulons pouvoir transformer des fichiers sources en quelque chose d'autre:
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-output} 
+				\includegraphics[width=0.6\textwidth]{../../res/diagrams/pipeline/pipeline-output} 
 				\caption{Sorties possibles d'un exécutable créé avec PP}
 			\end{figure}
 			
@@ -228,11 +312,12 @@
 			Comment allons-nous créer cet exécutable? Ce prochain schéma va nous montrer cela, avec les acteurs des cas d'utilisation pour plus de clareté (voir \autoref{sec:etudes-des-cas-d-utilisation}):
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline} 
+				\includegraphics[width=0.9\textwidth]{../../res/diagrams/pipeline/pipeline} 
 				\caption{Utilisation de PP pour créer un exécutable}
 			\end{figure}
 			
-			On voit ici apparaître le framework ainsi que le CLI, comment cela fonctionne:
+			\newpage
+			On voit ici apparaître le framework ainsi que le CLI. Comment cela fonctionne-t-il ?
 			\begin{enumerate}
 				\item Le concepteur crée sa grammaire EBNF
 				\item Le développeur utilise une fonctionnalité du CLI pour transformer la grammaire EBNF dans une grammaire compréhensible par le framework, les \textit{Rules}
@@ -251,7 +336,7 @@
 				\caption{Fonctionnement de PP}
 			\end{figure}
 			
-			Ce schéma fait le parallèle entre GOLD et PP. Là où GOLD s'arrête à la transformation d'une grammaire en tables, PP est plus général et permet de transformer depuis n'importe quelle langage (définissable par les \textit{rules}) vers n'importe quelle sortie.\\
+			Ce schéma fait le parallèle entre GOLD et PP. Là où GOLD s'arrête à la transformation d'une grammaire en tables, PP est plus général et permet de transformer depuis n'importe quel langage (définissable par les \textit{rules}) vers n'importe quelle sortie.\\
 			
 			Cependant les fonctionnalités de GOLD sont également intéressantes, et celles-ci peuvent être implémentées à l'aide de notre framework. Nous allons voir cela dans la section suivante.
 			
@@ -265,7 +350,7 @@
 					\item Fourni un pipeline de développement pour tout le processus
 					\item Fourni un ou des \textit{builder}/\textit{engine} pré-définis
 					\item Fourni la gestion des options en ligne de commande
-					\item est extensible pour permettre le changement de son comportement
+					\item Est extensible pour permettre le changement de son comportement
 				\end{itemize}
 				\item Le \textbf{CLI}:
 				\begin{itemize}
@@ -285,7 +370,7 @@
 				Avant de commencer ce cas d'utilisation, expliquons rapidement le fonctionnement interne du framework:
 				\begin{figure}[H]
 					\centering
-					\includegraphics[width=0.8\textwidth]{../../res/diagrams/pipeline/pipeline-framework} 
+					\includegraphics[width=0.7\textwidth]{../../res/diagrams/pipeline/pipeline-framework} 
 					\caption{Fonctionnement interne du framework (général)}
 				\end{figure}
 				
@@ -297,9 +382,9 @@
 					\item L'\textit{Engine} génère une sortie\\
 				\end{enumerate}
 				
-				Le framework fourni un squelette pour que le développeur puisse faire ce qu'il veut dans l'\textit{Engine} sans avoir à se soucier de certain détails (le \textit{parser} typiquement).\\
+				Le framework fourni un squelette pour que le développeur puisse faire ce qu'il veut dans l'\textit{Engine} sans avoir à se soucier de certains détails (le \textit{parser} typiquement).\\
 				
-				Si l'on revient sur notre cas:
+				Si l'on revient sur notre cas, les étapes sont:
 				\begin{enumerate}
 					\item On définit la grammaire Lua
 					\item On implémente un \textit{Engine} pour interpréter Lua\\
@@ -311,7 +396,7 @@
 				Ce cas ressemble beaucoup au cas précédent:
 				\begin{enumerate}
 					\item On définit la grammaire EBNF
-					\item On implémente un \textit{Engine} pour transformer en BNF
+					\item On implémente un \textit{Engine} pour la transformer en BNF
 				\end{enumerate}
 			
 			\subsubsection{Cas 3: transformation d'une grammaire EBNF en tables}
@@ -322,12 +407,13 @@
 					\caption{Utilisation du framework pour recréer le \textit{Builder} de GOLD}
 				\end{figure}
 				
+				\newpage
 				\begin{enumerate}
 					\item On définit la grammaire EBNF
 					\item On implémente un \textit{Engine} qui sérialise les tables dans un fichier (.cgt pour faire la comparaison avec GOLD)\\
 				\end{enumerate}
 				
-				Ce cas étant une fonctionnalité nécessaire au projet, nous pouvons l'inclure au CLI.
+				Ce cas étant une fonctionnalité nécessaire au projet, nous pouvons l'inclure directement au CLI.
 			
 			\subsubsection{Cas 4: transformation d'une grammaire EBNF en tables, puis implémentation d'un \textit{engine} en Python}
 				Ce cas est une utilisation typique de GOLD, voyons comment cela est fait avec PP:
@@ -337,13 +423,13 @@
 					\item On implémente un \textit{Engine} en Python qui utilise les tables\\
 				\end{enumerate}
 				
-				On voit ici que le framework est très général, ainsi les fonctionnalités de GOLD plus spécifiques doivent être implémentées à part (à l'aide du framework) et être intégrées au CLI.
+				On voit ici que le framework est très général, ainsi les fonctionnalités de GOLD qui sont plus spécifiques doivent être implémentées à part (à l'aide du framework) et être intégrées au CLI.
 
 	\section{Choix des technologies}
 	\label{sec:choix-des-technologies}
 	
 		\subsection{État de l'art}
-			La génération de parser est un domaine qui possède déjà nombre d'outils. Le lien suivant propose une liste de ceux-ci avec leurs spécificités: \url{https://en.wikipedia.org/wiki/Comparison_of_parser_generators}\\
+			La génération de \textit{parser} est un domaine qui recense déjà de nombreux outils. Le lien suivant propose une liste de ceux-ci avec leurs spécificités: \url{https://en.wikipedia.org/wiki/Comparison_of_parser_generators}\\
 			
 			Ces outils diffèrent notamment au niveau des points suivants:
 			\begin{itemize}
@@ -351,18 +437,20 @@
 				\item Grammaires d'entrée acceptées
 				\item Langages de sortie proposés
 				\item Plateformes de développement possible
-				\item Licence
+				\item Licence\\
 			\end{itemize}
+			
+			PP vise à offrir les mêmes fonctionnalités, cependant à plus de niveaux différents et avec une nouvelle approche. Justifiant ainsi le développement d'un nouvel outil. 
 	
 		\subsection{Choix du langage}
 			Un choix crucial dans ce projet est le choix du langage de programmation que nous allons utiliser pour implémenter notre solution. Plusieurs langages ont été choisis en début de projet pour être comparés:
 			\begin{itemize}
-				\item C\# 
+				\item C\#
 				\item F\#
 				\item Haskell\\
 			\end{itemize}
 			
-			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères pour lesquels chaque langage sera mis en compétition. Les critères fondamentaux sont éliminatifs, c'est-à-dire qu'un langage qui ne répondrait pas à l'un de ces critères est d'emblée supprimé: 
+			Pour choisir entre ces différentes options, nous allons nous baser sur plusieurs critères sur lesquels les langages seront mis en compétition. Les critères fondamentaux sont éliminatifs, c'est-à-dire qu'un langage qui ne répondrait pas à l'un de ces critères est d'emblée supprimé: 
 			\begin{table}[H]
 				\centering
 				\begin{tabular}{|c|l|c|c|c|}
@@ -373,7 +461,7 @@
 					\hline
 					1 & Le langage a une communauté active et des ressources sur internet & Oui & Non & Oui\\
 					2 & Le langage possède une ou des bibliothèques dans le domaine du \textit{parsing} & Oui & Oui & Oui\\
-					3 & L'implémentation d'un parser de test simple est aisée & Oui & Oui & Oui\\
+					3 & L'implémentation d'un \textit{parser} de test simple est aisée & Oui & Oui & Oui\\
 					\hline\hline
 					\multicolumn{2}{|c|}{\textbf{Total}} & Oui & Non & Oui\\
 					\hline
@@ -383,11 +471,11 @@
 			
 			Les détails des critères testés se trouvent dans l'annexe \ref{subsec:criteres-testes-pour-le-choix-du-langage}.\\
 			
-			F\# se retrouve d'office éliminé pour cause d'une communauté trop peu active, ce qui n'est pas une bonne chose pour un projet. Cela nous laisse à choisir entre C\# et Haskell. Concernant les bibliothèques de \textit{parsing}, Irony pour C\# et Parsec pour Haskell, celles-ci offrent des possibilités similaires et sont simples à prendre en main, néanmoins Parsec possède des ressources (tutos, articles) plus complètes que Irony. À propos des paradigmes, multiple pour C\# et fonctionnel pur pour Haskell, ceux-ci apportent des approches différentes du problèmes. Cependant aucun est incapable de résoudre les problèmes liés à ce projet.\\
+			F\# se retrouve d'office éliminé pour cause d'une communauté trop peu active, ce qui n'est pas une bonne chose pour un projet. Cela nous laisse le choix entre C\# et Haskell. Concernant les bibliothèques de \textit{parsing}, Irony pour C\# et Parsec pour Haskell, celles-ci offrent des possibilités similaires et sont simples à prendre en main, néanmoins Parsec possède des ressources (tutos, articles) plus complètes que Irony. À propos des paradigmes, multiple pour C\# et fonctionnel pur pour Haskell, ceux-ci apportent des approches différentes du problème. Cependant aucun est incapable de relever les défis liés à ce projet.\\
 			
-			Une différence entre l'implémentation du parser simplifié en C\# et en Haskell est la manipulation de l'AST. En effet en C\# les types des noeuds sont des \texttt{string}, le parcours est donc fait au \textit{runtime} à base de conditions \textit{if-else}. Haskell quant à lui permet de définir les types des noeuds de manière statique, ainsi le parcours de l'arbre se base sur du \textit{pattern matching}, ce qui amène à du code plus clair, plus court et plus sûr.\\
+			Une différence entre l'implémentation du \textit{parser} simplifié en C\# et celui en Haskell est la manipulation de l'AST. En effet en C\# les types des noeuds sont des \texttt{string}, le parcours est donc fait au \textit{runtime} à base de conditions \textit{if-else}. Haskell quant à lui permet de définir les types des noeuds de manière statique, ainsi le parcours de l'arbre se base sur du \textit{pattern matching}, ce qui amène à du code plus clair, plus court et plus sûr.\\
 			
-			Nous choisissons donc \textbf{Haskell} pour le développement de ce projet pour ses avantages suivants:
+			Nous choisissons donc \textbf{Haskell} pour le développement de ce projet pour les avantages suivants:
 			\begin{itemize}
 				\item Bonne communauté
 				\item Beaucoup de ressources
@@ -395,13 +483,13 @@
 				\item AST statique\\
 			\end{itemize}
 			
-			Haskell possède également d'autres avantages et il est utilisé par de nombreuses entreprises pour certains projets, notamment il est populaire pour le \textit{lexing/parsing}. Voici quelques liens de départ pour en savoir plus:
+			Haskell possède également d'autres avantages et il est utilisé par de nombreuses entreprises pour certains projets. Il est notamment populaire pour le \textit{lexing/parsing}. Voici quelques liens de départ pour en savoir plus:
 			\begin{itemize}
 				\item \url{https://wiki.haskell.org/Introduction}
 				\item \url{https://wiki.haskell.org/Haskell_in_industry}\\
 			\end{itemize}
 			
-			Cela sera également l'occasion de concevoir et développer un projet complet à l'aide d'un langage fonctionnel pur, chose que nous n'avons pas eu la possibilité de faire lors du cursus.
+			Cela sera également l'occasion de concevoir et de développer un projet complet à l'aide d'un langage fonctionnel pur, approche que nous n'avons pas eu la possibilité de faire lors du cursus.
 			
 		\subsection{Cadre de développement}
 			La gestion de ce projet utilise plusieurs outils pour sa réalisation, voici une liste pour référence:
@@ -416,10 +504,32 @@
 				\item Atom \cite{atom} : Éditeur de texte\\
 			\end{itemize}
 			
-			Le langage choisi étant Haskell, nous allons nous baser sur ces \textit{guidelines} pour le développement:\\ \url{https://wiki.haskell.org/Programming_guidelines}
+			Le langage choisi étant Haskell, nous allons nous baser sur ces \textit{guidelines} pour le développement:\\ \url{https://wiki.haskell.org/Programming_guidelines}\\
+		
+		\newpage
+		\subsection{Organisation du dossier}
+			Le dossier du TB est organisé de manière hiérarchique afin que l'on puisse s'y retrouver facilement. Voici un aperçu pour simplifier la lecture du rapport:
+			\begin{figure}[H]
+				\centering
+				\dirtree{%
+					.1 platinum-parsing/\DTcomment{}.
+					.2 cli/\DTcomment{codes source du CLI}.
+					.2 doc/\DTcomment{documentations concernant PP}.
+					.2 extra-doc/\DTcomment{documentations concernant le TB}.
+					.2 hackage/\DTcomment{archives pour la distribution de PP}.
+					.2 res/\DTcomment{ressources diverses (images, grammaires, etc.)}.
+					.2 src/\DTcomment{codes source de PP}.
+					.2 test/\DTcomment{codes source des tests unitaires}.
+					.2 trials/\DTcomment{tests divers}.
+					.2 index.html\DTcomment{\textit{landing page}}.
+					.2 platinum-parsing.cabal\DTcomment{description du \textit{package}}.
+					.2 <...>\DTcomment{}.
+				}
+				\caption{Organisation du dossier du TB}
+			\end{figure}
 		
 	\section{Planification des tâches}
-		Dans la \autoref{sec:architecture-du-projet} \textit{architecture du projet} nous avons poser la forme générale de Platinum Parsing, cependant cette approche reste très générale et nous devons à présent la réduire pour répondre efficacement aux objectifs principaux du projet. Cette section cherche à organiser le développement dans ce sens. Évidemment, une fois ces objectifs remplis, la suite logique est d'aller vers l'architecture générale.\\
+		Dans la \autoref{sec:architecture-du-projet}, \textit{architecture du projet}, nous avons posé la forme générale de Platinum Parsing, cependant cette approche reste très générale et nous devons à présent la réduire pour répondre efficacement aux objectifs principaux du projet. Cette section cherche à organiser le développement dans ce sens. Évidemment, une fois ces objectifs remplis, la suite logique est d'aller vers l'architecture générale.\\
 		
 		Rappelons donc les objectifs principaux:
 		\begin{itemize}
@@ -430,14 +540,14 @@
 			\item Générer les tables selon une grammaire EBNF donnée
 			\item Être capable de traduire les tables selon un modèle fourni par l'utilisateur
 			\item Permettre d'attacher un \textit{callback} aux noeuds de l'AST
-			\item Fournir une démonstration en développant un lexer et un parser en C\# pour le langage ISO CNC\\
+			\item Fournir une démonstration en développant un \textit{lexer} et un \textit{parser} en C\# pour le langage ISO CNC\\
 		\end{itemize}
 		
 		À partir de cette liste, nous pouvons organiser le développement en phases successives:
 		\begin{enumerate}
-			\item Choix et définition de la grammaire non-contextuelle $\rightarrow$ voir \autoref{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
+			\item Choix et définition de la grammaire non-contextuelle 
 			\subitem + Définition de l'AST pour la grammaire choisie 
-			\item Création d'un parser pour la grammaire $\rightarrow$ voir \autoref{sec:creation-d-un-parser-pour-la-grammaire}
+			\item Création d'un \textit{parser} pour la grammaire 
 			\subitem + Donnant en sortie l'AST correspondant
 			\subitem + Test avec des grammaires
 			\subitem + Intégration au CLI
@@ -449,24 +559,33 @@
 			\item Test d'une grammaire à partir d'un texte en entrée
 			\subitem + Analyse de la validité de la grammaire
 			\subitem + Aide à la correction des erreurs de grammaire 
-			\subitem + Test avec des grammaires ambiguës simples
+			\subitem + Test avec des grammaires ambigües simples
 			\subitem + Intégration au CLI
 			\item Génération des tables dans un langage cible selon un modèle
 			\subitem + Intégration au CLI
-			\item Utilisation des tables générées en C\#, en démonstration
+			\item Utilisation des tables générées en C\#, comme démonstration
 			\subitem + Attache de \textit{callbacks} 
 			\item \textit{Tests, améliorations, objectifs optionnels, etc.}\\
 		\end{enumerate} 
 		
-		L'ordre est important car chaque étape dépend des précédentes. Les structures de données ainsi que les algorithmes seront choisis au fur et à mesure des recherches dans les phases. Il en va de même pour les schémas UML (classes, séquences, etc.), en effet le projet est assez conséquent et tout concevoir avant la réalisation n'est pas une bonne approche. De ce fait chaque étape est à voir comme un module à part entière, et chacun de ces modules aura sa conception propre. Puis, dès que l'on aura une vision plus précise du tout, on pourra expliquer plus facilement le fonctionnement générale de la solution.\\
+		L'ordre est important car chaque étape dépend des précédentes. Les structures de données ainsi que les algorithmes seront choisis au fur et à mesure des recherches dans chaque phase. Il en va de même pour les schémas UML (classes, séquences, etc.), en effet le projet est assez conséquent et tout concevoir avant la réalisation n'est pas une bonne approche. De ce fait chaque étape est à voir comme un module à part entière, et chacun de ces modules aura sa conception propre. Puis, dès que l'on aura une vision plus précise du tout, on pourra expliquer plus précisément le fonctionnement générale de la solution.\\
 		
 		Cette façon de procéder a l'avantage d'être plus résistante aux changements que l'on pourrait vouloir faire. Un peu comme un développement agile par itérations. Bien évidemment, il ne faut pas perdre de vue le projet dans sa globalité lors de chaque étape.\\
 		
-		La tâche \textit{Intégration au CLI} se fait en parallèle des étapes. Toutes ces fonctionnalités allant dans le CLI pour être mise en commun, et fournir une interface utilisateur simple. Il paraît donc évident que le CLI doit être développé en même temps.
+		La tâche \textit{Intégration au CLI} se fait en parallèle des étapes. Toutes ces fonctionnalités allant dans le CLI pour être mises en commun, et pour fournir une interface utilisateur simple. Il paraît donc évident que le CLI doit être développé en même temps.\\
+		
+		\subsection{Note sur le \textit{planning}}
+			La planification du travail est décomposée en trois grandes phases:
+			\begin{enumerate}
+				\item Phase I: Analyse du problème et choix des technologies
+				\item Phase II: Implémentation minimale des objectifs
+				\item Phase III: Approfondissements
+			\end{enumerate}
+			Nous avons à présent fini la phase I, les sections suivantes concerne la phase II. Nous reviendrons plus tard dans ce rapport sur la phase III. Les détails de chaque phase peuvent être trouvés dans le fichier\\ \texttt{extra-doc/planning/planning.xls}, également disponible dans l'annexe \autoref{subsec:planning}. 
 	
 	\section{Choix et définition de la grammaire non-contextuelle}
 	\label{sec:choix-et-definition-de-la-grammaire-non-contextuelle}
-		Afin de créer le parser, l'utilisateur aura besoin de définir son langage à l'aide d'une grammaire. Le langage le plus connu pour cela est BNF, avec ces différentes variantes (qui elles-mêmes ont des variantes): EBNF et ABNF.\\
+		Afin de créer le \textit{parser}, l'utilisateur aura besoin de définir son langage à l'aide d'une grammaire. Le langage le plus connu pour cela est BNF, avec ces différentes variantes (qui elles-mêmes ont des variantes): EBNF et ABNF.\\
 		
 		Nous devons choisir quelle variante nous allons utiliser pour PP. ABNF est exclu car sa lisibilité n'est pas très bonne pour les humains, son utilisation est plutôt pour la définition de protocoles. Concernant BNF et EBNF, les deux offrent les mêmes possibilités mais EBNF est généralement plus lisible et agréable à utiliser. À cette adresse (\url{http://xahlee.info/parser/bnf_ebnf_abnf.html}) nous avons un bon résumé que je copie ici:
 		\begin{quote}
@@ -484,13 +603,13 @@
 		Nous choisissons donc EBNF comme langage pour la grammaire d'entrée de PP. De plus il s'agit du seul des trois qui est défini par une norme officielle: ISO/IEC 14977:1996. Nous avons donc une base solide sur laquelle nous appuyer.
 	
 		\subsection{Définition de l'AST pour la grammaire choisie}
-			À présent que le langage pour la grammaire a été choisi (EBNF), nous devons spécifier sa propre grammaire pour implémenter le parser. La norme ISO/IEC 14977:1996 nous donne cela, réécrit ci-après:
+			À présent que le langage pour la grammaire a été choisi (EBNF), nous devons spécifier sa propre grammaire pour implémenter le \textit{parser}. La norme ISO/IEC 14977:1996 nous donne cela, réécrit ci-après:
 			
 			\inputminted{ebnf}{../../res/grammars/ebnf.ebnf}
 			\captionof{listing}{EBNF utilisé pour se définir lui-même}
 			
 			\paragraph{}
-			L'AST en Haskell de cette grammaire est faite à l'aide d'un type de donnée algébrique, qui traduit l'EBNF ci-dessus simplement et assez directement:
+			L'AST en Haskell de cette grammaire est fait à l'aide d'un type de donnée algébrique, qui traduit l'EBNF ci-dessus simplement et directement:
 			
 			\begin{minted}{haskell}
 				newtype Syntax = Syntax [SyntaxRule]
@@ -514,7 +633,8 @@
 			\paragraph{}
 			Notons que les commentaires ne sont pas représentés par l'AST, ni les \textit{special sequence} qui n'ont pas de signification utile.
 			
-	\section{Création d'un parser pour la grammaire}
+	\newpage
+	\section{Création d'un \textit{parser} pour la grammaire}
 	\label{sec:creation-d-un-parser-pour-la-grammaire}
 		%+ Donnant en sortie l'AST correspondant
 		Maintenant que nous avons notre grammaire ainsi que l'AST correspondant, nous pouvons implémenter un parser à l'aide de Parsec. Commençons par poser les premiers modules (fichiers Haskell) que nous allons utiliser: 
@@ -528,7 +648,7 @@
 			\caption{Premiers modules de PP}
 		\end{table}
 		
-		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage.\\
+		Ces fichiers sont assez simples. Le gros du travail a été de créer les \textit{parsers} pour la grammaire EBNF à l'aide de Parsec, de la même manière que pour le \textit{parser} simple que nous avions fait lors du choix du langage (voir annexe \autoref{subsec:criteres-testes-pour-le-choix-du-langage}).\\
 		
 		La classe de type \hs{PP.Grammar.InputGrammar} définit les fonctions communes à tous les AST, on peut voir cela comme une interface en Java.\\
 		
@@ -549,7 +669,9 @@
 				\caption{Premiers modules de test}
 			\end{table}  
 			
-			Ces tests nous ont révéler certains problèmes du \textit{parser}, cependant ceux-ci sont mineurs et nous allons donc simplement ouvrir des tickets pour les corriger plus tard:
+			De manière générale, tous les modules \hs{PP.Aaa.Bbb} auront leurs tests dans \hs{PPTest.Aaa.Bbb}.\\
+			
+			Ces tests nous ont révélé certains problèmes du \textit{parser}, cependant ceux-ci sont mineurs et nous allons donc simplement ouvrir des tickets pour les corriger plus tard:
 			\begin{itemize}
 				\item Le tiret étant admis dans les \textit{meta identifier}, la règle d'exception \mintinline{ebnf}{character - "'"} doit être écrite \mintinline{ebnf}{<character> - "'"} pour enlever l'ambigüité
 				\item La règle \mintinline{ebnf}{a=<b>;} retourne une erreur sur le $<$ suivant le $=$, cela uniquement lorsque les deux sont collés 
@@ -563,7 +685,7 @@
 				\item Exécuter la commande correctement\\
 			\end{enumerate}
 			
-			Pour parser les options de la ligne de commande, Haskell possède plusieurs bibliothèques pour nous simplifier la vie: \url{https://wiki.haskell.org/Command_line_option_parsers}. Parmi ces possibilités, nous allons choisir \texttt{optparse-applicative} \cite{optparse} car elle est moderne, populaire, et elle répond à nos besoins.\\
+			Pour gérer les options de la ligne de commande, Haskell possède plusieurs bibliothèques pour nous simplifier la vie: \url{https://wiki.haskell.org/Command_line_option_parsers}. Parmi ces possibilités, nous avons choisi \texttt{optparse-applicative} \cite{optparse} car elle est moderne, populaire, et qu'elle répond à nos besoins.\\
 			
 			L'organisation des modules du CLI se fait assez simplement à partir des tâches listées ci-dessus:
 			\begin{table}[H]
@@ -587,7 +709,7 @@
 			\captionof{listing}{Première commande du CLI}
 			
 			\paragraph{}
-			Ce qui correspond au \textit{parsing} du fichier \texttt{res/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche.
+			Ce qui correspond au \textit{parsing} du fichier \texttt{res/grammars/ebnf.ebnf} en AST, puis on \hs{stringify} l'AST et on l'affiche (\hs{parse}: code $\rightarrow$ AST, \hs{stringify}: AST $\rightarrow$ code).
 			
 	\section{Génération de la table LALR}
 	\label{sec:generation-de-la-table-lalr}	
@@ -622,15 +744,15 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[width=0.6\textwidth]{../../res/diagrams/misc/generation-process}
+			\includegraphics[width=0.7\textwidth]{../../res/diagrams/misc/generation-process}
 			\caption{Processus de génération de la table LALR}
 		\end{figure}
 		
-		Voyons donc en premier la fonction \hs{rules}, qui transforme l'AST de EBNF en AST simplifié, tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \hs{Rule} dans \hs{PP.Rule}, et nous ajoutons une fonction \hs{rules :: ast -> [Rule]} à la classe de type \hs{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \hs{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \hs{PPTest.Grammars.Ebnf} naturellement.\\
+		Voyons donc en premier la fonction \hs{rules}, qui transforme l'AST de EBNF en AST simplifié (structure \hs{Rule} vue ci-dessus), tout en gardant le sens original des règles EBNF \cite{ebnftobnf}. Par exemple les règles \mintinline{ebnf}{a = [b]; b = "c" | "d";} seront transformées en \mintinline{ebnf}{a = b; a = ; b = 'c'; b = 'd';}. Pour cela nous définissons le type \hs{Rule} dans \hs{PP.Rule}, et nous ajoutons une fonction \hs{rules :: ast -> [Rule]} à la classe de type \hs{PP.Grammar.InputGrammar}. De ce fait nous devons implémenter cette fonction pour l'AST de l'EBNF, cela se fait dans \hs{PP.Grammars.Ebnf}. Les tests sont ajoutés au module \hs{PPTest.Grammars.Ebnf} naturellement.\\
 		
 		Passons à la fonction \hs{extend}. Celle-ci doit augmenter la grammaire, c'est-à-dire pour une grammaire \mintinline{ebnf}{a = b; b = 'c';} on aura: \mintinline{ebnf}{__start = a; a = b; b = 'c';}. Il est possible que la grammaire ne contienne aucune ou plusieurs règles de départ, cela doit être détecté évidemment. L'implémentation se trouve dans \hs{PP.Rule} et les tests dans \hs{PPTest.Rule}.\\
 		
-		La fonction suivante est \hs{first} qui doit construire l'ensemble PREMIER d'une règle. Pour optimiser cela, nous allons réunir tous ces ensembles dans une structure \hs{FirstSet}. De plus les calculs ne seront réalisés qu'une seule fois. Cela est également fait dans \hs{PP.Rule}.\\
+		La fonction suivante est \hs{first} qui doit construire l'ensemble PREMIER d'une règle. Pour optimiser cela, nous allons réunir tous ces ensembles dans une structure \hs{FirstSet}. Ainsi les calculs ne seront réalisés qu'une seule fois. Cela est également fait dans \hs{PP.Rule}.\\
 		
 		Faisons un résumé de ce que nous avons actuellement:
 		\begin{minted}{haskell}
@@ -669,9 +791,9 @@
 		\captionof{listing}{Passage du \hs{RuleSet} en \hs{LrTable}}
 		
 		\paragraph{}
-		L'implémentation ci-dessus se base sur le Dragon Book \cite{dragonbook}, chapitres 4.7 à 4.7.4. Les chapitres suivants proposent une construction plus efficace (en terme de mémoire notamment) de la table LALR, cela pourrait faire l'objet d'une amélioration pour plus tard.\\
+		Tout le processus ci-dessus se base sur le Dragon Book \cite{dragonbook}, chapitres 4.7 à 4.7.4. Les chapitres suivants proposent une construction plus efficace (en terme de mémoire notamment) de la table LALR, cela pourrait faire l'objet d'une amélioration pour plus tard.\\
 		
-		Notons que la table n'est pas stockée comme un tableau à deux dimensions. En effet, une bonne partie de la table est positionnée à \hs{LrError}, il ne sert à rien de stocker cela. Nous utilisons donc une \hs{Data.Map.Strict} à la place: \url{http://hackage.haskell.org/package/containers-0.5.10.2/docs/Data-Map-Strict.html}.
+		Notons que la table n'est pas stockée comme un tableau à deux dimensions. En effet, une bonne partie de la table est positionnée à \hs{LrError}, il ne sert à rien de stocker cela. Nous utilisons donc une \hs{Data.Map.Strict} (\textit{hashmap}) à la place: \url{http://hackage.haskell.org/package/containers-0.5.10.2/docs/Data-Map-Strict.html}. Il peut être intéressant de proposer plusieurs structures pour le stockage de la table, ainsi l'utilisateur pourrait lui-même choisir en fonction des compromis qu'il souhaite faire. Cela pourrait également faire l'objet d'une amélioration future.
 		
 		\subsection{Test avec une grammaire simple}
 			Les tests ont utilisés la grammaire suivantes:
@@ -679,7 +801,7 @@
 				S = C, C;
 				C = "c", C | "d";
 			\end{minted}
-			Tirée du Dragon Book \cite{dragonbook}, afin d'avoir une référence fiable sur les bons résultats à obtenir.
+			Celle-ci est tirée du Dragon Book \cite{dragonbook}, afin d'avoir une référence fiable sur les bons résultats à obtenir.
 		
 		\subsection{Intégration au CLI}
 			L'intégration au CLI se fait dans le module \hs{Cmd.Lalr}, les différentes options sont:
@@ -698,18 +820,21 @@
 			\captionof{listing}{Aide de la commande LALR du CLI}
 			
 			\paragraph{}
-			L'affichage de la table LALR (flag \texttt{--table}) s'affiche encore comme la \hs{Map} qui contient la table, cela fera l'objet d'une amélioration future.
+			L'affichage de la table LALR (flag \texttt{--table}) s'affiche comme la \hs{Map} qui la contient, cela pourrait faire l'objet d'une amélioration future.
 			
 	\section{Définition de la grammaire du langage ISO CNC}
 		À présent que nous avons un générateur de table LALR, et avant d'implémenter le \textit{parser} LALR même, nous allons définir la grammaire EBNF du langage ISO CNC \cite{gcode}. Cela nous permettra d'avoir une base pour les tests à venir.\\
 		
-		Pour écrire cette grammaire, celle-ci n'étant pas trouvable sur Internet, nous partons d'un programme écrit en ISO CNC et on en extrait des règles de production. Nous pouvons procéder ainsi car nous avons seulement besoin d'une grammaire pour les tests, pas une grammaire exacte du langage ISO CNC.\\
+		Pour écrire cette grammaire, celle-ci n'étant pas trouvable sur Internet, nous partons d'un programme écrit en ISO CNC et on construit des règles de production. Nous pouvons procéder ainsi car nous avons seulement besoin d'une grammaire pour les tests, pas d'une grammaire exacte du langage ISO CNC.\\
 		
 		Le programme se trouve dans le dossier \texttt{trials/iso-cnc-prog/}, la grammaire quant à elle dans le fichier \texttt{res/grammars/iso-cnc.ebnf}. Pour le moment cela n'est qu'un premier jet, nous avons besoin d'implémenter la partie suivante (test des grammaires) pour la vérifier et éventuellement la corriger. Nous reviendrons donc dessus à la fin de la prochaine section.
 		
+		\paragraph{Modification}
+		Il est finalement apparu qu'utiliser la grammaire ISO CNC à la place d'une autre n'apporte aucun bénéfice particulier. Nous avons donc soit utiliser une grammaire plus simple pour les tests, soit une grammaire beaucoup plus compliquée pour la validation (langage C). 	 
+		
 	\section{Test d'une grammaire à partir d'un texte en entrée}
 	\label{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}
-		Dans cette section nous nous intéressons aux tests possibles sur une grammaire, afin de la valider. Commençons par isoler les différentes erreurs possibles dans notre cas:
+		Dans cette section nous nous intéressons aux tests possibles sur une grammaire, afin de la valider. Commençons par isoler les différentes erreurs possibles:
 		\begin{enumerate}
 			\item Syntaxe de la grammaire fausse
 			\item Transformation en règles canoniques impossible
@@ -727,7 +852,7 @@
 		\captionof{listing}{Signature de la fonction \hs{PP.Rule.check}}
 		
 		\paragraph{}
-		Celle-ci prend un ensemble de règles canoniques, et retourne une paire \hs{(errors, warnings)} avec \hs{errors} une liste de non-terminaux manquants et/ou ayant une récursion à gauche (uniquement directe pour le moment), et \hs{warnings} une liste des non-terminaux inutilisés. Cette approche nous permet d'ajouter d'autres types d'erreurs et/ou \textit{warnings} sans avoir à toucher une autre partie du code.\\
+		Celle-ci prend un ensemble de règles canoniques, et retourne une paire \hs{(errors, warnings)} avec \hs{errors} une liste de non-terminaux manquants et/ou ayant une récursion à gauche (uniquement directe pour le moment), et \hs{warnings} une liste des non-terminaux inutilisés. Cette approche nous permet d'ajouter d'autres types d'erreurs et/ou \textit{warnings} sans avoir à toucher à une autre partie du code.\\
 		
 		Passons maintenant au point 6, une grammaire est non-LALR si, lors de la génération de la table, des conflits \textit{shift/reduce} et/ou \textit{reduce/reduce} apparaissent. Ces conflits sont ignorés par la fonction de génération actuelle, cependant ajouter leur détection est très simple:
 		\begin{minted}{haskell}
@@ -743,18 +868,7 @@
 		Pour finir penchons-nous sur le point 7. Pour celui-ci nous avons une table LALR générée correctement, et on souhaite valider si cette table \textit{parse} effectivement le langage défini par la grammaire. Cela nécessite l'implémentation d'un \textit{parser} LR:
 		\begin{figure}[H]
 			\centering
-			\begin{tikzpicture}
-				\draw (3,4) rectangle (5,5) node[pos=.5] {Input};
-				\draw (0,2) rectangle (2,3) node[pos=.5] {State stack};
-				\draw (3,2) rectangle (5,3) node[pos=.5] {Parser LR};
-				\draw (6,2) rectangle (8,3) node[pos=.5] {Output};
-				\draw (3,0) rectangle (5,1) node[pos=.5] {LALR table};
-				
-				\draw[->] (3,2.5) -- (2,2.5);
-				\draw[->] (5,2.5) -- (6,2.5);
-				\draw[->] (4,3) -- (4,4);
-				\draw[->] (4,2) -- (4,1);
-			\end{tikzpicture}
+			\includegraphics[width=0.5\textwidth]{../../res/diagrams/misc/parser-lr}
 			\caption{Schéma d'un analyseur syntaxique (\textit{parser})}
 		\end{figure}
 		
@@ -787,6 +901,7 @@
 				, lrStack  :: [Int]      -- ^State stack
 				, lrAction :: LrAction   -- ^Action to do
 				, lrInput  :: String     -- ^Input
+				, lrAst    :: LrAst      -- ^Parsed AST
 				} deriving (Eq, Show)
 		\end{minted}
 		\captionof{listing}{Configuration d'un \textit{parser} LR}
@@ -810,7 +925,7 @@
 		
 		\subsection{Intégration au CLI}
 		\label{subsec:test-grammaire-integration-au-cli}
-			L'intégration au CLI est très simple et vient en l'ajout de deux nouveaux arguments: \texttt{--check} et \texttt{--test-with}. Afin de mettre en évidence leur utilisation et la détection correcte des erreurs (en plus des tests unitaires), nous avons mis dans le dossier \texttt{res/grammars/wrong} des grammaires fausses mettant en évidence les différents problèmes possibles.\\
+			L'intégration au CLI est très simple et se traduit en l'ajout de deux nouveaux arguments: \texttt{--check} et \texttt{--test-with}. Afin de mettre en évidence leur utilisation et la détection correcte des erreurs (en plus des tests unitaires), nous avons mis dans le dossier \texttt{res/grammars/wrong} des grammaires fausses mettant en évidence les différents problèmes possibles.\\
 			
 			Comme exemples:
 			\begin{minted}{console}
@@ -821,7 +936,7 @@
 				[PP][EBNF][CHECK][INFO] direct left-recusion: A
 				[PP][EBNF][CHECK][INFO] warnings:
 				
-				$ pp lalr -f res/grammars/test.ebnf --test-with ignored/test.txt 
+				$ pp lalr -f res/grammars/test.ebnf --test-with ignored/test-correct.txt 
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][LALR][TASK][START] compute collection and table
@@ -829,7 +944,7 @@
 				[PP][LALR][INFO] after 32 iterations: 
 				[PP][LALR][INFO] input accepted
 				
-				$ pp lalr -f res/grammars/test.ebnf --test-with ignored/test.txt 
+				$ pp lalr -f res/grammars/test.ebnf --test-with ignored/test-wrong.txt 
 				[PP][INFO] starting...
 				[PP][INFO] verbosity: 30
 				[PP][LALR][TASK][START] compute collection and table
@@ -892,15 +1007,9 @@
 				\paragraph{}
 				Un exemple de la nouvelle sortie (avec les tags) peut être vu dans les exemples de la \autoref{subsec:test-grammaire-integration-au-cli}.
 			
-		\subsection{Validation de la grammaire ISO CNC}
-			\todo{reporté car finalement pas urgent}
-			
-		\subsection{Test sur une grammaire C modifiée}
-			\todo{reporté pour des tests en phase III}
-			
 	\section{Génération des tables dans un langage cible}
 	\label{sec:generation-des-tables-dans-un-langage-cible}
-		Maintenant que les tests ont été réalisés, nous pouvons nous pencher sur la génération de la table LALR dans un langage autre que Haskell. Pour cela nous avons besoin de deux choses: un modèle (\textit{template}) sur lequel se baser, et donc un moteur de \textit{template}.\\
+		Maintenant que les tests ont été réalisés, nous pouvons nous pencher sur la génération de la table LALR dans un langage autre que Haskell. Pour cela nous avons besoin de deux choses: un modèle (\textit{template}) sur lequel se baser, ainsi qu'un moteur de \textit{template}.\\
 		
 		Il existe plusieurs bibliothèques pour cela (\url{https://stackoverflow.com/questions/5770168/templating-packages-for-haskell}), nos choix sont \texttt{heterocephalus} \cite{heterocephalus} qui propose une syntaxe simple avec l'interpolation de variables, ainsi que des structures de contrôles (\texttt{if}, \texttt{forall}, ...) qui seront nécessaires dans notre cas, et \texttt{HStringTemplate} \cite{hstringtemplate} qui propose à peu près la même chose.\\
 		
@@ -966,6 +1075,7 @@
 		\paragraph{}
 		Cette approche est extensible et sépare les différentes responsabilités. Le code \hs{compile (context 3) "it's the number $x$"} donnera en sortie: \texttt{"it's the number 3"}.\\
 		
+		\newpage
 		Le contexte ici pour la table LR est plus complexe. Le tableau suivant résume les différentes variables disponibles ainsi que leurs champs:
 		\begin{table}[H]
 			\centering
@@ -1001,12 +1111,12 @@
 			\caption{Variables interpolables pour le \textit{template} LR}
 		\end{table}
 		
-		Ces champs nous offre toutes les informations dont nous avions besoin pour l'écriture d'un \textit{template}. Nous avons ci-dessous le premier modèle, qui génère simplement la table LR:
+		Ces champs nous offrent toutes les informations dont nous avons besoin pour l'écriture d'un \textit{template}. Nous avons ci-dessous le premier modèle, qui génère simplement la table LR:
 		\inputminted{text}{../../res/templates/lr-table}
 		\captionof{listing}{Template générant la table LR simplement}
 		
 		\paragraph{}
-		Ce \textit{template} nous donne en sortie (exemple avec une grammaire simple):
+		Ce \textit{template} nous donne en sortie (exemple avec une grammaire simple pour garder la sortie courte):
 		\begin{minted}{text}
 			STATE 12
 			TERM 6
@@ -1064,7 +1174,9 @@
 			11 TERM + REDUCE T 3
 			11 TERM EMPTY REDUCE T 3
 		\end{minted}
+		\captionof{listing}{Compilation du \textit{template} précédent}
 		
+		\paragraph{}
 		Cette sortie peut être utilisée par un autre programme pour nourrir une table LR dans n'importe quel langage.
 		
 		\subsection{Intégration au CLI}
@@ -1075,13 +1187,12 @@
 			
 	\section{Démonstration en C\#}
 	\label{sec:demonstration-en-csharp}
-		PP est désormais capable de lire une grammaire EBNF, de générer la table LALR correspondante, et de compiler un fichier \textit{template}. Dans cette section nous allons utiliser tout cela, pour démontrer le fonctionnement global ainsi que l'accomplissement des objectifs principaux du cahier des charges.\\
+		PP est désormais capable de lire une grammaire EBNF, de générer la table LALR correspondante, et de compiler un fichier \textit{template}. Dans cette section, nous allons utiliser tout cela pour démontrer le fonctionnement global ainsi que l'accomplissement des objectifs principaux du cahier des charges.\\
 		
 		La démonstration se sépare en plusieurs parties:
 		\begin{itemize}
-			\item Définition de la grammaire ISO CNC (déjà fait)
-			\item Écriture d'un programme en ISO CNC (déjà fait)
-			\item Validation de la grammaire (déjà fait)
+			\item Définition d'une grammaire simple
+			\item Validation de la grammaire 
 			\item Écriture d'un \textit{engine} en C\#
 			\subitem + Avec construction de l'AST 
 			\subitem + Avec attache de \textit{callback} sur l'AST
@@ -1105,10 +1216,10 @@
 				\caption{Structure de l'\textit{engine} C\#}
 			\end{table}
 			
-			Le point important à noter est \texttt{LrTable}. Grâce à cette approche, l'écriture du \textit{template} n'aura qu'à dériver cette interface pour fonctionner avec l'\textit{engine}. Nous verrons cela dans la partie suivante.
+			Le point important à noter est que \texttt{LrTable} est une interface. Grâce à cette approche, l'écriture du \textit{template} n'aura qu'à dériver cette interface pour fonctionner avec l'\textit{engine}. Nous verrons cela dans la partie suivante.
 		
 		\subsection{Écriture du \textit{template} pour l'\textit{engine}}
-			Comme mentionné à la fin de la partie précédente, le \textit{template} doit dériver l'interface \texttt{LrTable} pour être utilisable par le moteur:
+			Comme mentionné à la fin de la partie précédente, le \textit{template} doit dériver l'interface \texttt{LrTable} pour être utilisable par le moteur:\\
 			\inputminted{csharp}{../../res/templates/csharp-table.cs}
 			\captionof{listing}{\textit{template} pour l'\textit{engine} C\# (fichier \texttt{res/templates/csharp-table.cs})}
 			
@@ -1133,6 +1244,7 @@
 					};
 				}
 			\end{minted}
+			\captionof{listing}{Exemple de compilation du \textit{template} précédent}
 			
 		\subsection{Validation du \textit{pipeline}}
 			Avant de faire la démonstration en ISO CNC, qui possède un code assez conséquent, nous allons valider la solution avec un exemple plus simple.\\
@@ -1145,7 +1257,6 @@
 			Compilons-la avec notre \textit{template}:
 			\begin{minted}{text}
 				$ pp -s lalr -f simple.ebnf --template csharp.cs > LrTableImpl.cs
-				$
 			\end{minted}
 			\captionof{listing}{Compilation d'une table LALR avec un \textit{template}}
 			
@@ -1201,6 +1312,7 @@
 			
 			Il apparaît après cette démonstration qu'il n'est pas nécessaire de faire la même avec le langage ISO CNC, comme initialement prévu. En effet cela n'apporterait aucune valeur ajoutée.\\
 			
+			\newpage
 			Nous pouvons résumer la démonstration ainsi:
 			\begin{figure}[H]
 				\centering
@@ -1209,10 +1321,10 @@
 			\end{figure}
 			
 	\section{Planification de la phase III}		
-		Comme on a pu le voir dans la section précédente, \textit{platinum parsing} réponds désormais à tous les objectifs que nous nous avions fixé pour la phase II (phase minimale). Nous pouvons à présent penser aux prochaines étapes, plusieurs choix sont possibles:
+		Comme on a pu le voir dans la section précédente, Platinum Parsing réponds désormais à tous les objectifs que nous nous avions fixé pour la phase II (phase minimale). Nous pouvons à présent penser aux prochaines étapes, plusieurs choix sont possibles:
 		\begin{itemize}
 			\item Ajout de l'analyse lexicale (\textit{lexer})
-			\subitem En plus de l'analyseur syntaxique déjà présent (\textit{parser})
+			\subitem En plus de l'analyseur syntaxique (\textit{parser}) déjà présent 
 			\item Intégration à un éditeur de texte
 			\subitem Soit un IDE dédié, soit un plugin pour un éditeur existant
 			\item Peaufinages en général
@@ -1223,7 +1335,7 @@
 		
 		Si tous ces choix sont pertinents, il est cependant difficile de savoir si tous seront réalisables dans le temps imparti à la phase III. Nous devons donc choisir l'ordre dans lequel nous voulons attaquer ces différentes étapes.\\
 		
-		La principale question est entre le \textit{lexer} ou l'intégration à un éditeur. Concrètement nous allons privilégier le \textit{lexer} si les gains (performances, fonctionnalités) associés sont conséquents. Pour savoir cela nous allons donc commencer par une étape d'analyse qui consistera à quantifier ces gains, et ainsi nous pourrons choisir quelle étape réaliser en premier.\\
+		La principale question se trouve entre le \textit{lexer} et l'intégration à un éditeur. Concrètement, nous allons privilégier le \textit{lexer} si les gains (performances, fonctionnalités) associés sont conséquents. Pour savoir cela nous allons donc commencer par une étape d'analyse qui consistera à quantifier ces gains, ainsi nous pourrons choisir quelle étape réaliser en premier.\\
 		
 		Voici donc la planification pour les 6 dernières semaines:
 		\begin{table}[H]
@@ -1235,7 +1347,7 @@
 				2 ou 3 & 2 semaines & Ajout du \textit{lexer}\\
 				2 ou 3 & 1 semaine & Intégration à un éditeur\\
 				4 & 1 semaine & Mise en ligne, peaufinages\\
-				& 1 semaine & Semaine tampon\\
+				& 1 semaine & Semaine tampon, rendu final\\
 			\end{tabular}
 			\caption{Planification de la phase III}
 		\end{table}
@@ -1304,7 +1416,7 @@
 			Le code source pour ce test est dans le dossier \texttt{./trials/csharp-lexer-analysis/}. Notons encore que le \textit{lexer} implémenté est très simple, ce qui implique que les résultats ci-dessus ne sont pas représentatifs à 100\%. 
 		
 		\subsection{Quels sont les gains sur la chaîne de compilation ?}
-			Comme on a pu le voir, l'ajout du \textit{lexer} apporte un gain conséquent en terme de performances. Cela s'explique assez facilement, en effet la conséquence directe de cet ajout est que la table LALR est plus simple. Ce qui implique donc un AST plus simple/petit, donc plus rapidement construit et évalué. Tout cela vient du fait que l'entrée est une suite de \textit{token} et non pas de caractères.\\
+			Comme on a pu le voir, l'ajout du \textit{lexer} apporte un gain conséquent en terme de performances. Cela s'explique assez facilement, en effet la conséquence directe de cet ajout est que la table LALR est plus simple. Ce qui implique donc un AST plus simple/petit, donc plus rapidement construit et évalué. Tout cela vient du fait que l'entrée est une suite de \textit{token} et non plus de caractères, comme c'est le cas dans la version sans \textit{lexer}.\\
 			
 			L'ajout de l'analyse lexicale en début de compilation apporte donc un grand plus sur toute la suite de la chaîne.
 		
@@ -1322,7 +1434,7 @@
 			\captionof{listing}{Simplification d'une grammaire avec les expressions régulières}
 		
 		\subsection{Quels sont les gains conceptuellement parlant ?}
-			Le principal gain conceptuel est très important: la \textit{séparation des responsabilités}. Celui-ci apporte en plus la \textit{factorisation} du code ainsi qu'une meilleure \textit{extensibilité} de la chaîne de compilation.
+			Le principal gain conceptuel est très important: la \textit{séparation des responsabilités}. Celui-ci implique en plus la \textit{factorisation} du code ainsi qu'une meilleure \textit{extensibilité} de la chaîne de compilation.
 		
 		\subsection{Conclusion de l'analyse}			
 			On s'aperçoit tout de suite que l'analyse lexicale apporte beaucoup, et ce sur de multiple aspects. Nous concluons donc qu'il est plus pertinent d'effectuer cet ajout à PP en premier, puis nous pourrons attaquer la partie "intégration à un éditeur de texte".\\
@@ -1337,14 +1449,15 @@
 				\end{enumerate}
 			\end{quote} 
 			
+	\newpage
 	\section{Intégration de l'analyse lexicale}
-		Nous avons vu dans la section précédente que l'analyse lexicale (\textit{lexer}) est un plus pour PP. Nous allons donc à présent nous pencher sur son intégration dans le produit actuel. Pour obtenir une meilleure vision du travail à effectuer, nous avons commencé par lire le chapitre 3 du Dragon Book \cite{dragonbook} qui concerne l'analyse lexicale. À partir de cela les sous-tâches suivantes ont pu être posées:
+		Nous avons vu dans la section précédente que l'analyse lexicale (\textit{lexer}) est un plus pour PP. Nous allons donc nous pencher sur son intégration dans le produit actuel. Pour obtenir une meilleure vision du travail à effectuer, nous avons commencé par lire le chapitre 3 du Dragon Book \cite{dragonbook} qui concerne l'analyse lexicale. À partir de cela les sous-tâches suivantes ont pu être posées:
 		\begin{enumerate}
 			\item Intégration des motifs lexicaux au fichier de grammaire
 			\subitem + Définir la syntaxe utilisée dans la grammaire
 			\subitem + Définir l'AST pour les motifs lexicaux
 			
-			\item Effectuer la séparation \textit{lexer} / \textit{parser}
+			\item Effectuer la séparation \textit{lexer} / \textit{parser}:
 			\subitem Remplacer les terminaux par des motifs
 			\subitem Modifier l'AST de l'EBNF en conséquence
 			
@@ -1403,7 +1516,7 @@
 			\paragraph{}
 			Les modules suivants ont été ajoutés: \hs{PP.Grammars.Lexical} et \hs{PPTest.Grammars.Lexical}.\\
 			
-			À présent que nous pouvons lire des expressions régulières, nous devons pouvoir les récupérer dans un fichier de grammaire, typiquement EBNF dans notre cas. Nous devons donc ajouter cela à \hs{PP.Grammars.EBNF}. Cet ajout pouvant être commun aux modules de \hs{PP.Grammars.*}, nous allons créer un \textit{helper} \hs{PP.Grammars.LexicalHelper} dont l'unique objectif est de lire les règles lexicales et de s'intégrer aisément dans un autre module.\\
+			À présent que nous pouvons lire des expressions régulières, nous devons pouvoir les récupérer dans un fichier de grammaire, typiquement EBNF dans notre cas. Nous devons donc ajouter cela à \hs{PP.Grammars.EBNF}. Cet ajout pouvant être commun aux modules de \hs{PP.Grammars.*}, nous allons créer un \textit{helper} \hs{PP.Grammars.LexicalHelper} dont l'unique objectif est de lire les règles lexicales et de s'intégrer aisément dans une autre grammaire.\\
 			
 			Cette approche fait que \hs{PP.Grammars.Ebnf} n'a pas demandé beaucoup de changements. Nous pouvons les résumer:
 			\begin{table}[H]
@@ -1431,13 +1544,14 @@
 			\captionof{listing}{Règles de grammaire et règles lexicales}
 			
 		\subsection{Séparation des parties \textit{lexer} et des parties \textit{parser}}
-			Cette partie a pu être faîte dans la partie précédente.
+			Cette partie a pu être faîte dans la partie précédente (voir \hs{PP.separate}).
 			
 		\subsection{Génération des automates pour l'analyse lexicale}
 			Chaque expression régulière est utilisée par le \textit{lexer} pour reconnaître les différentes unités lexicales (\textit{token}). Cependant l'AST d'une \textit{regex} reste une structure complexe à utiliser. C'est pour cette raison que les \textit{lexer} utilisent plutôt des automates à états finis à la place d'un AST.\\
 			
 			Le \textit{Dragon Book} nous explique comment passer de l'AST à un AFN (automate à états finis non-déterministe), puis d'un AFN à un AFD (automate à états finis déterministe). Un \textit{lexer} peut utiliser directement un AFN, cependant l'utilisation d'un AFD est plus efficace.\\
 			
+			\newpage
 			Un automate est un graphe orienté, avec les sommets comme états et les arcs comme transition entre les états. Chaque arc est accompagné du symbole (caractère) autorisant la transition d'un état à un autre:
 			\begin{figure}[H]
 				\centering
@@ -1471,8 +1585,9 @@
 			\paragraph{}
 			Notons qu'il est possible d'optimiser l'AFD obtenu, cependant cela est gardé pour une amélioration future.
 			
+		\newpage
 		\subsection{Implémentation du \textit{lexer} complet}
-			L'architecture d'un \textit{lexer} est semblable à celle d'un \textit{parser} LR:
+			L'architecture d'un \textit{lexer} est semblable à celle d'un \textit{parser} LR (voir \autoref{sec:test-d-une-grammaire-a-partir-d-un-texte-en-entree}):
 			\begin{figure}[H]
 				\centering
 				\includegraphics[width=0.5\textwidth]{../../res/diagrams/misc/lexer-dfa}
@@ -1527,7 +1642,7 @@
 		\subsection{Intégration à PP et tests}
 			Maintenant que le \textit{lexer} est complet (générateurs et simulateurs d'automates), nous pouvons intégrer cela au reste de PP. Pour rappel, le \textit{parser} actuel lit l'entrée caractère par caractère. Nous allons modifier ce comportement pour lire \textit{token} par \textit{token}.\\
 			
-			Concrètement les changements consistent à changer le type d'entrée \hs{String} (= \hs{[Char]}) en \hs{[OToken]}, partout où cela est nécessaire:
+			Concrètement, les changements consistent à changer le type d'entrée \hs{String} (= \hs{[Char]}) en \hs{[OToken]}, partout où cela est nécessaire:
 			\begin{itemize}
 				\item \hs{PP.Rule}
 				\item \hs{PP.Builder}
@@ -1536,7 +1651,7 @@
 				\item \hs{PP.Parsers.*}\\
 			\end{itemize}
 			
-			Les responsabilités étant bien découplés, le support des \hs{OToken} n'ont pas demandé beaucoup de changements.\\
+			Les responsabilités étant bien découplées, le support des \hs{OToken} n'a pas demandé beaucoup de changements.\\
 			
 			Les modules suivant ont également été modifiés pour intégrer le \textit{lexer}:
 			\begin{table}[H]
@@ -1562,12 +1677,15 @@
 					3 & La grammaire C fournie est récursive à gauche & Corrigé à la main\\
 					4 & La grammaire C n'était pas LALR (conflits) & Corrigé à la main\\
 					5 & Les terminaux étaient traités comme des \textit{regex} & Corrigé\\ 
+					6 & L'ordre des règles lexicales est important & Corrigé\\
+					7 & Il est inutile de garder des règles lexicales non-utilisées & Corrigé\\
 				\end{tabular}
 				\caption{Bugs découverts lors du test de la grammaire C}
 			\end{table}
 			
-			En plus des bugs découverts et corrigés, nous avons constater que la génération de la table LALR et de l'AFD prenait environ 45 minutes. Ce temps est conséquent, surtout si nous devons relancer une commande plusieurs fois et donc régénérer le tout à chaque fois. Cette problématique est le sujet de la prochaine section.
+			En plus des bugs découverts et corrigés, nous avons constaté que la génération de la table LALR et de l'AFD prenait environ 45 minutes. Ce temps est conséquent, surtout si nous devons relancer une commande plusieurs fois et donc régénérer le tout à chaque appel. Cette problématique est le sujet de la prochaine section.
 			
+	\newpage
 	\section{Réutilisation des résultats précédents}
 		Comme mentionné juste avant, nous avons décidé d'ajouter un module \hs{Work} au CLI, responsable de stocker les résultats et de les réutiliser si possible. Pour cela, le module a besoin de savoir ce qui a déjà été fait ou non. Nous avons donc eu besoin des bibliothèques Haskell suivantes:
 		\begin{table}[H]
@@ -1577,13 +1695,13 @@
 				\hline 
 				\hs{Data.Binary} & Sérialisation des structures de données\\
 				\hs{Data.Hash} & Hash des structures de données\\
-				\hs{Data.Yaml} & Manipulation de fichier \texttt{.yaml}\\
+				\hs{Data.Yaml} & Manipulation de fichier \texttt{.yaml} \cite{yaml}\\
 				\hs{System.Directory} & Manipulation du système de fichiers\\
 			\end{tabular}
 			\caption{Bibliothèques utiles pour le module \hs{Work} du CLI}
 		\end{table}
 			
-		Le module stocke ces informations dans le dossier \texttt{.pp-work/}, relativement au dossier où est lancé la commande. De plus le fichier \texttt{.pp-work/work.yaml} contient toutes les informations dont le module a besoin:
+		Le module stocke les données dont il a besoin dans le dossier \texttt{.pp-work/}, relativement au dossier où est lancé la commande. De plus le fichier \texttt{.pp-work/work.yaml} contient toutes les informations dont le module a besoin:
 		\begin{minted}{yaml}
 			- path: grammar.ebnf        # grammaire traitee
 			  id: 1234                  # ID unique pour la grammaire
@@ -1610,9 +1728,80 @@
 				.3 <...>\DTcomment{}.
 				.2 <...>\DTcomment{}.
 			}
+			\caption{Organisation du dossier \texttt{.pp-work/}}
 		\end{figure}
 		
-		Tout cela permet de gagner un temps énorme lorsque la grammaire n'est plus amenée à changer. Notons que l'utilisateur a le choix de l'utiliser ou non à l'aide de l'option \texttt{-w} du CLI.
+		Tout cela permet de gagner un temps énorme lorsque la grammaire n'est plus amenée à changer. Notons que l'utilisateur a le choix de l'utiliser ou non à l'aide de l'option \texttt{-w} (ou \texttt{--work}) du CLI.\\
+		
+		Maintenant que les structures sont sauvegardées, nous pouvons rapidement finir la démonstration sur la grammaire C. On y voit que les structure sont réutilisées, ce qui donne un test très rapide:
+		\begin{minted}{console}
+			$ cat test1.c
+			int main() { return 0; }
+			$ pp -w lalr -f RTDynamicC.ebnf -t test1.c --ast --tokens
+			[PP][INFO] starting...
+			[PP][INFO] verbosity: 30
+			[PP][INFO] working directory set to: .
+			[PP][INFO] current working directory: /foo/bar
+			[PP][LALR][TASK][START] compute collection and table
+			[PP][LALR][WORK][INFO] ("RTDynamicC.ebnf","collection") not modified
+			[PP][LALR][WORK][INFO] use previous work
+			[PP][LALR][WORK][INFO] ("RTDynamicC.ebnf","table") not modified
+			[PP][LALR][WORK][INFO] use previous work
+			[PP][LALR][TASK][END] in 721ms, compute collection and table
+			[PP][LALR][TASK][START] compute DFA
+			[PP][LALR][WORK][INFO] ("RTDynamicC.ebnf","dfa") not modified
+			[PP][LALR][WORK][INFO] use previous work
+			[PP][LALR][TASK][END] in 6ms, compute DFA
+			[PP][LALR][INFO] input tokens:
+			OToken2 "int" "__token_int"
+			OToken2 "main" "Id"
+			OToken2 "(" "__token_("
+			OToken2 ")" "__token_)"
+			OToken2 "{" "__token_{"
+			OToken2 "return" "__token_return"
+			OToken2 "0" "OctLiteral"
+			OToken2 ";" "__token_;"
+			OToken2 "}" "__token_}"
+			[PP][LALR][INFO] parsed AST:
+			|Start
+				|Decls
+					|[<Decl>,<Decls>]
+						|Decl
+							|Func Decl
+								|Func Item
+									|Func ID
+										|Type
+											|Base
+												|Signed
+												|Scalar
+													|[OToken2 "int" "__token_int"]
+										|[OToken2 "main" "Id"]
+									|[OToken2 "(" "__token_("]
+									|[OToken2 ")" "__token_)"]
+									|Block
+										|[OToken2 "{" "__token_{"]
+										|Stm List
+											|[<Stm>,<Stm List>]
+												|Stm
+													|Normal Stm
+														|[OToken2 "return" "__token_return"]
+														|Expr
+															...
+																|Value
+																	|[OToken2 "0" "OctLiteral"]
+															|...
+													|[OToken2 ";" "__token_;"]
+											|Stm List
+												|[<Stm>,<Stm List>]
+									|[OToken2 "}" "__token_}"]
+						|Decls
+							|[<Decl>,<Decls>]
+			
+			after 105 iterations: 
+			input accepted
+			[PP][INFO] bye.
+		\end{minted}
+		\captionof{listing}{Test d'un fichier source C avec la grammaire C}
 		
 		\subsection{Analyse des performances de la génération}
 			Nous allons rapidement nous intéresser aux performances de la génération, notamment pour cibler quelle partie prend le plus de temps.\\
@@ -1632,14 +1821,15 @@
 			
 			On constate que la génération de la collection d'items est la partie lente du processus. La cause peut être trouvée à différent niveau:
 			\begin{enumerate}
-				\item La collection est intrinsèquement de grande taille
-				\item L'algorithme utilisé est connu pour être gourmand
+				\item La collection est intrinsèquement de grande taille et prend donc naturellement du temps et de la mémoire
+				\item L'algorithme utilisé est connu pour être gourmand en temps et surtout en mémoire
 				\item Les structures internes utilisés ne sont pas optimales\\
 			\end{enumerate}
 			
-			Par rapport au point (1), il semble prudent de dire que la génération de la collection sera toujours la partie la plus lente. Pour ce qui est de l'algorithme (2), nous avions déjà mentionné qu'une alternative plus rapide et surtout moins gourmande en mémoire existe, il s'agit donc d'un axe de développement à explorer. Pour finir avec les structures internes utilisées (3), nous utilisons des tableaux, des listes et des ensembles. À ce niveau-là il y a aussi des améliorations possibles, dans le sens où elles ne sont pas utilisées à leur maximum. Cependant la piste de l'algorithme devrait être privilégiée dans un premier temps. 
+			Par rapport au point (1), il semble prudent de dire que la génération de la collection sera toujours la partie la plus lente. Pour ce qui est de l'algorithme (2), nous avions déjà mentionné qu'une alternative plus rapide et surtout moins gourmande en mémoire existe, il s'agit donc d'un axe de développement à explorer. Pour finir avec les structures internes utilisées (3), nous utilisons des tableaux, des listes et des ensembles. À ce niveau-là il y a aussi des améliorations possibles, dans le sens où elles ne sont pas utilisées à leur maximum. Cependant la piste de l'algorithme devrait être privilégiée dans un premier temps, car le gain en mémoire est le plus conséquent de ce côté.
 		
 	\section{Intégration à un éditeur de texte}
+	\label{sec:integration-a-un-editeur-de-texte}
 		Platinum Parsing possède à présent un \textit{framework} ainsi qu'un \textit{CLI}, la dernière pièce manquante est un éditeur de texte. Le but principal étant de pouvoir utiliser le CLI sans avoir à taper une seule commande, voici une liste de fonctionnalités possibles:
 		\begin{itemize}
 			\item Création de projet PP
@@ -1653,6 +1843,7 @@
 		
 		Pour le choix de l'éditeur de texte, nous avons choisi Atom \cite{atom} car il est/a: \textit{open source}, extensible (\textit{package}), coloration syntaxique EBNF, populaire. Les alternatives existantes sont \textit{VS Code} ou \textit{Sublime Text}.\\
 		
+		\newpage
 		Atom propose par ailleurs un plugin \textit{Package Generator} pour commencer un nouveau plugin, c'est donc ce que nous allons utiliser pour créer notre outil. Le \textit{package} est organisé ainsi:
 		\begin{figure}[H]
 			\centering
@@ -1677,11 +1868,20 @@
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/create-menu}
+			\caption{Création d'un nouveau projet PP, menu}
+		\end{figure}
+		\begin{figure}[H]
+			\centering
 			\includegraphics[width=0.8\textwidth]{../../res/diagrams/atom/create-dialog}
+			\caption{Création d'un nouveau projet PP, choix du nom}
+		\end{figure}
+		\begin{figure}[H]
+			\centering
 			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/create-folder}
-			\caption{Création d'un nouveau projet PP}
+			\caption{Création d'un nouveau projet PP, choix du dossier}
 		\end{figure}
 		
+		\newpage
 		Cela a pour effet d'ouvrir une nouvelle fenêtre Atom avec le dossier du projet ouvert:
 		\begin{figure}[H]
 			\centering
@@ -1696,6 +1896,7 @@
 			\caption{Fichier de configuration avec \textit{templates} et tests}
 		\end{figure}
 		
+		\newpage
 		Puis on appelle la commande de compilation:
 		\begin{figure}[H]
 			\centering
@@ -1704,15 +1905,23 @@
 			\caption{Compilation du projet avec Atom}
 		\end{figure}
 		
-		On voit que les informations du fichier de configuration ont bien été prises en compte. Notons également le dossier \texttt{.pp-work/} qui a été utilisé.\\
+		On voit que les informations du fichier de configuration ont bien été prises en compte. Notons également le dossier \texttt{.pp-work/} qui a été créé.\\
 		
-		Pour finir la dernière fonctionnalité actuellement disponible est le test de la grammaire sur un fichier source:
+		Pour finir, la dernière fonctionnalité actuellement disponible est le test de la grammaire sur un fichier source:
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.7\textwidth]{../../res/diagrams/atom/test-menu}
+			\caption{Test de la grammaire sur un fichier source avec Atom, menu}
+		\end{figure}
+		\begin{figure}[H]
+			\centering
 			\includegraphics[width=0.8\textwidth]{../../res/diagrams/atom/test-dialog}
+			\caption{Test de la grammaire sur un fichier source avec Atom, choix du fichier}
+		\end{figure}
+		\begin{figure}[H]
+			\centering
 			\includegraphics[width=0.5\textwidth]{../../res/diagrams/atom/ast-viewer}
-			\caption{Test de la grammaire sur un fichier source avec Atom}
+			\caption{Test de la grammaire sur un fichier source avec Atom, visualiseur}
 		\end{figure}
 		
 		Cela a pour effet d'ouvrir un visualiseur d'AST.\\
@@ -1731,6 +1940,7 @@
 		Notons que l'\textit{AST Viewer} est encore très simple, cependant le rendre interactif prendrait trop de temps. Nous privilégions donc la tâche suivante pour le moment.\\
 		
 	\section{Mise en ligne du projet}
+	\label{sec:mise-en-ligne-du-projet}
 		L'une des requêtes du projet était la mise en ligne sur Internet, afin que la communauté puisse profiter et améliorer Platinum Parsing librement. Cette mise en ligne a demandé plusieurs étapes résumées ci-après.
 		
 		\subsection{\textit{Landing Page}}
@@ -1739,11 +1949,23 @@
 			Pour ce qui est de la création de la page elle-même, nous avons utiliser un modèle libre sur le site \url{https://html5up.net/}. Le modèle choisi est \textit{Read Only}.\\
 			
 			Pour finir, le nom de domaine \url{platinum-parsing.org} a été acheté et redirigé sur la \textit{github-pages} du projet. On peut donc y accéder aisément avec l'adresse: \url{www.platinum-parsing.org}.
+			
+			\begin{figure}[H]
+				\centering 
+				\includegraphics[width=0.9\textwidth]{../../res/diagrams/online/landing-page}
+				\caption{La \textit{landing page} dans un navigateur}
+			\end{figure}
 	
 		\subsection{Plugin Atom}
 			Le plugin Atom (intégration à un éditeur de texte) doit également être mis en ligne. Afin que l'installation soit aisée pour l'utilisateur d'Atom, nous avons utiliser les normes d'Atom. Cela implique que le plugin s'insère correctement dans l'\textit{écosystème} d'Atom. Le plugin est accessible ici: \url{https://atom.io/packages/platinum-parsing-atom}.\\
 			
 			Notons qu'il a été nécessaire de créer un \textit{repo} dédié au plugin: \url{https://github.com/chlablak/platinum-parsing-atom}.
+			
+			\begin{figure}[H]
+				\centering 
+				\includegraphics[width=0.9\textwidth]{../../res/diagrams/online/atom}
+				\caption{Le \textit{plugin} Atom dans un navigateur}
+			\end{figure}
 			
 		\subsection{Hackage}
 			Hackage est le centre général de tous les \textit{packages} Haskell. Cela rend leur utilisation ainsi que la gestion de leurs dépendances beaucoup plus simple. Il semble donc évident que Platinum Parsing doit être disponible sur Hackage également: \url{http://hackage.haskell.org/package/platinum-parsing}.\\
@@ -1754,18 +1976,50 @@
 				\item Un utilisateur peut installer le CLI en une seule commande
 				\item Un utilisateur peut utiliser le Framework en une seule ligne
 			\end{itemize}
+			
+			\begin{figure}[H]
+				\centering 
+				\includegraphics[width=0.9\textwidth]{../../res/diagrams/online/hackage}
+				\caption{Le \textit{package} Haskell dans un navigateur}
+			\end{figure}
 		
 		\subsection{GitHub}
-			Pour finir le \textit{repo} du projet a été mis en public: \url{https://github.com/chlablak/platinum-parsing}. Dans le but que PP soit un projet sérieux, un \textit{README} avec procédure d'installation et liens utiles a été fait.\\
+			Pour finir le \textit{repo} du projet a été mis en public: \url{https://github.com/chlablak/platinum-parsing}. Dans le but que PP soit un projet sérieux, un \textit{README} avec procédure d'installation et liens utiles a été rédigé.\\
 			
-			De plus, nous avons ajouté un dossier \texttt{doc/} contenant des exemples d'utilisation, des références ainsi que des procédures utiles pour une personne souhaitant travailler sur Platinum Parsing.
+			De plus, nous avons ajouté un dossier \texttt{doc/} contenant des exemples d'utilisation, des références ainsi que des procédures utiles pour une personne souhaitant travailler sur/avec Platinum Parsing.
+			
+			\begin{figure}[H]
+				\centering 
+				\includegraphics[width=0.9\textwidth]{../../res/diagrams/online/github}
+				\caption{Le \textit{repo} GitHub dans un navigateur}
+			\end{figure}
+
+	\section{Conclusion}
+		Vis-à-vis des produits fournis, que ce soit le \textit{framework}, le CLI ou encore l'intégration Atom, tous les objectifs principaux du cahier des charges ont été remplis. Le projet étant à présent en ligne avec plusieurs ressources d'utilisation, tout est en place pour que la communauté ainsi que moi-même puissions continuer à faire grandir Platinum Parsing.\\
 		
-	\section{Démonstration de PP avec une grammaire conséquente}
-		\todo{}	
+		L'architecture a été pensée de sorte que, à long terme, Platinum Parsing soit un outil complet dans le domaine du développement de compilateur. Les possibilités d'améliorations et de nouvelles fonctionnalités sont très nombreuses, on peut en citer quelques-unes:
+		\begin{itemize}
+			\item Pour le \textit{framework}, support de la chaîne de compilation complète
+			\item Pour le CLI, meilleur fichier de configuration avec plus d'options
+			\item Pour Atom, affichage de graphiques supplémentaires, édition de grammaire\\
+		\end{itemize}
+		
+		Au-delà des améliorations, il subsiste encore plusieurs \textit{bugs} dans l'implémentation actuelle. Tous ceux-ci sont répertoriés dans les \textit{issues} du repo GitHub, en voici quelques-uns:
+		\begin{itemize}
+			\item Le \textit{parsing} de grammaire EBNF échoue dans un cas précis
+			\item Les \textit{builders} ne supportent pas la récursion à gauche
+			\item Le CLI utilise uniquement \textit{stdout} et pas \textit{stderr}\\
+		\end{itemize}
+		
+		Cependant, tous ces problèmes sont corrigeables et/ou implémentables, par conséquent il n'y a pas de soucis majeur concernant les choix effectués durant le projet. Le choix du langage Haskell a par ailleurs été une bonne expérience, son approche fonctionnelle est particulièrement adaptée aux algorithmes liés à la compilation, avec un code source très expressif.\\
+		
+		Concernant la planification, celle-ci a été plutôt bien respectée, avec au final 454 heures de travail effectif sur les 450 heures prévues. L'organisation en trois grosses phases (pré-étude $\rightarrow$ implémentation minimale $\rightarrow$ approfondissements) a été très pertinente, et toutes les tâches nécessaires à chaque phase ont été bien cernées dès le début de chaque phase. Par la suite chacune de ces tâches, notamment les complexes, ont fait l'objet d'une approche itérative, ce qui a permit de rester souple par rapport aux soucis rencontrés. \\
+		
+		Pour finir sur le travail personnel, il n'a pas toujours été facile de travailler sur Platinum Parsing en parallèle des projets des autres cours du semestre. Cependant la répartition des heures a permis de garder un rythme continu du début à la fin. Le début du projet a par ailleurs été le moment le plus compliqué, car les objectifs et les tâches à réaliser étaient encore flous. Cela est notamment du au fait que le sujet à traiter est très complexe. Le \textit{Dragon Book} a par ailleurs été d'une grande aide tout au long du projet, un incontournable pour le développement dans ce type de sujet.\\
+		
+		En conclusion, ce travail a été une expérience très enrichissante, que ce soit du côté théorique ou du côté pratique. La diversité des aspects du projet a permis de découvrir plusieurs technologies, et d'acquérir de nouvelles connaissances dans des domaines que nous n'avions pas eu l'occasion d'apprendre durant le cursus. Je suis donc fier d'avoir pu mener de A à Z un projet complet et complexe, qui je l'espère saura servir à la communauté.
 	
-	\section{TODO}
-		\todo{}
-	
+	\newpage
 	\section{Annexes}
 			
 		\subsection{Liste des figures}
@@ -1805,25 +2059,25 @@
 				<a2>=<a>,<b>|<b>;
 			\end{verbatim}
 			
-			Pour simplification, nous avons uniquement:
+			Pour simplifier, nous avons uniquement:
 			\begin{itemize}
 				\item La définition de règle avec \texttt{=} : \texttt{<rule>=<expr>;}
 				\item La concaténation avec \texttt{,} : \texttt{<a>,<b>}
 				\item Le choix avec \texttt{|} : \texttt{<a>|<b>}
 				\item Les terminaux entourés par des guillemets simples: \texttt{'a'}
-				\item Les non-terminaux entourés par \texttt{<>} ou pas
+				\item Les non-terminaux entourés par \texttt{<>}, ou pas
 				\item Pas de gestion des espaces, tabulations, ...
 				\item Pas de gestion de la priorité des opérateurs, ni des parenthèses\\
 			\end{itemize}
 			
-			Le parser doit pouvoir sortir l'AST correspondant.
+			Le \textit{parser} doit pouvoir sortir l'AST correspondant.
 					
 			\subsubsection{Langage Haskell}
 				Concernant Haskell, le lien suivant contient tous les pointeurs utiles en ressources: \url{https://www.haskell.org/documentation}. Pour ce qui est de la communauté, les questions et réponses sont quotidiennes sur \textit{stack overflow} ainsi que sur \textit{reddit}. Il y a également un wiki communautaire.\\
 				
 				Le lien suivant liste différentes bibliothèques présente pour ce langage: \url{https://wiki.haskell.org/Applications_and_libraries}. Plusieurs outils ou bibliothèques pour le parsing existent et sont listés ici: \url{https://wiki.haskell.org/Applications_and_libraries/Compiler_tools}. De plus ce langage est la base de plusieurs compilateurs, voir: \url{https://wiki.haskell.org/Applications_and_libraries/Compilers_and_interpreters}\\
 				
-				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait moins de 50 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Pour 1 million d'itérations, le parsing prend environ 140ms. Notons qu'il y a de nombreuses ressources concernant Parsec.
+				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/haskell-simple-ebnf/}. La taille du module EBNF fait moins de 50 lignes, comprenant l'AST ainsi que le parser. Nous avons utilisé la bibliothèque Parsec \cite{parsec} qui utilise une syntaxe très proche de l'EBNF, ce qui est très pratique. Notons qu'il y a de nombreuses ressources (tutoriels, documentation, exemples, etc.) concernant Parsec.
 				
 				\inputminted{haskell}{../../trials/haskell-simple-ebnf/src/EBNF.hs}
 				\captionof{listing}{Utilisation de Parsec avec Haskell}
@@ -1831,9 +2085,9 @@
 			\subsubsection{Langage C\#}
 				C\# est un langage développé par Microsoft avec la base de .NET derrière. Les ressources sur Internet ne manquent pas et la communauté est bonne.\\
 				
-				La bibliothèque Irony \cite{irony} permet de construire un parser très simplement. En effet Irony utilise la surcharge des opérateurs pour avoir une syntaxe proche de celle de l'EBNF, ce qui est très pratique.\\
+				La bibliothèque Irony \cite{irony} permet de construire un \textit{parser} très simplement. En effet Irony utilise la surcharge des opérateurs pour avoir une syntaxe proche de celle de l'EBNF, ce qui est très pratique.\\
 				
-				L'implémentation du parser simplifié se trouve dans le dossier \texttt{./trials/csharp-simple-ebnf}. La taille du module EBNF fait moins de 50 lignes, et est très simple à comprendre. Notons tout de même que Irony possède assez peu de ressources sur Internet.
+				L'implémentation du \textit{parser} simplifié se trouve dans le dossier \texttt{./trials/csharp-simple-ebnf}. La taille du module EBNF fait moins de 50 lignes, et est très simple à comprendre. Notons tout de même que Irony possède assez peu de ressources sur Internet.
 				
 				\inputminted{csharp}{../../trials/csharp-simple-ebnf/csharp-simple-ebnf/EBNF.cs}
 				\captionof{listing}{Utilisation de Irony avec C\#}
@@ -1847,7 +2101,159 @@
 				
 				\inputminted{fsharp}{../../trials/fsharp-simple-ebnf/fsharp-simple-ebnf/EBNF.fs}
 				\captionof{listing}{Utilisation de FParsec avec F\#}
+				
+
+
+		\subsection{Modules finaux de Platinum Parsing}
+			Le projet étant maintenant distribué, nous pouvons faire un rappel des modules développés:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{ll}
+					\textbf{Module} & \textbf{Description}\\
+					\hline
+					\hs{PP} & Import général des fonctionnalités\\
+					\hs{PP.Builder} & Définitions communes aux \textit{builders}\\
+					\hs{PP.Builders.Dfa} & Construction d'AFD\\
+					\hs{PP.Builders.Lalr} & Construction de table LALR\\
+					\hs{PP.Builders.Lr1} & Construction des items LR1\\
+					\hs{PP.Builders.Nfa} & Construction d'AFN\\
+					\hs{PP.Grammar} & Définitions communes aux \textit{grammars}\\
+					\hs{PP.Grammars.Ebnf} & Grammaire EBNF\\
+					\hs{PP.Grammars.LexicalHelper} & Aide d'intégration des \textit{lexical}\\
+					\hs{PP.Grammars.Lexical} & Grammaire d'expressions régulières\\
+					\hs{PP.Lexer} & Définitions communes aux \textit{lexers}\\
+					\hs{PP.Lexers.Dfa} & Analyse lexicale avec un AFD\\
+					\hs{PP.Parser} & Définitions communes aux \textit{parsers}\\
+					\hs{PP.Parsers.Lr} & Analyse syntaxique avec table (LA)LR\\
+					\hs{PP.Rule} & Manipulation des règles canoniques\\
+					\hs{PP.Template} & Définitions communes aux \textit{templates}\\
+					\hs{PP.Templates.Dfa} & Modèle pour l'export d'AFD\\
+					\hs{PP.Templates.Lr} & Modèle pour l'export de table (LA)LR\\
+				\end{tabular}
+				\caption{Modules finaux de PP}
+			\end{table}
+			
+			Évidemment chaque module a son équivalent \hs{PPTest.*} pour l'implémentation des tests unitaires.\\
+			
+			\newpage
+			Le CLI a lui aussi ses modules propres:
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{ll}
+					\textbf{Module} & \textbf{Description}\\
+					\hline
+					\hs{Args} & Définitions des arguments de la ligne de commande\\
+					\hs{Cmd.Build} & Implémentation de la commande \texttt{pp build}\\
+					\hs{Cmd.Ebnf} & Implémentation de la commande \texttt{pp ebnf}\\
+					\hs{Cmd.Lalr} & Implémentation de la commande \texttt{pp lalr}\\
+					\hs{Cmd.New} & Implémentation de la commande \texttt{pp new}\\
+					\hs{Log} & Gestion uniforme de l'affichage\\
+					\hs{Main} & Point d'entrée du programme\\
+					\hs{Project} & Gestion du fichier \texttt{pp.yaml}\\
+					\hs{Work} & Gestion du dossier \texttt{.pp-work/}\\
+				\end{tabular}
+				\caption{Modules finaux du CLI}
+			\end{table}
+
+		\subsection{État du CLI}
+		\label{subsec:etat-du-cli}
+			Le CLI propose différentes fonctionnalités ainsi que plusieurs options associées, voici un résumé tel qu'affiché dans la console:
+			\begin{minted}{console}
+				$ pp --help
+				tools for helping PP projects
+				
+				Usage: pp [-v|--verbosity LEVEL] [-s|--silent] [-w|--work] [--path PATH] COMMAND
+					Platinum Parsing CLI
+				
+				Available options:
+					-v,--verbosity LEVEL     Set verbosity level
+					-s,--silent              Verbosity off
+					-w,--work                Use '.pp-work/' directory
+					--path PATH              Change working directory path
+					-h,--help                Show this help text
+				
+				Available commands:
+					ebnf                     Manipulate EBNF grammars
+					lalr                     Generate LALR parsing table
+					new                      Create a new PP project
+					build                    Build a PP project
+				$ pp ebnf --help
+				Usage: pp ebnf (-f|--file FILENAME) [--minify] [--rules] [--first] [--check]
+				[--lexical] [--regexfy] [--clean-lexical]
+					Manipulate EBNF grammars
+				
+				Available options:
+					-f,--file FILENAME       Input file
+					--minify                 Print the minified grammar
+					--rules                  Print the obtained rules
+					--first                  Print the first set
+					--check                  Search for errors
+					--lexical                Print lexical rules
+					--regexfy                Print regexfied lexical rules
+					--clean-lexical          Remove unused tokens (with --regexfy)
+					-h,--help                Show this help text
+				$ pp lalr --help
+				Usage: pp lalr (-f|--file FILENAME) [--collection] [--set I] [--table]
+				[-t|--test-with FILENAME] [--template FILENAME] [--dfa] [--ast]
+				[--ast-to-html FILENAME] [--tokens]
+					Generate LALR parsing table
+				
+				Available options:
+					-f,--file FILENAME       Input file
+					--collection             Print the items sets collection
+					--set I                  Print a specific items set
+					--table                  Print the LALR parsing table
+					-t,--test-with FILENAME  Test the table on a source file
+					--template FILENAME      Specify a template file to use
+					--dfa                    Print the DFA
+					--ast                    Print the parsed AST (with --test-with)
+					--ast-to-html FILENAME   Output the parsed AST to HTML list (with --test-with)
+					--tokens                 Print the consumed tokens (with --test-with)
+					-h,--help                Show this help text
+				$ pp new --help
+				Usage: pp new (-n|--name NAME)
+					Create a new PP project
+				
+				Available options:
+					-n,--name NAME           Project name
+					-h,--help                Show this help text
+				$ pp build --help
+				Usage: pp build [--no-template] [--no-test] [-t|--test-with FILENAME] [--ast]
+				[--ast-to-html FILENAME]
+					Build a PP project
+				
+				Available options:
+					--no-template            Disable templates compilation
+					--no-test                Disable tests execution
+					-t,--test-with FILENAME  Test the grammar on a source file
+					--ast                    Print the parsed AST (with --test-with)
+					--ast-to-html FILENAME   Output the parsed AST to HTML list
+					-h,--help                Show this help text
+			\end{minted}
+			\captionof{listing}{Aide affichée depuis le CLI}
+			
+		\newpage
+		\subsection{Planning}
+		\label{subsec:planning}
+			Tiré du fichier \texttt{extra-doc/planning/planning.xls}.
+		
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=\textwidth]{../planning/phase1}
+				\caption{Phase I : pré-étude (analyses et recherches)}
+			\end{figure}
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=\textwidth]{../planning/phase2}
+				\caption{Phase II : implémentation minimale}
+			\end{figure}
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=\textwidth]{../planning/phase3}
+				\caption{Phase III : approfondissements}
+			\end{figure}
 	
+		\newpage
 		\subsection{Références}
 			\begingroup
 				\renewcommand{\section}[2]{}
@@ -1928,7 +2334,13 @@
 					\bibitem{fgl} Functional Graph Library,\\
 						\url{https://hackage.haskell.org/package/fgl-5.5.3.1}\\
 						
+					\bibitem{gcode} G-code,\\
+						\url{https://en.wikipedia.org/wiki/G-code}\\
+						
+					\bibitem{yaml} YAML, Yet Another Markup Language,\\
+						\url{https://en.wikipedia.org/wiki/YAML}\\
+						
 				\end{thebibliography}
 			\endgroup
 	
-\end{document}\grid
+\end{document}

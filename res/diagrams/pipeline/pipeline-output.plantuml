@@ -1,0 +1,16 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "source files" as input
+rectangle "executable" as exe
+rectangle "interpretation" as o1
+rectangle "transpiled files" as o2
+rectangle "tables" as o3
+
+input -> exe
+exe --> o1
+exe --> o2
+exe --> o3
+
+@enduml

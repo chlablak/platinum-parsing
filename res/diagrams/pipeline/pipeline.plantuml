@@ -1,0 +1,32 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle {
+  rectangle "EBNF" as ebnf
+  rectangle "CLI" as cli1
+  actor "conceptor" as conceptor
+}
+rectangle {
+  rectangle "rules" as rules
+  rectangle "output" as output
+  rectangle "..." as other
+  rectangle "CLI" as cli2
+  actor "developper" as developper
+  actor "maintainer" as maintainer
+}
+rectangle {
+  rectangle "executable" as exe
+  actor "user" as user
+}
+rectangle "framework" as framework
+
+ebnf -> cli1
+cli1 -> rules
+rules --> cli2
+output --> cli2
+other --> cli2
+framework -> cli2
+cli2 -> exe
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+
+skinparam monochrome true
+
+rectangle "rules\n(for EBNF)" as rules
+rectangle "builder" as builder
+rectangle "tables" as tables
+rectangle "grammar" as grammar
+rectangle "engine\n(serialize)" as engine
+rectangle "tables\n(.cgt)" as cgt
+
+rules -> builder
+builder -> tables
+tables -> engine
+grammar --> engine
+engine -> cgt
+
+@enduml

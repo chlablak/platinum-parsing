@@ -3,8 +3,10 @@ module EBNF
     , statements
     ) where
 
-import Text.Parsec as P
+import           Text.Parsec as P
 
+-- AST
+------
 data TOperator =
     TConcatenation
   | TAlternation
@@ -21,6 +23,8 @@ data TStatement =
   | TStatements [TStatement]
       deriving (Show)
 
+-- Parsers
+----------
 rule :: P.Parsec String st TExpression
 rule = TRule <$> (P.try (P.char '<' *> ruleDef <* P.char '>') <|> ruleDef)
   where
