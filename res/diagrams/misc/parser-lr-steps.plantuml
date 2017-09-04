@@ -1,0 +1,26 @@
+@startuml
+
+rectangle "<i>Parser</i> LR" as parser
+rectangle "<i>State Stack</i>\n<b>[4,0]</b>" as stack #Yellow
+rectangle "Entrée\n<b>$</b>" as input
+rectangle "Sortie" as output {
+  rectangle "C" as C1
+  rectangle "c" as c
+  rectangle "C" as C2
+  rectangle "d" as d
+  rectangle "d" as d2
+  rectangle "C" as C3
+  rectangle "S" as S 
+  C1 -- c
+  C2 -- d
+  C1 -- C2
+  C3 -- d2
+  S -- C1
+  S -- C3
+}
+
+Table <-- parser
+input -> parser
+stack <-- parser
+
+@enduml

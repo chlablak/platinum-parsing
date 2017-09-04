@@ -1,0 +1,14 @@
+@startuml
+
+rectangle "Grammaire\nsource" as grammar 
+rectangle "Platinum Parsing" as pp
+rectangle "Compilateur" as compiler
+rectangle "Source" as src
+rectangle "Cible" as dst
+
+grammar --> pp
+pp -> compiler
+src --> compiler
+compiler --> dst
+
+@enduml

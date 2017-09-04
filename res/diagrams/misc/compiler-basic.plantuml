@@ -1,0 +1,10 @@
+@startuml
+
+rectangle "Langage source" as src
+rectangle "Compilation" as compiler
+rectangle "Langage cible" as dst
+
+src --> compiler
+compiler -> dst
+
+@enduml

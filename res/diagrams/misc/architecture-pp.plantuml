@@ -1,15 +1,12 @@
 @startuml
 
-skinparam monochrome true
-
-rectangle "Environnement de développement" as ide
-rectangle "Interface en ligne de commande" as cli
-rectangle "Framework" as fw
+rectangle "Environnement de développement" as ide #Yellow
+rectangle "Interface en ligne de commande" as cli #Yellow
+rectangle "Framework" as fw #Yellow
 rectangle "Builders" as b
 rectangle "Grammars" as g
 rectangle "Parsers" as p
 rectangle "..." as o
-
 
 ide --> cli
 cli --> fw

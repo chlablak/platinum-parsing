@@ -1,18 +1,22 @@
 @startuml
 
-skinparam monochrome true
-
 rectangle "Analyseur syntaxique\n<i>Parser LR</i>" as parser
+rectangle "Analyseur lexical\n<i>Lexer</i>" as lexer
 
-rectangle "Table LALR" as table
+rectangle "Table LALR" as table #Yellow
+rectangle "AFD" as afd #Yellow
 rectangle "Platinum Parsing" as pp
 rectangle "Grammaire EBNF" as ebnf
 
-token -> parser
+input -> lexer
+lexer -> tokens
+tokens -> parser
 parser -> AST
 
 table <-- parser
+afd <-- lexer
 ebnf -> pp
-pp -> table
+pp --> table
+pp --> afd
 
 @enduml

@@ -1,0 +1,15 @@
+@startuml
+
+rectangle "<i>Parser</i>" as parser1
+rectangle "<i>Parser</i>" as parser2
+rectangle "<i>Lexer</i>" as lexer2
+
+Texte1 --> parser1
+parser1 -> AST1
+
+Texte2 --> lexer2
+lexer2 -> Tokens
+Tokens --> parser2
+parser2 -> AST2
+
+@enduml

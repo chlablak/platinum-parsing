@@ -1,22 +1,20 @@
 @startuml
 
-skinparam monochrome true
-
-rectangle "AST" as ast
+rectangle "Grammar" as ast
 rectangle "Rule" as rule1
-rectangle "Identifier\n<i><b>S</b></i>" as id1
-rectangle "List" as list1
+rectangle "Identifier\n<i><b>S</b></i>" as id1 #Yellow
+rectangle "Alternative" as list1 
 rectangle "Definition" as def11
-rectangle "NonTerm\n<i><b>C</b></i>" as nt111
-rectangle "NonTerm\n<i><b>C</b></i>" as nt112
+rectangle "NonTerm\n<i><b>C</b></i>" as nt111 #Orange
+rectangle "NonTerm\n<i><b>C</b></i>" as nt112 #Orange
 rectangle "Rule" as rule2
-rectangle "Identifier\n<i><b>C</b></i>" as id2
-rectangle "List" as list2
+rectangle "Identifier\n<i><b>C</b></i>" as id2 #Yellow
+rectangle "Alternative" as list2 
 rectangle "Definition" as def21
 rectangle "Definition" as def22
-rectangle "Term\n<i><b>c</b></i>" as t211
-rectangle "NonTerm\n<i><b>C</b></i>" as nt211
-rectangle "Term\n<i><b>d</b></i>" as t221
+rectangle "Term\n<i><b>c</b></i>" as t211 #Red
+rectangle "NonTerm\n<i><b>C</b></i>" as nt211 #Orange
+rectangle "Term\n<i><b>d</b></i>" as t221 #Red
 
 ast -- rule1
 rule1 -- id1

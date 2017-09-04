@@ -1,7 +1,5 @@
 @startuml
 
-skinparam monochrome true
-
 rectangle "Grammaire" as grammar
 rectangle "AST" as ast
 rectangle "Règles" as rules
